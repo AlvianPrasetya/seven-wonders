@@ -1,13 +1,13 @@
 using UnityEngine;
 
+public enum PassDirection { Left, Right };
+
 public class PassHandResolver : IResolver {
 
-	public enum Direction { Left, Right };
+	private PassDirection passDirection;
 
-	private Direction direction;
-
-	public PassHandResolver(Direction direction) {
-		this.direction = direction;
+	public PassHandResolver(PassDirection passDirection) {
+		this.passDirection = passDirection;
 	}
 
 	public void Resolve() {

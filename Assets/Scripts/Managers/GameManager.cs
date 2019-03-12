@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
-	public GameManager Instance { get; private set; }
+	public static GameManager Instance { get; private set; }
 	private Queue<IResolver> resolverQueue;
 	public Queue<Card> discardPile { get; private set; }
 
