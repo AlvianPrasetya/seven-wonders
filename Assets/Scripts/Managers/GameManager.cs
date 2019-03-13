@@ -1,42 +1,39 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
 	public static GameManager Instance { get; private set; }
-	private Queue<IResolver> resolverQueue;
-	public Queue<Card> discardPile { get; private set; }
+    private ResolverQueue resolverQueue;
 
 	void Awake() {
 		Instance = this;
-		resolverQueue = new Queue<IResolver>();
-		discardPile = new Queue<Card>();
+        resolverQueue = new ResolverQueue();
 	}
 
 	void Start() {
-		resolverQueue.Enqueue(new MatchResolver());
+		resolverQueue.Enqueue(new MatchResolver(), 1);
 	}
 
 	void Update() {
 		Resolve();
 	}
 
-	public void EnqueueResolver(IResolver resolver) {
-		resolverQueue.Enqueue(resolver);
-	}
-
-	public void AddToDiscardPile(Card cardToDiscard) {
-		discardPile.Enqueue(cardToDiscard);
+	public void EnqueueResolver(IResolver resolver, int priority) {
+		resolverQueue.Enqueue(resolver, priority);
 	}
 
 	private void Resolve() {
-		if (resolverQueue.Count == 0) {
+		if (resolverQueue.Size() == 0) {
 			// No resolver pending in queue, stop resolving
 			return;
 		}
 
-		IResolver resolver = resolverQueue.Dequeue();
-		resolver.Resolve();
+		IResolver resolver = resolverQueue.Peek();
+		if (resolver.TryResolve()) {
+			resolverQueue.Dequeue();
+		}
+
+        Debug.Log("Queue size: " + resolverQueue.Size());
 	}
 
 }

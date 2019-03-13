@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SelectLeadersResolver : IResolver {
+public class PreGameResolver : IResolver {
 
 	public bool TryResolve() {
 		return true;

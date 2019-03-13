@@ -1,15 +1,16 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class MatchResolver : IResolver {
 
-	const int numAges = 3;
-	
-	public void Resolve() {
-		GameManager.Instance.EnqueueResolver(new SelectLeadersResolver());
-		for (int i = 1; i <= numAges; i++) {
-			GameManager.Instance.EnqueueResolver(new AgeResolver(i));
-		}
-		GameManager.Instance.EnqueueResolver(new TallyPointsResolver());
+	public bool TryResolve() {
+		GameManager.Instance.EnqueueResolver(new PreGameResolver(), 1);
+		GameManager.Instance.EnqueueResolver(new SelectLeadersResolver(), 1);
+		GameManager.Instance.EnqueueResolver(new Age1Resolver(), 1);
+		GameManager.Instance.EnqueueResolver(new Age2Resolver(), 1);
+		GameManager.Instance.EnqueueResolver(new Age3Resolver(), 1);
+		GameManager.Instance.EnqueueResolver(new PostGameResolver(), 1);
+
+		return true;
 	}
 
 }

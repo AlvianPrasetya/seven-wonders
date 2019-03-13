@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SelectLeadersResolver : IResolver {
+public class Age1Resolver : IResolver {
 
 	public bool TryResolve() {
 		return true;
