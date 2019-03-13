@@ -6,8 +6,7 @@ public class Age2Resolver : IResolver {
 		return true;
 	}
 
-    public void Resolve() {
-        
-    }
+	public void Resolve() {
+	}
 
 }

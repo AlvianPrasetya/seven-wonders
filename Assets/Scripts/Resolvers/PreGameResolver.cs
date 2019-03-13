@@ -6,8 +6,7 @@ public class PreGameResolver : IResolver {
 		return true;
 	}
 
-    public void Resolve() {
-        
-    }
+	public void Resolve() {
+	}
 
 }

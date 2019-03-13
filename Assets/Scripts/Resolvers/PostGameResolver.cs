@@ -6,8 +6,7 @@ public class PostGameResolver : IResolver {
 		return true;
 	}
 
-    public void Resolve() {
-        
-    }
+	public void Resolve() {
+	}
 
 }
