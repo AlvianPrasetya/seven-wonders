@@ -1,5 +1,6 @@
 ﻿public interface IResolver {
 
-	bool TryResolve();
+	bool IsResolvable();
+    void Resolve();
 	
 }

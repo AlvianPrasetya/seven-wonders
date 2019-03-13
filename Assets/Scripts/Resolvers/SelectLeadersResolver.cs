@@ -2,8 +2,12 @@ using UnityEngine;
 
 public class SelectLeadersResolver : IResolver {
 
-	public bool TryResolve() {
+	public bool IsResolvable() {
 		return true;
 	}
+
+    public void Resolve() {
+        
+    }
 
 }

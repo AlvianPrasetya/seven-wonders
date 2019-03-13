@@ -3,11 +3,11 @@
 public class GameManager : MonoBehaviour {
 
 	public static GameManager Instance { get; private set; }
-    private ResolverQueue resolverQueue;
+	private ResolverQueue resolverQueue;
 
 	void Awake() {
 		Instance = this;
-        resolverQueue = new ResolverQueue();
+		resolverQueue = new ResolverQueue();
 	}
 
 	void Start() {
@@ -29,11 +29,12 @@ public class GameManager : MonoBehaviour {
 		}
 
 		IResolver resolver = resolverQueue.Peek();
-		if (resolver.TryResolve()) {
+		if (resolver.IsResolvable()) {
 			resolverQueue.Dequeue();
+			resolver.Resolve();
 		}
 
-        Debug.Log("Queue size: " + resolverQueue.Size());
+		Debug.Log("Queue size: " + resolverQueue.Size());
 	}
 
 }

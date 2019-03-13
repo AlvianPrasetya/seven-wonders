@@ -2,8 +2,12 @@ using UnityEngine;
 
 public class Age3Resolver : IResolver {
 
-	public bool TryResolve() {
+	public bool IsResolvable() {
 		return true;
 	}
+
+    public void Resolve() {
+        
+    }
 
 }

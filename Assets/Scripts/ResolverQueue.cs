@@ -1,3 +1,5 @@
+using UnityEngine;
+
 // ResolverQueue is a priority queue implementation for IResolver.
 public class ResolverQueue {
 
@@ -15,7 +17,7 @@ public class ResolverQueue {
 			this.enqueueIndex = enqueueIndex;
 		}
 
-		public static bool operator<(ResolverNode x, ResolverNode y) {
+		public static bool operator <(ResolverNode x, ResolverNode y) {
 			if (x.priority < y.priority) {
 				return true;
 			}
@@ -27,7 +29,7 @@ public class ResolverQueue {
 			return false;
 		}
 
-		public static bool operator>(ResolverNode x, ResolverNode y) {
+		public static bool operator >(ResolverNode x, ResolverNode y) {
 			if (x.priority > y.priority) {
 				return true;
 			}
@@ -64,6 +66,11 @@ public class ResolverQueue {
 		int index = queueSize++;
 		resolverArray[index] = resolverNode;
 		BubbleUp(index);
+
+		Debug.Log(string.Format(
+			"Enqueued resolver with priority {0} and enqueue index {1}",
+			priority, index
+		));
 	}
 
 	public IResolver Peek() {
@@ -78,17 +85,21 @@ public class ResolverQueue {
 		if (queueSize == 0) {
 			return null;
 		}
-		
+
+		Debug.Log(string.Format(
+			"Dequeued resolver with priority {0} and enqueue index {1}",
+			resolverArray[0].priority, resolverArray[0].enqueueIndex
+		));
+
 		IResolver resolver = resolverArray[0].resolver;
 		resolverArray[0] = null;
+		queueSize--;
 
-		if (queueSize == 1) {
-			queueSize--;
+		if (queueSize == 0) {
 			return resolver;
 		}
 
-		Swap(0, queueSize - 1);
-		queueSize--;
+		Swap(0, queueSize);
 		BubbleDown(0);
 		return resolver;
 	}
@@ -109,15 +120,16 @@ public class ResolverQueue {
 		int leftChildIndex = GetLeftChildIndex(currentIndex);
 		int rightChildIndex = GetRightChildIndex(currentIndex);
 
-		while ((leftChildIndex < queueSize && resolverArray[currentIndex] < resolverArray[leftChildIndex])
-			|| (rightChildIndex < queueSize && resolverArray[currentIndex] < resolverArray[rightChildIndex])) {
-			if (resolverArray[leftChildIndex] > resolverArray[rightChildIndex]) {
+		while ((leftChildIndex < queueSize && resolverArray[currentIndex] < resolverArray[leftChildIndex]) ||
+			(rightChildIndex < queueSize && resolverArray[currentIndex] < resolverArray[rightChildIndex])) {
+			if (rightChildIndex >= queueSize || resolverArray[leftChildIndex] > resolverArray[rightChildIndex]) {
 				Swap(currentIndex, leftChildIndex);
 				currentIndex = leftChildIndex;
 			} else {
 				Swap(currentIndex, rightChildIndex);
+				currentIndex = rightChildIndex;
 			}
-			
+
 			leftChildIndex = GetLeftChildIndex(currentIndex);
 			rightChildIndex = GetRightChildIndex(currentIndex);
 		}
