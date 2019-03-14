@@ -3,14 +3,14 @@ using UnityEngine;
 public class LoadAge3StockResolver : IResolver {
 
 	public bool IsResolvable() {
-		return GameManager.Instance.StockPiles.ContainsKey(Stock.RawMaterials) &&
-			GameManager.Instance.StockPiles.ContainsKey(Stock.ManufacturedGoods) &&
-			GameManager.Instance.StockPiles.ContainsKey(Stock.Civilian) &&
-			GameManager.Instance.StockPiles.ContainsKey(Stock.Scientific) &&
-			GameManager.Instance.StockPiles.ContainsKey(Stock.Commercial) &&
-			GameManager.Instance.StockPiles.ContainsKey(Stock.Military) &&
-			GameManager.Instance.StockPiles.ContainsKey(Stock.Guild) &&
-			GameManager.Instance.StockPiles.ContainsKey(Stock.City);
+		return GameManager.Instance.StockPiles.ContainsKey(StockType.RawMaterial) &&
+			GameManager.Instance.StockPiles.ContainsKey(StockType.ManufacturedGoods) &&
+			GameManager.Instance.StockPiles.ContainsKey(StockType.Civilian) &&
+			GameManager.Instance.StockPiles.ContainsKey(StockType.Scientific) &&
+			GameManager.Instance.StockPiles.ContainsKey(StockType.Commercial) &&
+			GameManager.Instance.StockPiles.ContainsKey(StockType.Military) &&
+			GameManager.Instance.StockPiles.ContainsKey(StockType.Guild) &&
+			GameManager.Instance.StockPiles.ContainsKey(StockType.City);
 	}
 
 	public void Resolve() {

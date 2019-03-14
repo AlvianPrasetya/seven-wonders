@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class ShuffleStockResolver : IResolver {
 	
-	private Stock stockToShuffle;
+	private StockType stockToShuffle;
 
-	public ShuffleStockResolver(Stock stockToShuffle) {
+	public ShuffleStockResolver(StockType stockToShuffle) {
 		this.stockToShuffle = stockToShuffle;
 	}
 

@@ -6,24 +6,23 @@ public class GameManager : MonoBehaviour {
 	[System.Serializable]
 	public class StockCardPile {
 
-		public Stock stock;
-		public CardPile cardPile;
+		public StockType stock;
+		public Stock cardPile;
 
 	}
 
 	public static GameManager Instance { get; private set; }
 
-	public CardPile DiscardPile { get; private set; }
-	public Dictionary<Stock, CardPile> StockPiles { get; private set; }
+	public StockCardPile[] stocks;
 
-	[SerializeField]
-	private StockCardPile[] stocks;
+	public Stock DiscardPile { get; private set; }
+	public Dictionary<StockType, Stock> StockPiles { get; private set; }
 	private ResolverQueue resolverQueue;
 
 	void Awake() {
 		Instance = this;
 
-		StockPiles = new Dictionary<Stock, CardPile>();
+		StockPiles = new Dictionary<StockType, Stock>();
 		foreach (StockCardPile stockCardPile in stocks) {
 			StockPiles.Add(stockCardPile.stock, stockCardPile.cardPile);
 		}

@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class DealStockResolver : IResolver {
 	
-	private Stock stockToDeal;
+	private StockType stockToDeal;
 
-	public DealStockResolver(Stock stockToDeal) {
+	public DealStockResolver(StockType stockToDeal) {
 		this.stockToDeal = stockToDeal;
 	}
 

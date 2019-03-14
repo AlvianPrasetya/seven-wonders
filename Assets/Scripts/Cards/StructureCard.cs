@@ -1,6 +1,8 @@
 using UnityEngine;
 
-public abstract class StructureCard : Card, IBuildable, IBuriable, IDiscardable {
+public class StructureCard : Card, IBuildable, IBuriable, IDiscardable {
+
+	public int minPlayers;	
 	
 	public void Build() {
 	}
