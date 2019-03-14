@@ -1,12 +1,32 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
+	[System.Serializable]
+	public class StockCardPile {
+
+		public Stock stock;
+		public CardPile cardPile;
+
+	}
+
 	public static GameManager Instance { get; private set; }
+
+	public CardPile DiscardPile { get; private set; }
+	public Dictionary<Stock, CardPile> StockPiles { get; private set; }
+
+	[SerializeField]
+	private StockCardPile[] stocks;
 	private ResolverQueue resolverQueue;
 
 	void Awake() {
 		Instance = this;
+
+		StockPiles = new Dictionary<Stock, CardPile>();
+		foreach (StockCardPile stockCardPile in stocks) {
+			StockPiles.Add(stockCardPile.stock, stockCardPile.cardPile);
+		}
 		resolverQueue = new ResolverQueue();
 	}
 
