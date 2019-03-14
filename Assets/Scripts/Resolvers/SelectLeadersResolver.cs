@@ -6,7 +6,7 @@ public class SelectLeadersResolver : IResolver {
 		return true;
 	}
 
-    public void Resolve() {
-    }
+	public void Resolve() {
+	}
 
 }

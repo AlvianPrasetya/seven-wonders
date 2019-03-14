@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class LoadAge3StockResolver : IResolver {
 
-    public bool IsResolvable() {
+	public bool IsResolvable() {
 		return GameManager.Instance.StockPiles.ContainsKey(Stock.RawMaterials) &&
 			GameManager.Instance.StockPiles.ContainsKey(Stock.ManufacturedGoods) &&
 			GameManager.Instance.StockPiles.ContainsKey(Stock.Civilian) &&
@@ -13,7 +13,7 @@ public class LoadAge3StockResolver : IResolver {
 			GameManager.Instance.StockPiles.ContainsKey(Stock.City);
 	}
 
-    public void Resolve() {
-    }
+	public void Resolve() {
+	}
 
 }
