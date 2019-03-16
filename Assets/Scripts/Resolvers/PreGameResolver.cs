@@ -4,28 +4,85 @@ using UnityEngine;
 public class PreGameResolver : IResolvable {
 
 	public IEnumerator Resolve() {
-		GameManager.Instance.EnqueueResolver(new LoadBankResolver(), 3);
-		GameManager.Instance.EnqueueResolver(new LoadStockResolver(StockType.RawMaterial), 3);
-		GameManager.Instance.EnqueueResolver(new LoadStockResolver(StockType.ManufacturedGoods), 3);
-		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.RawMaterial, 5, true), 3);
-		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.ManufacturedGoods, 5), 3);
-		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.Guild, 5), 3);
-		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.City, 5), 3);
-		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.Leader, 5), 3);
-		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.Wonder, 5), 3);
-		GameManager.Instance.EnqueueResolver(new LoadAge3StockResolver(), 3);
-		GameManager.Instance.EnqueueResolver(new LoadAge2StockResolver(), 3);
-		GameManager.Instance.EnqueueResolver(new LoadAge1StockResolver(), 3);
-		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.Age3, 5), 3);
-		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.Age2, 5), 3);
-		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.Age1, 5), 3);
-		GameManager.Instance.EnqueueResolver(new DealStockResolver(StockType.Age3), 3);
-		GameManager.Instance.EnqueueResolver(new DealStockResolver(StockType.Age2), 3);
-		GameManager.Instance.EnqueueResolver(new DealStockResolver(StockType.Age1), 3);
-		GameManager.Instance.EnqueueResolver(new DealStockResolver(StockType.Leader), 3);
-		GameManager.Instance.EnqueueResolver(new DealStockResolver(StockType.Wonder), 3);
+		Coroutine loadBank = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.bank.Load()
+		);
+		Coroutine loadRawMaterialStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.RawMaterial].Load()
+		);
+		Coroutine loadManufacturedGoodsStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.ManufacturedGoods].Load()
+		);
+		Coroutine loadCivilianStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Civilian].Load()
+		);
+		Coroutine loadScientificStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Scientific].Load()
+		);
+		Coroutine loadCommercialStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Commercial].Load()
+		);
+		Coroutine loadMilitaryStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Military].Load()
+		);
+		Coroutine loadGuildStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Guild].Load()
+		);
+		Coroutine loadWonderStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Wonder].Load()
+		);
+		yield return loadRawMaterialStock;
+		yield return loadManufacturedGoodsStock;
+		yield return loadCivilianStock;
+		yield return loadScientificStock;
+		yield return loadCommercialStock;
+		yield return loadMilitaryStock;
+		yield return loadGuildStock;
+		yield return loadWonderStock;
+
+		Coroutine shuffleGuildStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Guild].Shuffle(5)
+		);
+		Coroutine shuffleWonderStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Wonder].Shuffle(5)
+		);
+		yield return shuffleGuildStock;
+		yield return shuffleWonderStock;
+
+		Coroutine dealWonderStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Wonder].Deal()
+		);
+
+		yield return GameManager.Instance.Stocks[StockType.Age1].Load();
+		Coroutine shuffleAge1Stock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Age1].Shuffle(5)
+		);
+		yield return GameManager.Instance.Stocks[StockType.Age2].Load();
+		Coroutine shuffleAge2Stock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Age2].Shuffle(5)
+		);
+		yield return GameManager.Instance.Stocks[StockType.Age3].Load();
+		Coroutine shuffleAge3Stock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Age3].Shuffle(5)
+		);
+		yield return shuffleAge1Stock;
+		Coroutine dealAge1Stock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Age1].Deal()
+		);
+		yield return shuffleAge2Stock;
+		Coroutine dealAge2Stock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Age2].Deal()
+		);
+		yield return shuffleAge3Stock;
+		Coroutine dealAge3Stock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Age3].Deal()
+		);
 		
-		yield return null;
+		yield return loadBank;
+		yield return dealWonderStock;
+		yield return dealAge1Stock;
+		yield return dealAge2Stock;
+		yield return dealAge3Stock;
 	}
 
 }
