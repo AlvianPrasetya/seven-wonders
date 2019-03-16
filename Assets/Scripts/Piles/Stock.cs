@@ -9,31 +9,25 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 
 	public Card[] initialCardPrefab;
 	public Stock[] shuffleStocks;
-	public LinkedList<Card> Cards { get; private set; }
-	public override int Count {
-		get {
-			return Cards.Count;
-		}
-	}
 
 	void Awake() {
-		Cards = new LinkedList<Card>();
+		Elements = new LinkedList<Card>();
 	}
 
 	public override IEnumerator Push(Card card) {
-		Vector3 dropPosition = transform.position + transform.up * DropSpacing * (Cards.Count + 1);
-		yield return card.MoveTowards(dropPosition, transform.rotation, 100);
+		Vector3 dropPosition = transform.position + transform.up * DropSpacing * (Elements.Count + 1);
+		yield return card.MoveTowards(dropPosition, transform.rotation, 100, 360);
 
-		Cards.AddLast(card);
+		Elements.AddLast(card);
 	}
 
 	public override Card Pop() {
-		if (Cards.Count == 0) {
+		if (Elements.Count == 0) {
 			return null;
 		}
 
-		Card topCard = Cards.Last.Value;
-		Cards.RemoveLast();
+		Card topCard = Elements.Last.Value;
+		Elements.RemoveLast();
 		return topCard;
 	}
 
@@ -45,14 +39,14 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 	}
 
 	public IEnumerator Shuffle(int numIterations) {
-		if (Cards.Count < 2) {
+		if (Elements.Count < 2) {
 			// Less than 2 cards, no point in shuffling
 			yield break;
 		}
 
 		for (int i = 0; i < numIterations; i++) {
 			// Move each card to a random shuffle stock
-			while (Cards.Count != 0) {
+			while (Elements.Count != 0) {
 				yield return shuffleStocks[Random.Range(0, shuffleStocks.Length)].Push(PopBottom());
 			}
 
@@ -67,25 +61,19 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 		yield return null;
 	}
 
-	protected IEnumerator PushMany(Card[] cards) {
-		foreach (Card card in cards) {
-			yield return Push(card);
-		}
-	}
-
 	protected Card PopBottom() {
-		if (Cards.Count == 0) {
+		if (Elements.Count == 0) {
 			return null;
 		}
 
-		Card bottomCard = Cards.First.Value;
-		Cards.RemoveFirst();
+		Card bottomCard = Elements.First.Value;
+		Elements.RemoveFirst();
 		return bottomCard;
 	}
 
 	protected Card[] PopBottomMany(int count) {
 		List<Card> poppedCards = new List<Card>();
-		while (poppedCards.Count != count && Cards.Count != 0) {
+		while (poppedCards.Count != count && Elements.Count != 0) {
 			poppedCards.Add(PopBottom());
 		}
 

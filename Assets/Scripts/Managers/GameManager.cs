@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour {
 
 	}
 
+	public Bank bank;
 	public StockCardPile[] stocks;
 
 	public static GameManager Instance { get; private set; }

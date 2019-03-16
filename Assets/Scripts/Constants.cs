@@ -8,5 +8,6 @@ public enum Structure { RawMaterial, ManufacturedGoods, Civilian, Scientific, Co
 public class Constant {
 
 	public const float DistanceEpsilon = 0.01f;
+	public const float AngleEpsilon = 0.1f;
 
 }

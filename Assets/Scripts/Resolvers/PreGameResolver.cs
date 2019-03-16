@@ -4,9 +4,11 @@ using UnityEngine;
 public class PreGameResolver : IResolvable {
 
 	public IEnumerator Resolve() {
+		GameManager.Instance.EnqueueResolver(new LoadBankResolver(), 3);
 		GameManager.Instance.EnqueueResolver(new LoadStockResolver(StockType.RawMaterial), 3);
 		GameManager.Instance.EnqueueResolver(new LoadStockResolver(StockType.ManufacturedGoods), 3);
-		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.RawMaterial, 5), 3);
+		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.RawMaterial, 5, true), 3);
+		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.ManufacturedGoods, 5), 3);
 		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.Guild, 5), 3);
 		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.City, 5), 3);
 		GameManager.Instance.EnqueueResolver(new ShuffleStockResolver(StockType.Leader, 5), 3);

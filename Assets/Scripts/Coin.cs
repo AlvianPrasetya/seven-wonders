@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public abstract class Card : MonoBehaviour {
+public class Coin : MonoBehaviour {
 
 	private const float DefaultTranslateSpeed = 50.0f;
 	private const float DefaultRotateSpeed = 60.0f;

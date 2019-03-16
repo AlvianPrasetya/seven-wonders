@@ -6,10 +6,12 @@ public class ShuffleStockResolver : IResolvable {
 	
 	private StockType stockType;
 	private int numIterations;
+	private bool runInParallel;
 
-	public ShuffleStockResolver(StockType stockType, int numIterations) {
+	public ShuffleStockResolver(StockType stockType, int numIterations, bool runInParallel = false) {
 		this.stockType = stockType;
 		this.numIterations = numIterations;
+		this.runInParallel = runInParallel;
 	}
 
 	public IEnumerator Resolve() {
@@ -19,7 +21,12 @@ public class ShuffleStockResolver : IResolvable {
 			yield break;
 		}
 
-		yield return stock.Shuffle(numIterations);
+		if (runInParallel) {
+			// Run in parallel if a monobehaviour is provided
+			GameManager.Instance.StartCoroutine(stock.Shuffle(numIterations));
+		} else {
+			yield return stock.Shuffle(numIterations);
+		}
 	}
 
 }
