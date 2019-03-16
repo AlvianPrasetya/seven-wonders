@@ -50,7 +50,7 @@ public class PreGameResolver : IResolvable {
 		yield return shuffleWonderStock;
 
 		Coroutine dealWonderStock = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.Stocks[StockType.Wonder].Deal()
+			GameManager.Instance.Stocks[StockType.Wonder].Deal(GameManager.Instance.players.Length * 2)
 		);
 
 		yield return GameManager.Instance.Stocks[StockType.Age1].Load();
@@ -67,15 +67,15 @@ public class PreGameResolver : IResolvable {
 		);
 		yield return shuffleAge1Stock;
 		Coroutine dealAge1Stock = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.Stocks[StockType.Age1].Deal()
+			GameManager.Instance.Stocks[StockType.Age1].Deal(GameManager.Instance.Stocks[StockType.Age1].Count)
 		);
 		yield return shuffleAge2Stock;
 		Coroutine dealAge2Stock = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.Stocks[StockType.Age2].Deal()
+			GameManager.Instance.Stocks[StockType.Age2].Deal(GameManager.Instance.Stocks[StockType.Age2].Count)
 		);
 		yield return shuffleAge3Stock;
 		Coroutine dealAge3Stock = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.Stocks[StockType.Age3].Deal()
+			GameManager.Instance.Stocks[StockType.Age3].Deal(GameManager.Instance.Stocks[StockType.Age3].Count)
 		);
 		
 		yield return loadBank;

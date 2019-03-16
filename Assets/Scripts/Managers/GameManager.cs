@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour {
 
 	public Bank bank;
 	public StockCardPile[] stocks;
+	public Player[] players;
 
 	public static GameManager Instance { get; private set; }
 	public Dictionary<StockType, Stock> Stocks { get; private set; }

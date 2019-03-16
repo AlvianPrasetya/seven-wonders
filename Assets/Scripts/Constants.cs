@@ -4,6 +4,7 @@ public enum StockType {
 	Age1, Age2, Age3
 }
 public enum Structure { RawMaterial, ManufacturedGoods, Civilian, Scientific, Commercial, Military, Guild, City, Leader, Wonder };
+public enum Age { Age1, Age2, Age3 };
 
 public class Constant {
 

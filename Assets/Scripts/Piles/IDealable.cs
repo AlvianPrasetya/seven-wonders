@@ -2,6 +2,6 @@ using System.Collections;
 
 public interface IDealable {
 	
-	IEnumerator Deal();
+	IEnumerator Deal(int count);
 
 }

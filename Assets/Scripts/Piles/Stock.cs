@@ -31,7 +31,7 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 		return topCard;
 	}
 
-	public IEnumerator Load() {
+	public virtual IEnumerator Load() {
 		foreach (Card cardPrefab in initialCardPrefab) {
 			Card card = Instantiate(cardPrefab, transform.position, transform.rotation);
 			yield return Push(card);
@@ -57,11 +57,11 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 		}
 	}
 
-	public IEnumerator Deal() {
+	public IEnumerator Deal(int count) {
 		yield return null;
 	}
 
-	protected Card PopBottom() {
+	public Card PopBottom() {
 		if (Elements.Count == 0) {
 			return null;
 		}
@@ -71,13 +71,21 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 		return bottomCard;
 	}
 
-	protected Card[] PopBottomMany(int count) {
+	public Card[] PopBottomMany(int count) {
 		List<Card> poppedCards = new List<Card>();
 		while (poppedCards.Count != count && Elements.Count != 0) {
 			poppedCards.Add(PopBottom());
 		}
 
 		return poppedCards.ToArray();
+	}
+
+	public Card PeekBottom() {
+		if (Elements.Count == 0) {
+			return null;
+		}
+
+		return Elements.First.Value;
 	}
 
 }
