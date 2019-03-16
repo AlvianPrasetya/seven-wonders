@@ -6,8 +6,8 @@ public abstract class Card : MonoBehaviour {
 	private const float DefaultTranslateSpeed = 50.0f;
 	private const float DefaultRotateSpeed = 60.0f;
 
-	private Collider collider;
-	private Rigidbody rigidbody;
+	private new Collider collider;
+	private new Rigidbody rigidbody;
 
 	void Awake() {
 		collider = GetComponent<Collider>();
