@@ -2,41 +2,101 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Stock represents a pile of cards with stack-like behaviours.
-public class Stock : CardPile {
+// Stock represents a pile of loadable, shuffleable and dealable cards.
+public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 
-	public Stack<Card> Cards { get; private set; }
+	private const float DropSpacing = 0.25f;
+
+	public Card[] initialCardPrefab;
+	public Stock[] shuffleStocks;
+	public LinkedList<Card> Cards { get; private set; }
+	public override int Count {
+		get {
+			return Cards.Count;
+		}
+	}
 
 	void Awake() {
-		Cards = new Stack<Card>();
+		Cards = new LinkedList<Card>();
 	}
 
 	void Start() {
-		StartCoroutine(LoadCards());
+		StartCoroutine(Load());
 	}
 
-	public override void Push(Card card) {
-		Vector3 dropPosition = transform.position + transform.up * 0.5f * (Cards.Count + 1);
-		StartCoroutine(card.MoveTowards(dropPosition, card.transform.rotation));
+	public override IEnumerator Push(Card card) {
+		Vector3 dropPosition = transform.position + transform.up * DropSpacing * (Cards.Count + 1);
+		yield return card.MoveTowards(dropPosition, transform.rotation, 100);
 
-		Cards.Push(card);
+		Cards.AddLast(card);
 	}
 
 	public override Card Pop() {
-		return Cards.Pop();
+		if (Cards.Count == 0) {
+			return null;
+		}
+
+		Card topCard = Cards.Last.Value;
+		Cards.RemoveLast();
+		return topCard;
 	}
 
-	protected override IEnumerator LoadCards() {
-		foreach (Card cardPrefab in cardPrefabs) {
-			Card card = Instantiate(
-				cardPrefab,
-				transform.position + transform.up * 0.5f * (Cards.Count + 1),
-				transform.rotation
-			);
-			Push(card);
-
-			yield return new WaitForSeconds(0.05f);
+	public IEnumerator Load() {
+		foreach (Card cardPrefab in initialCardPrefab) {
+			Card card = Instantiate(cardPrefab, transform.position, transform.rotation);
+			yield return Push(card);
 		}
+
+		yield return new WaitForSeconds(3.0f);
+		yield return Shuffle(10);
+	}
+
+	public IEnumerator Shuffle(int numIterations) {
+		if (Cards.Count < 2) {
+			// Less than 2 cards, no point in shuffling
+			yield break;
+		}
+
+		for (int i = 0; i < numIterations; i++) {
+			// Move each card to a random shuffle stock
+			while (Cards.Count != 0) {
+				yield return shuffleStocks[Random.Range(0, shuffleStocks.Length)].Push(PopBottom());
+			}
+
+			// Merge all shuffle stocks
+			foreach (Stock shuffleStock in shuffleStocks) {
+				yield return PushMany(shuffleStock.PopBottomMany(shuffleStock.Count));
+			}
+		}
+	}
+
+	public IEnumerator Deal() {
+		yield return null;
+	}
+
+	protected IEnumerator PushMany(Card[] cards) {
+		foreach (Card card in cards) {
+			yield return Push(card);
+		}
+	}
+
+	protected Card PopBottom() {
+		if (Cards.Count == 0) {
+			return null;
+		}
+
+		Card bottomCard = Cards.First.Value;
+		Cards.RemoveFirst();
+		return bottomCard;
+	}
+
+	protected Card[] PopBottomMany(int count) {
+		List<Card> poppedCards = new List<Card>();
+		while (poppedCards.Count != count && Cards.Count != 0) {
+			poppedCards.Add(PopBottom());
+		}
+
+		return poppedCards.ToArray();
 	}
 
 }

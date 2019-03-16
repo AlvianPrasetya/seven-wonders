@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ShuffleStockResolver : IResolver {
@@ -13,6 +14,10 @@ public class ShuffleStockResolver : IResolver {
 	}
 
 	public void Resolve() {
+		Stock stock;
+		if (!GameManager.Instance.StockPiles.TryGetValue(stockToShuffle, out stock)) {
+			return;
+		}
 	}
 
 }
