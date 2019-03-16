@@ -1,6 +1,7 @@
+using System.Collections;
 using UnityEngine;
 
-public class DealStockResolver : IResolver {
+public class DealStockResolver : IResolvable {
 	
 	private StockType stockToDeal;
 
@@ -8,11 +9,8 @@ public class DealStockResolver : IResolver {
 		this.stockToDeal = stockToDeal;
 	}
 
-	public bool IsResolvable() {
-		return GameManager.Instance.StockPiles.ContainsKey(stockToDeal);
-	}
-
-	public void Resolve() {
+	public IEnumerator Resolve() {
+		yield return null;
 	}
 
 }

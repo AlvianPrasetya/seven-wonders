@@ -1,12 +1,10 @@
+using System.Collections;
 using UnityEngine;
 
-public class Age3Resolver : IResolver {
+public class Age3Resolver : IResolvable {
 
-	public bool IsResolvable() {
-		return true;
-	}
-
-	public void Resolve() {
+	public IEnumerator Resolve() {
+		yield return null;
 	}
 
 }

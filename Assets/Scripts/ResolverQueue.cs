@@ -7,11 +7,11 @@ public class ResolverQueue {
 
 	private class ResolverNode {
 
-		public IResolver resolver;
+		public IResolvable resolver;
 		public int priority;
 		public int enqueueIndex;
 
-		public ResolverNode(IResolver resolver, int priority, int enqueueIndex) {
+		public ResolverNode(IResolvable resolver, int priority, int enqueueIndex) {
 			this.resolver = resolver;
 			this.priority = priority;
 			this.enqueueIndex = enqueueIndex;
@@ -57,7 +57,7 @@ public class ResolverQueue {
 		return queueSize;
 	}
 
-	public void Enqueue(IResolver resolver, int priority) {
+	public void Enqueue(IResolvable resolver, int priority) {
 		if (queueSize == MaxElements) {
 			return;
 		}
@@ -73,7 +73,7 @@ public class ResolverQueue {
 		));
 	}
 
-	public IResolver Peek() {
+	public IResolvable Peek() {
 		if (queueSize == 0) {
 			return null;
 		}
@@ -81,7 +81,7 @@ public class ResolverQueue {
 		return resolverArray[0].resolver;
 	}
 
-	public IResolver Dequeue() {
+	public IResolvable Dequeue() {
 		if (queueSize == 0) {
 			return null;
 		}
@@ -91,7 +91,7 @@ public class ResolverQueue {
 			resolverArray[0].priority, resolverArray[0].enqueueIndex
 		));
 
-		IResolver resolver = resolverArray[0].resolver;
+		IResolvable resolver = resolverArray[0].resolver;
 		resolverArray[0] = null;
 		queueSize--;
 

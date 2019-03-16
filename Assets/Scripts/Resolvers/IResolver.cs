@@ -1,6 +1,7 @@
-﻿public interface IResolver {
+﻿using System.Collections;
 
-	bool IsResolvable();
-	void Resolve();
+public interface IResolvable {
+
+	IEnumerator Resolve();
 	
 }

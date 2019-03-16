@@ -1,12 +1,10 @@
+using System.Collections;
 using UnityEngine;
 
-public class SelectLeadersResolver : IResolver {
+public class SelectLeadersResolver : IResolvable {
 
-	public bool IsResolvable() {
-		return true;
-	}
-
-	public void Resolve() {
+	public IEnumerator Resolve() {
+		yield return null;
 	}
 
 }

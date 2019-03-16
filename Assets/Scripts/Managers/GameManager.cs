@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
@@ -11,49 +12,38 @@ public class GameManager : MonoBehaviour {
 
 	}
 
-	public static GameManager Instance { get; private set; }
-
 	public StockCardPile[] stocks;
 
+	public static GameManager Instance { get; private set; }
+	public Dictionary<StockType, Stock> Stocks { get; private set; }
 	public Stock DiscardPile { get; private set; }
-	public Dictionary<StockType, Stock> StockPiles { get; private set; }
+
 	private ResolverQueue resolverQueue;
 
 	void Awake() {
 		Instance = this;
 
-		StockPiles = new Dictionary<StockType, Stock>();
+		Stocks = new Dictionary<StockType, Stock>();
 		foreach (StockCardPile stockCardPile in stocks) {
-			StockPiles.Add(stockCardPile.stock, stockCardPile.cardPile);
+			Stocks.Add(stockCardPile.stock, stockCardPile.cardPile);
 		}
 		resolverQueue = new ResolverQueue();
 	}
 
 	void Start() {
 		resolverQueue.Enqueue(new MatchResolver(), 1);
+		StartCoroutine(Resolve());
 	}
 
-	void Update() {
-		Resolve();
-	}
-
-	public void EnqueueResolver(IResolver resolver, int priority) {
+	public void EnqueueResolver(IResolvable resolver, int priority) {
 		resolverQueue.Enqueue(resolver, priority);
 	}
 
-	private void Resolve() {
-		if (resolverQueue.Size() == 0) {
-			// No resolver pending in queue, stop resolving
-			return;
+	private IEnumerator Resolve() {
+		while (resolverQueue.Size() != 0) {
+			yield return resolverQueue.Dequeue().Resolve();
+			Debug.Log("Queue size: " + resolverQueue.Size());
 		}
-
-		IResolver resolver = resolverQueue.Peek();
-		if (resolver.IsResolvable()) {
-			resolverQueue.Dequeue();
-			resolver.Resolve();
-		}
-
-		Debug.Log("Queue size: " + resolverQueue.Size());
 	}
 
 }

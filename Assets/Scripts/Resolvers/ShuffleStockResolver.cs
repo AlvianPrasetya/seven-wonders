@@ -1,23 +1,25 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
-public class ShuffleStockResolver : IResolver {
+public class ShuffleStockResolver : IResolvable {
 	
-	private StockType stockToShuffle;
+	private StockType stockType;
+	private int numIterations;
 
-	public ShuffleStockResolver(StockType stockToShuffle) {
-		this.stockToShuffle = stockToShuffle;
+	public ShuffleStockResolver(StockType stockType, int numIterations) {
+		this.stockType = stockType;
+		this.numIterations = numIterations;
 	}
 
-	public bool IsResolvable() {
-		return GameManager.Instance.StockPiles.ContainsKey(stockToShuffle);
-	}
-
-	public void Resolve() {
+	public IEnumerator Resolve() {
 		Stock stock;
-		if (!GameManager.Instance.StockPiles.TryGetValue(stockToShuffle, out stock)) {
-			return;
+		if (!GameManager.Instance.Stocks.TryGetValue(stockType, out stock)) {
+			Debug.LogErrorFormat("Missing stock of type {0}", stockType);
+			yield break;
 		}
+
+		yield return stock.Shuffle(numIterations);
 	}
 
 }

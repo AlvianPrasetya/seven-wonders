@@ -20,10 +20,6 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 		Cards = new LinkedList<Card>();
 	}
 
-	void Start() {
-		StartCoroutine(Load());
-	}
-
 	public override IEnumerator Push(Card card) {
 		Vector3 dropPosition = transform.position + transform.up * DropSpacing * (Cards.Count + 1);
 		yield return card.MoveTowards(dropPosition, transform.rotation, 100);
@@ -46,9 +42,6 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 			Card card = Instantiate(cardPrefab, transform.position, transform.rotation);
 			yield return Push(card);
 		}
-
-		yield return new WaitForSeconds(3.0f);
-		yield return Shuffle(10);
 	}
 
 	public IEnumerator Shuffle(int numIterations) {
