@@ -73,7 +73,9 @@ public class AgeStock : Stock {
 			}
 		}
 
-		while (guildStock.Count != 0) {
+		// N + 2 guild cards
+		int guildsCount = GameManager.Instance.players.Length + 2;
+		for (int i = 0; i < guildsCount; i++) {
 			Card card = guildStock.Pop();
 			if (((StructureCard) card).age == age) {
 				yield return Push(card);
