@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Stock represents a pile of loadable, shuffleable and dealable cards.
+// Stock represents a pile of cards to be dealt.
 public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 
 	private const float DropSpacing = 0.25f;
 
 	public Card[] initialCardPrefabs;
 	public Stock[] shuffleStocks;
+	public Facing facing;
 
 	void Awake() {
 		Elements = new LinkedList<Card>();
@@ -16,9 +17,15 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 
 	public override IEnumerator Push(Card card) {
 		Vector3 dropPosition = transform.position + transform.up * DropSpacing * (Elements.Count + 1);
-		yield return card.MoveTowards(dropPosition, transform.rotation, 100, 360);
+		Vector3 dropEulerAngles = transform.rotation.eulerAngles;
+		if (facing == Facing.Down) {
+			dropEulerAngles.z = 180.0f;
+		}
+		Quaternion dropRotation = Quaternion.Euler(dropEulerAngles);
+		yield return card.MoveTowards(dropPosition, dropRotation, 100, 1080);
 
 		Elements.AddLast(card);
+		card.transform.parent = transform;
 	}
 
 	public override Card Pop() {

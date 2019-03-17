@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class Coin : MonoBehaviour {
+public class Coin : MonoBehaviour, IMoveable {
 
 	private const float DefaultTranslateSpeed = 50.0f;
 	private const float DefaultRotateSpeed = 60.0f;

@@ -1,10 +1,10 @@
 using System.Collections;
 using UnityEngine;
 
-public abstract class Card : MonoBehaviour {
+public abstract class Card : MonoBehaviour, IMoveable {
 
 	private const float DefaultTranslateSpeed = 50.0f;
-	private const float DefaultRotateSpeed = 60.0f;
+	private const float DefaultRotateSpeed = 720.0f;
 
 	private new Collider collider;
 	private new Rigidbody rigidbody;

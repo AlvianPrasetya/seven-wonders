@@ -16,6 +16,7 @@ public class CoinPile : Pile<Coin> {
 		yield return coin.MoveTowards(dropPosition, transform.rotation, 100, 360);
 
 		Elements.AddLast(coin);
+		coin.transform.parent = transform;
 	}
 
 	public override Coin Pop() {

@@ -65,6 +65,7 @@ public class PreGameResolver : IResolvable {
 		Coroutine shuffleAge3Stock = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.Stocks[StockType.Age3].Shuffle(5)
 		);
+
 		yield return shuffleAge1Stock;
 		Coroutine dealAge1Stock = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.Stocks[StockType.Age1].Deal(GameManager.Instance.Stocks[StockType.Age1].Count)
