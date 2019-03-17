@@ -60,6 +60,15 @@ public class Bank : MonoBehaviour, ILoadable {
 		return tallestCoinPile.Pop();
 	}
 
+	public Coin[] PopMany(int count) {
+		List<Coin> poppedCoins = new List<Coin>();
+		while (poppedCoins.Count != count && Count != 0) {
+			poppedCoins.Add(Pop());
+		}
+
+		return poppedCoins.ToArray();
+	}
+
 	public IEnumerator Load() {
 		for (int i = 0; i < initialCoinCount; i++) {
 			Coin coin = Instantiate(coinPrefab, transform.position, transform.rotation);
