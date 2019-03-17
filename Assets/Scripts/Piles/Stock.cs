@@ -47,12 +47,12 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 		for (int i = 0; i < numIterations; i++) {
 			// Move each card to a random shuffle stock
 			while (Elements.Count != 0) {
-				yield return shuffleStocks[Random.Range(0, shuffleStocks.Length)].Push(PopBottom());
+				yield return shuffleStocks[Random.Range(0, shuffleStocks.Length)].Push(Pop());
 			}
 
 			// Merge all shuffle stocks
 			foreach (Stock shuffleStock in shuffleStocks) {
-				yield return PushMany(shuffleStock.PopBottomMany(shuffleStock.Count));
+				yield return PushMany(shuffleStock.PopMany(shuffleStock.Count));
 			}
 		}
 	}
