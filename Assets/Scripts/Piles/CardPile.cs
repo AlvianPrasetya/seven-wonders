@@ -22,7 +22,9 @@ public class CardPile : Pile<Card> {
 	public override IEnumerator Push(Card card) {
 		Vector3 dropPosition = transform.position + transform.up * DropSpacing * (Cards.Count + 1);
 		Vector3 dropEulerAngles = transform.rotation.eulerAngles;
-		if (facing == Facing.Down) {
+		if (facing == Facing.Up) {
+			dropEulerAngles.z = 0.0f;
+		} else {
 			dropEulerAngles.z = 180.0f;
 		}
 		Quaternion dropRotation = Quaternion.Euler(dropEulerAngles);
