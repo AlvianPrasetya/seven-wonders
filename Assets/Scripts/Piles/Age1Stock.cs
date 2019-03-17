@@ -7,19 +7,21 @@ public class Age1Stock : Stock {
 		Stock manufacturedGoodsStock = GameManager.Instance.Stocks[StockType.ManufacturedGoods];
 
 		while (rawMaterialStock.Count != 0) {
-			Card card = rawMaterialStock.PeekBottom();
+			Card card = rawMaterialStock.Pop();
 			if (((StructureCard) card).age == Age.Age1) {
-				yield return Push(rawMaterialStock.PopBottom());
+				yield return Push(card);
 			} else {
+				yield return rawMaterialStock.Push(card);
 				break;
 			}
 		}
 
 		while (manufacturedGoodsStock.Count != 0) {
-			Card card = manufacturedGoodsStock.PeekBottom();
+			Card card = manufacturedGoodsStock.Pop();
 			if (((StructureCard) card).age == Age.Age1) {
-				yield return Push(manufacturedGoodsStock.PopBottom());
+				yield return Push(card);
 			} else {
+				yield return manufacturedGoodsStock.Push(card);
 				break;
 			}
 		}

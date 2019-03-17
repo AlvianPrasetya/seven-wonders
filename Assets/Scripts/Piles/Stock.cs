@@ -7,7 +7,7 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 
 	private const float DropSpacing = 0.25f;
 
-	public Card[] initialCardPrefab;
+	public Card[] initialCardPrefabs;
 	public Stock[] shuffleStocks;
 
 	void Awake() {
@@ -32,8 +32,8 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 	}
 
 	public virtual IEnumerator Load() {
-		foreach (Card cardPrefab in initialCardPrefab) {
-			Card card = Instantiate(cardPrefab, transform.position, transform.rotation);
+		for (int i = initialCardPrefabs.Length - 1; i >= 0; i--) {
+			Card card = Instantiate(initialCardPrefabs[i], transform.position, transform.rotation);
 			yield return Push(card);
 		}
 	}
