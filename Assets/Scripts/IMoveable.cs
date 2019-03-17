@@ -3,6 +3,6 @@ using UnityEngine;
 
 public interface IMoveable {
 	
-	IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation, float translateSpeed, float rotateSpeed);
+	IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation);
 
 }

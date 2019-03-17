@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Bank represents piles of coins that supplies all players with coins.
-public class Bank : Pile<Coin>, ILoadable {
+public class Bank : MonoBehaviour, ILoadable {
 
 	public Coin coinPrefab;
 	public int initialCoinCount;
 	public CoinPile[] coinPiles;
-	public override int Count {
+	public int Count {
 		get {
 			int count = 0;
 			foreach (CoinPile coinPile in coinPiles) {
@@ -18,7 +18,7 @@ public class Bank : Pile<Coin>, ILoadable {
 		}
 	}
 
-	public override IEnumerator Push(Coin coin) {
+	public IEnumerator Push(Coin coin) {
 		CoinPile shortestCoinPile = null;
 		foreach (CoinPile coinPile in coinPiles) {
 			if (shortestCoinPile == null) {
@@ -34,7 +34,13 @@ public class Bank : Pile<Coin>, ILoadable {
 		yield return shortestCoinPile.Push(coin);
 	}
 
-	public override Coin Pop() {
+	public IEnumerator PushMany(Coin[] coins) {
+		foreach (Coin coin in coins) {
+			yield return Push(coin);
+		}
+	}
+
+	public Coin Pop() {
 		if (Count == 0) {
 			return null;
 		}

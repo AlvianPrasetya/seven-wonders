@@ -7,16 +7,16 @@ public class Player : MonoBehaviour {
 	public class DeckEntry {
 
 		public DeckType deckType;
-		public Deck deck;
+		public CardPile deck;
 
 	}
 
 	public DeckEntry[] decks;
 
-	public Dictionary<DeckType, Deck> Decks { get; private set; }
+	public Dictionary<DeckType, CardPile> Decks { get; private set; }
 
 	void Awake() {
-		Decks = new Dictionary<DeckType, Deck>();
+		Decks = new Dictionary<DeckType, CardPile>();
 		foreach (DeckEntry deckEntry in decks) {
 			Decks.Add(deckEntry.deckType, deckEntry.deck);
 		}

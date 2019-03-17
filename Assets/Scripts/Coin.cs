@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class Coin : MonoBehaviour, IMoveable {
 
-	private const float DefaultTranslateSpeed = 50.0f;
-	private const float DefaultRotateSpeed = 60.0f;
+	private const float TranslateSpeed = 200;
+	private const float RotateSpeed = 1440;
 
 	private new Collider collider;
 	private new Rigidbody rigidbody;
@@ -15,8 +15,7 @@ public class Coin : MonoBehaviour, IMoveable {
 	}
 
 	public IEnumerator MoveTowards(
-		Vector3 targetPosition, Quaternion targetRotation,
-		float translateSpeed = DefaultTranslateSpeed, float rotateSpeed = DefaultRotateSpeed
+		Vector3 targetPosition, Quaternion targetRotation
 	) {
 		collider.enabled = false;
 		rigidbody.useGravity = false;
@@ -38,7 +37,7 @@ public class Coin : MonoBehaviour, IMoveable {
 			float currentTrajectoryAngle = -Mathf.PI;
 			float sqrDistance = Vector3.SqrMagnitude(targetPosition - transform.position);
 			while (sqrDistance > Constant.DistanceEpsilon * Constant.DistanceEpsilon) {
-				float deltaDistance = translateSpeed * Time.deltaTime;
+				float deltaDistance = TranslateSpeed * Time.deltaTime;
 				if (deltaDistance * deltaDistance > sqrDistance) {
 					// Overshot, set position to target position
 					transform.position = targetPosition;
@@ -65,7 +64,7 @@ public class Coin : MonoBehaviour, IMoveable {
 			float currentTrajectoryAngle = Mathf.Asin(distY / arcRadius);
 			float sqrDistance = Vector3.SqrMagnitude(targetPosition - transform.position);
 			while (sqrDistance > Constant.DistanceEpsilon * Constant.DistanceEpsilon) {
-				float deltaDistance = translateSpeed * Time.deltaTime;
+				float deltaDistance = TranslateSpeed * Time.deltaTime;
 				if (deltaDistance * deltaDistance > sqrDistance) {
 					// Overshot, set position to target position
 					transform.position = targetPosition;

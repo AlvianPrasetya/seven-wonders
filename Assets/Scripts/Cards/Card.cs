@@ -3,8 +3,8 @@ using UnityEngine;
 
 public abstract class Card : MonoBehaviour, IMoveable {
 
-	private const float DefaultTranslateSpeed = 50.0f;
-	private const float DefaultRotateSpeed = 720.0f;
+	private const float TranslateSpeed = 200;
+	private const float RotateSpeed = 1080;
 
 	private new Collider collider;
 	private new Rigidbody rigidbody;
@@ -15,8 +15,7 @@ public abstract class Card : MonoBehaviour, IMoveable {
 	}
 
 	public IEnumerator MoveTowards(
-		Vector3 targetPosition, Quaternion targetRotation,
-		float translateSpeed = DefaultTranslateSpeed, float rotateSpeed = DefaultRotateSpeed
+		Vector3 targetPosition, Quaternion targetRotation
 	) {
 		collider.enabled = false;
 		rigidbody.useGravity = false;
@@ -24,7 +23,7 @@ public abstract class Card : MonoBehaviour, IMoveable {
 		float sqrDistance = Vector3.SqrMagnitude(targetPosition - transform.position);
 		float angleDiff = Quaternion.Angle(transform.rotation, targetRotation);
 		while (sqrDistance > Constant.DistanceEpsilon * Constant.DistanceEpsilon || angleDiff > Constant.AngleEpsilon) {
-			float deltaDistance = translateSpeed * Time.deltaTime;
+			float deltaDistance = TranslateSpeed * Time.deltaTime;
 			Vector3 deltaPosition = (targetPosition - transform.position).normalized * deltaDistance;
 			if (deltaDistance * deltaDistance > sqrDistance) {
 				// Overshot, set position to target position
@@ -34,7 +33,7 @@ public abstract class Card : MonoBehaviour, IMoveable {
 			}
 			sqrDistance = Vector3.SqrMagnitude(targetPosition - transform.position);
 
-			float deltaAngle = rotateSpeed * Time.deltaTime;
+			float deltaAngle = RotateSpeed * Time.deltaTime;
 			transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, deltaAngle);
 			angleDiff = Quaternion.Angle(transform.rotation, targetRotation);
 
