@@ -5,15 +5,15 @@ using UnityEngine;
 public class GameManager : MonoBehaviour {
 
 	[System.Serializable]
-	public class StockCardPile {
+	public class StockEntry {
 
-		public StockType stock;
-		public Stock cardPile;
+		public StockType stockType;
+		public Stock stock;
 
 	}
 
 	public Bank bank;
-	public StockCardPile[] stocks;
+	public StockEntry[] stocks;
 	public Player[] players;
 
 	public static GameManager Instance { get; private set; }
@@ -26,8 +26,8 @@ public class GameManager : MonoBehaviour {
 		Instance = this;
 
 		Stocks = new Dictionary<StockType, Stock>();
-		foreach (StockCardPile stockCardPile in stocks) {
-			Stocks.Add(stockCardPile.stock, stockCardPile.cardPile);
+		foreach (StockEntry stockEntry in stocks) {
+			Stocks.Add(stockEntry.stockType, stockEntry.stock);
 		}
 		resolverQueue = new ResolverQueue();
 	}

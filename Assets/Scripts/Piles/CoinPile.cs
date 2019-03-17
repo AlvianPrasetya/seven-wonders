@@ -6,27 +6,32 @@ using UnityEngine;
 public class CoinPile : Pile<Coin> {
 
 	private const float DropSpacing = 0.2f;
+	
+	public Stack<Coin> Coins { get; protected set; }
+	public override int Count {
+		get {
+			return Coins.Count;
+		}
+	}
 
 	void Awake() {
-		Elements = new LinkedList<Coin>();
+		Coins = new Stack<Coin>();
 	}
 
 	public override IEnumerator Push(Coin coin) {
-		Vector3 dropPosition = transform.position + transform.up * DropSpacing * (Elements.Count + 1);
+		Vector3 dropPosition = transform.position + transform.up * DropSpacing * (Coins.Count + 1);
 		yield return coin.MoveTowards(dropPosition, transform.rotation, 100, 360);
 
-		Elements.AddLast(coin);
+		Coins.Push(coin);
 		coin.transform.parent = transform;
 	}
 
 	public override Coin Pop() {
-		if (Elements.Count == 0) {
+		if (Coins.Count == 0) {
 			return null;
 		}
 
-		Coin topCoin = Elements.Last.Value;
-		Elements.RemoveLast();
-		return topCoin;
+		return Coins.Pop();
 	}
 
 }

@@ -8,9 +8,14 @@ public class Bank : Pile<Coin>, ILoadable {
 	public Coin coinPrefab;
 	public int initialCoinCount;
 	public CoinPile[] coinPiles;
-
-	void Awake() {
-		Elements = new LinkedList<Coin>();
+	public override int Count {
+		get {
+			int count = 0;
+			foreach (CoinPile coinPile in coinPiles) {
+				count += coinPile.Count;
+			}
+			return count;
+		}
 	}
 
 	public override IEnumerator Push(Coin coin) {
@@ -27,12 +32,10 @@ public class Bank : Pile<Coin>, ILoadable {
 		}
 
 		yield return shortestCoinPile.Push(coin);
-
-		Elements.AddLast(coin);
 	}
 
 	public override Coin Pop() {
-		if (Elements.Count == 0) {
+		if (Count == 0) {
 			return null;
 		}
 
@@ -48,14 +51,7 @@ public class Bank : Pile<Coin>, ILoadable {
 			}
 		}
 
-		Coin poppedCoin = tallestCoinPile.Pop();
-		Coin topCoin = Elements.Last.Value;
-		if (poppedCoin != topCoin) {
-			Debug.LogError("Popped coin and top coin mismatched");
-		}
-
-		Elements.RemoveLast();
-		return topCoin;
+		return tallestCoinPile.Pop();
 	}
 
 	public IEnumerator Load() {

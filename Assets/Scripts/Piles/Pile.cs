@@ -5,12 +5,7 @@ using UnityEngine;
 // Pile represents a collection of elements arranged in a stack-like manner.
 public abstract class Pile<T> : MonoBehaviour {
 
-	public LinkedList<T> Elements { get; protected set; }
-	public int Count {
-		get {
-			return Elements.Count;
-		}
-	}
+	public abstract int Count { get; }
 
 	public abstract IEnumerator Push(T element);
 	public abstract T Pop();
@@ -21,7 +16,7 @@ public abstract class Pile<T> : MonoBehaviour {
 	}
 	public T[] PopMany(int count) {
 		List<T> poppedElements = new List<T>();
-		while (poppedElements.Count != count && Elements.Count != 0) {
+		while (poppedElements.Count != count && Count != 0) {
 			poppedElements.Add(Pop());
 		}
 

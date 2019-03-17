@@ -2,6 +2,6 @@ using System.Collections;
 
 public interface IDealable {
 	
-	IEnumerator Deal(int count);
+	IEnumerator Deal(DeckType deckType);
 
 }

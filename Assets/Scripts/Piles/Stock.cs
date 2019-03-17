@@ -10,32 +10,38 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 	public Card[] initialCardPrefabs;
 	public Stock[] shuffleStocks;
 	public Facing facing;
+	public Stack<Card> Cards { get; protected set; }
+	public override int Count {
+		get {
+			return Cards.Count;
+		}
+	}
 
 	void Awake() {
-		Elements = new LinkedList<Card>();
+		Cards = new Stack<Card>();
 	}
 
 	public override IEnumerator Push(Card card) {
-		Vector3 dropPosition = transform.position + transform.up * DropSpacing * (Elements.Count + 1);
+		Vector3 dropPosition = transform.position + transform.up * DropSpacing * (Cards.Count + 1);
 		Vector3 dropEulerAngles = transform.rotation.eulerAngles;
-		if (facing == Facing.Down) {
+		if (facing == Facing.Up) {
+			dropEulerAngles.z = 0.0f;
+		} else {
 			dropEulerAngles.z = 180.0f;
 		}
 		Quaternion dropRotation = Quaternion.Euler(dropEulerAngles);
 		yield return card.MoveTowards(dropPosition, dropRotation, 100, 1080);
 
-		Elements.AddLast(card);
+		Cards.Push(card);
 		card.transform.parent = transform;
 	}
 
 	public override Card Pop() {
-		if (Elements.Count == 0) {
+		if (Cards.Count == 0) {
 			return null;
 		}
 
-		Card topCard = Elements.Last.Value;
-		Elements.RemoveLast();
-		return topCard;
+		return Cards.Pop();
 	}
 
 	public virtual IEnumerator Load() {
@@ -46,14 +52,14 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 	}
 
 	public IEnumerator Shuffle(int numIterations) {
-		if (Elements.Count < 2) {
+		if (Cards.Count < 2) {
 			// Less than 2 cards, no point in shuffling
 			yield break;
 		}
 
 		for (int i = 0; i < numIterations; i++) {
 			// Move each card to a random shuffle stock
-			while (Elements.Count != 0) {
+			while (Cards.Count != 0) {
 				yield return shuffleStocks[Random.Range(0, shuffleStocks.Length)].Push(Pop());
 			}
 
@@ -64,35 +70,12 @@ public class Stock : Pile<Card>, ILoadable, IShuffleable, IDealable {
 		}
 	}
 
-	public IEnumerator Deal(int count) {
-		yield return null;
-	}
-
-	public Card PopBottom() {
-		if (Elements.Count == 0) {
-			return null;
+	public IEnumerator Deal(DeckType deckType) {
+		int playerIndex = 0;
+		while (Cards.Count != 0) {
+			yield return GameManager.Instance.players[playerIndex].Decks[deckType].Push(Pop());
+			playerIndex = (playerIndex + 1) % GameManager.Instance.players.Length;
 		}
-
-		Card bottomCard = Elements.First.Value;
-		Elements.RemoveFirst();
-		return bottomCard;
-	}
-
-	public Card[] PopBottomMany(int count) {
-		List<Card> poppedCards = new List<Card>();
-		while (poppedCards.Count != count && Elements.Count != 0) {
-			poppedCards.Add(PopBottom());
-		}
-
-		return poppedCards.ToArray();
-	}
-
-	public Card PeekBottom() {
-		if (Elements.Count == 0) {
-			return null;
-		}
-
-		return Elements.First.Value;
 	}
 
 }
