@@ -15,16 +15,18 @@ public class Stock : CardPile, ILoadable, IShuffleable, IDealable {
 		}
 	}
 
-	public IEnumerator Shuffle(int numIterations) {
+	public IEnumerator Shuffle(int numIterations, int randomSeed) {
 		if (Elements.Count < 2) {
 			// Less than 2 cards, no point in shuffling
 			yield break;
 		}
 
+		System.Random random = new System.Random(randomSeed);
+
 		for (int i = 0; i < numIterations; i++) {
 			// Move each card to a random shuffle stock
 			while (Elements.Count != 0) {
-				yield return shuffleCardPiles[Random.Range(0, shuffleCardPiles.Length)].Push(Pop());
+				yield return shuffleCardPiles[random.Next(0, shuffleCardPiles.Length)].Push(Pop());
 			}
 
 			// Merge all shuffle stocks

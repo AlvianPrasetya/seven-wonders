@@ -19,8 +19,6 @@ public class Age1Resolver : IResolvable {
 			yield return unloadDecks.Dequeue();
 		}
 
-		Debug.Log("Discarding");
-
 		// Simulate all players discarding westernmost card
 		foreach (Player player in GameManager.Instance.players) {
 			yield return GameManager.Instance.discardPile.Push(player.hand.PopAt(0));
