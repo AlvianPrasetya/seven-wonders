@@ -19,6 +19,7 @@ public class Coin : MonoBehaviour, IMoveable {
 	) {
 		collider.enabled = false;
 		rigidbody.useGravity = false;
+		rigidbody.isKinematic = true;
 
 		Vector3 initialPosition = transform.position;
 
@@ -84,6 +85,7 @@ public class Coin : MonoBehaviour, IMoveable {
 
 		collider.enabled = true;
 		rigidbody.useGravity = true;
+		rigidbody.isKinematic = false;
 	}
 
 }

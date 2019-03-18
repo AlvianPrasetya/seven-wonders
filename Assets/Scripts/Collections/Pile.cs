@@ -5,7 +5,7 @@ using UnityEngine;
 // Pile represents a collection of moveable elements arranged in a stack-like manner.
 public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where T : MonoBehaviour, IMoveable {
 
-	public Vector3 dropSpacing = new Vector3(0, 0.2f, 0);
+	public Vector3 dropSpacing = new Vector3(0, 0.1f, 0);
 	public Facing facing = Facing.Up;
 	public Stack<T> Elements { get; protected set; }
 	public int Count {
@@ -32,6 +32,7 @@ public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where 
 
 		Elements.Push(element);
 		element.transform.parent = transform;
+		yield return null;
 	}
 
 	public IEnumerator PushMany(T[] elements) {

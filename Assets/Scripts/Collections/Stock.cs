@@ -9,7 +9,7 @@ public class Stock : CardPile, ILoadable, IShuffleable, IDealable {
 	public CardPile[] shuffleCardPiles;
 
 	public virtual IEnumerator Load() {
-		for (int i = initialCardPrefabs.Length - 1; i >= 0; i--) {
+		for (int i = 0; i < initialCardPrefabs.Length; i++) {
 			Card card = Instantiate(initialCardPrefabs[i], transform.position, transform.rotation);
 			yield return Push(card);
 		}

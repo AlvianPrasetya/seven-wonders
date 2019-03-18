@@ -25,8 +25,8 @@ public class PreGameResolver : IResolvable {
 		Coroutine loadMilitaryStock = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.Stocks[StockType.Military].Load()
 		);
-		Coroutine loadGuildStock = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.Stocks[StockType.Guild].Load()
+		Coroutine loadAndShuffleGuildStock = GameManager.Instance.StartCoroutine(
+			LoadAndShuffle(StockType.Guild, 5)
 		);
 
 		yield return loadRawMaterialStock;
@@ -35,35 +35,34 @@ public class PreGameResolver : IResolvable {
 		yield return loadScientificStock;
 		yield return loadCommercialStock;
 		yield return loadMilitaryStock;
-		yield return loadGuildStock;
-
-		Coroutine shuffleGuildStock = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.Stocks[StockType.Guild].Shuffle(5)
-		);
-
-		yield return GameManager.Instance.Stocks[StockType.Age1].Load();
-		Coroutine shuffleAndDealAge1 = GameManager.Instance.StartCoroutine(
-			ShuffleAndDeal(StockType.Age1, DeckType.Age1)
+		yield return loadAndShuffleGuildStock;
+		
+		yield return GameManager.Instance.Stocks[StockType.Age3].Load();
+		Coroutine shuffleAge3 = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Age3].Shuffle(5)
 		);
 		yield return GameManager.Instance.Stocks[StockType.Age2].Load();
-		Coroutine shuffleAndDealAge2 = GameManager.Instance.StartCoroutine(
-			ShuffleAndDeal(StockType.Age2, DeckType.Age2)
+		Coroutine shuffleAge2 = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Age2].Shuffle(5)
 		);
-		yield return shuffleGuildStock;
-		yield return GameManager.Instance.Stocks[StockType.Age3].Load();
-		Coroutine shuffleAndDealAge3 = GameManager.Instance.StartCoroutine(
-			ShuffleAndDeal(StockType.Age3, DeckType.Age3)
+		yield return GameManager.Instance.Stocks[StockType.Age1].Load();
+		Coroutine shuffleAge1 = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.Stocks[StockType.Age1].Shuffle(5)
 		);
+
+		yield return shuffleAge3;
+		yield return GameManager.Instance.Stocks[StockType.Age3].Deal(DeckType.Age3);
+		yield return shuffleAge2;
+		yield return GameManager.Instance.Stocks[StockType.Age2].Deal(DeckType.Age2);
+		yield return shuffleAge1;
+		yield return GameManager.Instance.Stocks[StockType.Age1].Deal(DeckType.Age1);
 		
 		yield return loadBank;
-		yield return shuffleAndDealAge1;
-		yield return shuffleAndDealAge2;
-		yield return shuffleAndDealAge3;
 	}
 
-	private IEnumerator ShuffleAndDeal(StockType stockType, DeckType deckType) {
-		yield return GameManager.Instance.Stocks[stockType].Shuffle(5);
-		yield return GameManager.Instance.Stocks[stockType].Deal(deckType);
+	private IEnumerator LoadAndShuffle(StockType stockType, int numIterations) {
+		yield return GameManager.Instance.Stocks[stockType].Load();
+		yield return GameManager.Instance.Stocks[stockType].Shuffle(numIterations);
 	}
 
 }

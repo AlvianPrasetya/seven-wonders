@@ -19,6 +19,7 @@ public abstract class Card : MonoBehaviour, IMoveable {
 	) {
 		collider.enabled = false;
 		rigidbody.useGravity = false;
+		rigidbody.isKinematic = true;
 
 		float sqrDistance = Vector3.SqrMagnitude(targetPosition - transform.position);
 		float angleDiff = Quaternion.Angle(transform.rotation, targetRotation);
@@ -42,6 +43,7 @@ public abstract class Card : MonoBehaviour, IMoveable {
 
 		collider.enabled = true;
 		rigidbody.useGravity = true;
+		rigidbody.isKinematic = false;
 	}
 
 }
