@@ -18,6 +18,11 @@ public class Age1Resolver : IResolvable {
 		while (unloadDecks.Count != 0) {
 			yield return unloadDecks.Dequeue();
 		}
+
+		// Simulate all players discarding westernmost card
+		foreach (Player player in GameManager.Instance.players) {
+			yield return GameManager.Instance.discardPile.Push(player.hand.PopAt(0));
+		}
 		
 		for (int i = 0; i < TurnCount - 1; i++) {
 			foreach (Player player in GameManager.Instance.players) {
@@ -36,6 +41,11 @@ public class Age1Resolver : IResolvable {
 			}
 			while (unloadDecks.Count != 0) {
 				yield return unloadDecks.Dequeue();
+			}
+
+			// Simulate all players discarding westernmost card
+			foreach (Player player in GameManager.Instance.players) {
+				yield return GameManager.Instance.discardPile.Push(player.hand.PopAt(0));
 			}
 		}
 		

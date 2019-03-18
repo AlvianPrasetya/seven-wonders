@@ -86,6 +86,14 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 		return null;
 	}
 
+	public Card PopAt(int pileIndex) {
+		if (pileIndex < 0 || pileIndex >= displayPiles.Length) {
+			return null;
+		}
+
+		return displayPiles[pileIndex].Pop();
+	}
+
 	public Card[] PopMany(int count) {
 		return PopMany(count, Direction.West);
 	}
