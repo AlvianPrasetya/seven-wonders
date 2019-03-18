@@ -43,7 +43,7 @@ public class Age2Resolver : IResolvable {
 				yield return unloadDecks.Dequeue();
 			}
 
-			// Simulate all players discarding westernmost card
+			// Simulate all players discarding easternmost card
 			foreach (Player player in GameManager.Instance.players) {
 				yield return GameManager.Instance.discardPile.Push(player.hand.PopAt(player.hand.displayPiles.Length - 1));
 			}
