@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Bank represents piles of coins that supplies all players with coins.
-public class Bank : MonoBehaviour, ILoadable {
+public class Bank : MonoBehaviour, IPushable<Coin>, IPoppable<Coin>, ILoadable {
 
 	public Coin coinPrefab;
 	public int initialCoinCount;
