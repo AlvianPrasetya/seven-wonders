@@ -40,12 +40,7 @@ public class Age1Resolver : IResolvable {
 		}
 		
 		foreach (Player player in GameManager.Instance.players) {
-			unloadHands.Enqueue(GameManager.Instance.StartCoroutine(
-				player.hand.Unload(GameManager.Instance.discardPile, Direction.West)
-			));
-		}
-		while (unloadHands.Count != 0) {
-			yield return unloadHands.Dequeue();
+			yield return player.hand.Unload(GameManager.Instance.discardPile, Direction.West);
 		}
 	}
 

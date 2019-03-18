@@ -28,9 +28,6 @@ public class PreGameResolver : IResolvable {
 		Coroutine loadGuildStock = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.Stocks[StockType.Guild].Load()
 		);
-		Coroutine loadWonderStock = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.Stocks[StockType.Wonder].Load()
-		);
 
 		yield return loadRawMaterialStock;
 		yield return loadManufacturedGoodsStock;
@@ -39,13 +36,9 @@ public class PreGameResolver : IResolvable {
 		yield return loadCommercialStock;
 		yield return loadMilitaryStock;
 		yield return loadGuildStock;
-		yield return loadWonderStock;
 
 		Coroutine shuffleGuildStock = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.Stocks[StockType.Guild].Shuffle(5)
-		);
-		Coroutine shuffleAndDealWonder = GameManager.Instance.StartCoroutine(
-			ShuffleAndDeal(StockType.Wonder, DeckType.Wonder)
 		);
 
 		yield return GameManager.Instance.Stocks[StockType.Age1].Load();
@@ -63,7 +56,6 @@ public class PreGameResolver : IResolvable {
 		);
 		
 		yield return loadBank;
-		yield return shuffleAndDealWonder;
 		yield return shuffleAndDealAge1;
 		yield return shuffleAndDealAge2;
 		yield return shuffleAndDealAge3;
