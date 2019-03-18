@@ -4,16 +4,48 @@ using UnityEngine;
 
 public class Age1Resolver : IResolvable {
 
+	private const int TurnCount = 6;
+
 	public IEnumerator Resolve() {
-		List<Coroutine> unloadAge1Decks = new List<Coroutine>();
+		Queue<Coroutine> unloadHands = new Queue<Coroutine>();
+		Queue<Coroutine> unloadDecks = new Queue<Coroutine>();
+		
 		foreach (Player player in GameManager.Instance.players) {
-			unloadAge1Decks.Add(GameManager.Instance.StartCoroutine(
-				player.Decks[DeckType.Age1].Unload(player.hand)
+			unloadDecks.Enqueue(GameManager.Instance.StartCoroutine(
+				player.Decks[DeckType.Age1].Unload(player.hand, Direction.West)
 			));
 		}
+		while (unloadDecks.Count != 0) {
+			yield return unloadDecks.Dequeue();
+		}
+		
+		for (int i = 0; i < TurnCount - 1; i++) {
+			foreach (Player player in GameManager.Instance.players) {
+				unloadHands.Enqueue(GameManager.Instance.StartCoroutine(
+					player.hand.Unload(player.westNeighbour.Decks[DeckType.EastDeck], Direction.West)
+				));
+			}
+			while (unloadHands.Count != 0) {
+				yield return unloadHands.Dequeue();
+			}
 
-		foreach (Coroutine unloadAge1Deck in unloadAge1Decks) {
-			yield return unloadAge1Deck;
+			foreach (Player player in GameManager.Instance.players) {
+				unloadDecks.Enqueue(GameManager.Instance.StartCoroutine(
+					player.Decks[DeckType.EastDeck].Unload(player.hand, Direction.West)
+				));
+			}
+			while (unloadDecks.Count != 0) {
+				yield return unloadDecks.Dequeue();
+			}
+		}
+		
+		foreach (Player player in GameManager.Instance.players) {
+			unloadHands.Enqueue(GameManager.Instance.StartCoroutine(
+				player.hand.Unload(GameManager.Instance.discardPile, Direction.West)
+			));
+		}
+		while (unloadHands.Count != 0) {
+			yield return unloadHands.Dequeue();
 		}
 	}
 

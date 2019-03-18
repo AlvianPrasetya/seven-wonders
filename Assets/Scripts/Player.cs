@@ -13,6 +13,8 @@ public class Player : MonoBehaviour {
 
 	public DeckEntry[] decks;
 	public Hand hand;
+	public Player westNeighbour;
+	public Player eastNeighbour;
 
 	public Dictionary<DeckType, Deck> Decks { get; private set; }
 

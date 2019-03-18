@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 
-public class Deck : Pile<Card>, IUnloadable<Card> {
+public class Deck : Pile<Card> {
 
-	public IEnumerator Unload(IPushable<Card> targetContainer) {
-		yield return targetContainer.PushMany(PopMany(Elements.Count));
+	public IEnumerator Unload(Hand targetHand, Direction pushDirection) {
+		yield return targetHand.PushMany(PopMany(Elements.Count), pushDirection);
 	}
 
 }
