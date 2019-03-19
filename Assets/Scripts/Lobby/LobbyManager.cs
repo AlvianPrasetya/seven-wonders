@@ -25,7 +25,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks {
 		Debug.Log(string.Format("Joined room {0}", PhotonNetwork.CurrentRoom.Name));
 		this.statusText.text = "Joined room";
 
-		PhotonNetwork.LoadLevel(LevelName.Game);
+		PhotonNetwork.LoadLevel(LevelName.Room);
 		string statusText = "Loading room";
 		Debug.Log(statusText);
 		this.statusText.text = statusText;

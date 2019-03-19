@@ -1,20 +1,19 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class RoomPlayer : MonoBehaviour {
 
-	public Text nicknameText;
-	public Image readyImage;
+	public TextMesh nicknameMesh;
+	public MeshRenderer readyMesh;
 
 	private bool ready;
 
 	public string Nickname {
 		get {
-			return nicknameText.text;
+			return nicknameMesh.text;
 		}
 
 		set {
-			nicknameText.text = value;
+			nicknameMesh.text = value;
 		}
 	}
 
@@ -25,7 +24,7 @@ public class RoomPlayer : MonoBehaviour {
 
 		set {
 			ready = value;
-			readyImage.gameObject.SetActive(value);
+			readyMesh.gameObject.SetActive(value);
 		}
 	}
 

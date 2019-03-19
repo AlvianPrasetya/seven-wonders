@@ -38,36 +38,23 @@ public class RoomManager : MonoBehaviourPunCallbacks {
 
 			startGameButton.gameObject.SetActive(false);
 		}
-	}
 
-	public override void OnJoinedRoom() {
-		RoomPlayer player = Instantiate(roomPlayerPrefab, transform.position, transform.rotation);
-		player.Nickname = PhotonNetwork.LocalPlayer.NickName;
-		player.IsReady = PhotonNetwork.LocalPlayer.IsMasterClient;
-
-		playersByActorID.Add(PhotonNetwork.LocalPlayer.ActorNumber, player);
-		
-		foreach (RoomSlot slot in slots) {
-			if (!slot.IsOccupied()) {
-				slot.Occupy(player);
-				break;
-			}
+		foreach (Photon.Realtime.PhotonPlayer player in PhotonNetwork.PlayerListOthers) {
+			CreatePlayer(player);
+		}
+		CreatePlayer(PhotonNetwork.LocalPlayer);
+		if (PhotonNetwork.IsMasterClient) {
+			// Master client is immediately ready when joining the room
+			ToggleReady();
+		} else {
+			// Other clients are not ready when joining the room
+			ToggleReady();
+			ToggleReady();
 		}
 	}
 
 	public override void OnPlayerEnteredRoom(Photon.Realtime.PhotonPlayer newPlayer) {
-		RoomPlayer player = Instantiate(roomPlayerPrefab, transform.position, transform.rotation);
-		player.Nickname = newPlayer.NickName;
-		player.IsReady = newPlayer.IsMasterClient;
-
-		playersByActorID.Add(newPlayer.ActorNumber, player);
-
-		foreach (RoomSlot slot in slots) {
-			if (!slot.IsOccupied()) {
-				slot.Occupy(player);
-				break;
-			}
-		}
+		CreatePlayer(newPlayer);
 	}
 
 	public override void OnPlayerLeftRoom(Photon.Realtime.PhotonPlayer otherPlayer) {
@@ -77,9 +64,10 @@ public class RoomManager : MonoBehaviourPunCallbacks {
 	}
 
 	public void ToggleReady() {
-		toggleReadyText.text = UnreadyText;
+		RoomPlayer player = playersByActorID[PhotonNetwork.LocalPlayer.ActorNumber];
+		toggleReadyText.text = player.IsReady ? ReadyText : UnreadyText;
 
-		photonView.RPC("ToggleReady", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
+		photonView.RPC("ToggleReady", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.ActorNumber);
 	}
 
 	public void StartGame() {
@@ -101,6 +89,21 @@ public class RoomManager : MonoBehaviourPunCallbacks {
 
 		if (PhotonNetwork.IsMasterClient) {
 			startGameButton.interactable = AreAllPlayersReady();
+		}
+	}
+
+	private void CreatePlayer(Photon.Realtime.PhotonPlayer photonPlayer) {
+		RoomPlayer player = Instantiate(roomPlayerPrefab, transform.position, transform.rotation);
+		player.Nickname = photonPlayer.NickName;
+		player.IsReady = false;
+
+		playersByActorID.Add(photonPlayer.ActorNumber, player);
+
+		foreach (RoomSlot slot in slots) {
+			if (!slot.IsOccupied()) {
+				slot.Occupy(player);
+				break;
+			}
 		}
 	}
 
