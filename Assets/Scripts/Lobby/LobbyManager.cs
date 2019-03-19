@@ -1,11 +1,23 @@
-﻿using Photon.Pun;
+﻿using System.Collections;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class LobbyManager : MonoBehaviourPunCallbacks {
 
+	private const float BackgroundStayDuration = 5;
+	private const float BackgroundTransitionDuration = 2;
+
+	public Image backgroundImageFrontBuffer;
+	public Image backgroundImageBackBuffer;
 	public InputField nicknameInputField;
 	public Text statusText;
+	public Sprite[] backgroundSprites;
+
+	void Start() {
+		backgroundImageFrontBuffer.sprite = backgroundSprites[0];
+		StartCoroutine(TransitionBackground());
+	}
 
 	public override void OnConnectedToMaster() {
 		string statusText = "Connected";
@@ -54,6 +66,57 @@ public class LobbyManager : MonoBehaviourPunCallbacks {
 
 		PhotonNetwork.GameVersion = Constant.GameVersion;
 		PhotonNetwork.ConnectUsingSettings();
+	}
+
+	private IEnumerator TransitionBackground() {
+		int backgroundIndex = 0;
+		while (true) {
+			yield return new WaitForSeconds(BackgroundStayDuration);
+
+			backgroundImageBackBuffer.sprite = backgroundSprites[++backgroundIndex % backgroundSprites.Length];
+			float fadeToBackBufferProgress = 0;
+			while (fadeToBackBufferProgress <= 1) {
+				backgroundImageFrontBuffer.color = new Color(
+					backgroundImageFrontBuffer.color.r,
+					backgroundImageFrontBuffer.color.g,
+					backgroundImageFrontBuffer.color.b,
+					Mathf.Lerp(1, 0, fadeToBackBufferProgress)
+				);
+
+				backgroundImageBackBuffer.color = new Color(
+					backgroundImageBackBuffer.color.r,
+					backgroundImageBackBuffer.color.g,
+					backgroundImageBackBuffer.color.b,
+					Mathf.Lerp(0, 1, fadeToBackBufferProgress)
+				);
+
+				fadeToBackBufferProgress += Time.deltaTime / BackgroundTransitionDuration;
+				yield return null;
+			}
+
+			yield return new WaitForSeconds(BackgroundStayDuration);
+
+			backgroundImageFrontBuffer.sprite = backgroundSprites[++backgroundIndex % backgroundSprites.Length];
+			float fadeToFrontBufferProgress = 0;
+			while (fadeToFrontBufferProgress <= 1) {
+				backgroundImageFrontBuffer.color = new Color(
+					backgroundImageFrontBuffer.color.r,
+					backgroundImageFrontBuffer.color.g,
+					backgroundImageFrontBuffer.color.b,
+					Mathf.Lerp(0, 1, fadeToFrontBufferProgress)
+				);
+
+				backgroundImageBackBuffer.color = new Color(
+					backgroundImageBackBuffer.color.r,
+					backgroundImageBackBuffer.color.g,
+					backgroundImageBackBuffer.color.b,
+					Mathf.Lerp(1, 0, fadeToFrontBufferProgress)
+				);
+
+				fadeToFrontBufferProgress += Time.deltaTime / BackgroundTransitionDuration;
+				yield return null;
+			}
+		}
 	}
 
 }
