@@ -14,9 +14,7 @@ public class Coin : MonoBehaviour, IMoveable {
 		rigidbody = GetComponent<Rigidbody>();
 	}
 
-	public IEnumerator MoveTowards(
-		Vector3 targetPosition, Quaternion targetRotation
-	) {
+	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation) {
 		collider.enabled = false;
 		rigidbody.useGravity = false;
 		rigidbody.isKinematic = true;

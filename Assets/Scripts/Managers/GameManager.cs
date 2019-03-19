@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour {
 
 	}
 
+	public GameCamera gameCamera;
 	public Bank bank;
 	public Deck discardPile;
 	public StockEntry[] stocks;

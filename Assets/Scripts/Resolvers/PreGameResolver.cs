@@ -50,6 +50,10 @@ public class PreGameResolver : IResolvable {
 		yield return loadMilitaryStock;
 		yield return loadAndShuffleGuildStock;
 
+		GameManager.Instance.StartCoroutine(
+			GameManager.Instance.gameCamera.MoveTowards(new Vector3(0, 40, -20), Quaternion.Euler(75, 0, 0), 10)
+		);
+		
 		yield return GameManager.Instance.Stocks[StockType.Age3].Load();
 		Coroutine shuffleAge3 = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.Stocks[StockType.Age3].Shuffle(5, age3RandomSeed)
@@ -61,6 +65,10 @@ public class PreGameResolver : IResolvable {
 		yield return GameManager.Instance.Stocks[StockType.Age1].Load();
 		Coroutine shuffleAge1 = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.Stocks[StockType.Age1].Shuffle(5, age1RandomSeed)
+		);
+
+		GameManager.Instance.StartCoroutine(
+			GameManager.Instance.gameCamera.MoveTowards(new Vector3(0, 85, 0), Quaternion.Euler(90, 0, 0), 10)
 		);
 
 		yield return shuffleAge3;
