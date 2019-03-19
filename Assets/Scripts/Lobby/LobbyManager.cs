@@ -5,14 +5,13 @@ using UnityEngine.UI;
 
 public class LobbyManager : MonoBehaviourPunCallbacks {
 
-	private const float BackgroundStayDuration = 5;
-	private const float BackgroundTransitionDuration = 2;
-
 	public Image backgroundImageFrontBuffer;
 	public Image backgroundImageBackBuffer;
 	public InputField nicknameInputField;
 	public Text statusText;
 	public Sprite[] backgroundSprites;
+	public float backgroundStayDuration = 5;
+	public float backgroundTransitionDuration = 2;
 
 	void Start() {
 		backgroundImageFrontBuffer.sprite = backgroundSprites[0];
@@ -71,7 +70,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks {
 	private IEnumerator TransitionBackground() {
 		int backgroundIndex = 0;
 		while (true) {
-			yield return new WaitForSeconds(BackgroundStayDuration);
+			yield return new WaitForSeconds(backgroundStayDuration);
 
 			backgroundImageBackBuffer.sprite = backgroundSprites[++backgroundIndex % backgroundSprites.Length];
 			float fadeToBackBufferProgress = 0;
@@ -90,11 +89,11 @@ public class LobbyManager : MonoBehaviourPunCallbacks {
 					Mathf.Lerp(0, 1, fadeToBackBufferProgress)
 				);
 
-				fadeToBackBufferProgress += Time.deltaTime / BackgroundTransitionDuration;
+				fadeToBackBufferProgress += Time.deltaTime / backgroundTransitionDuration;
 				yield return null;
 			}
 
-			yield return new WaitForSeconds(BackgroundStayDuration);
+			yield return new WaitForSeconds(backgroundStayDuration);
 
 			backgroundImageFrontBuffer.sprite = backgroundSprites[++backgroundIndex % backgroundSprites.Length];
 			float fadeToFrontBufferProgress = 0;
@@ -113,7 +112,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks {
 					Mathf.Lerp(1, 0, fadeToFrontBufferProgress)
 				);
 
-				fadeToFrontBufferProgress += Time.deltaTime / BackgroundTransitionDuration;
+				fadeToFrontBufferProgress += Time.deltaTime / backgroundTransitionDuration;
 				yield return null;
 			}
 		}
