@@ -3,7 +3,7 @@ using UnityEngine;
 
 public abstract class Card : MonoBehaviour, IMoveable {
 
-	private const float TranslateSpeed = 200;
+	private const float TranslateSpeed = 150;
 	private const float RotateSpeed = 1440;
 
 	private new Collider collider;
