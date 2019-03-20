@@ -8,7 +8,7 @@ public class GameCamera : MonoBehaviour {
 		Quaternion initialRotation = transform.rotation;
 
 		float progress = 0;
-		while (progress <= 1) {
+		while (progress < 1) {
 			progress = Mathf.Min(progress + Time.deltaTime / duration, 1);
 			
 			transform.position = Vector3.Lerp(initialPosition, targetPosition, progress);

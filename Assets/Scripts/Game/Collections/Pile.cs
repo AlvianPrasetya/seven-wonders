@@ -7,6 +7,7 @@ public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where 
 
 	public Vector3 dropSpacing = new Vector3(0, 0.1f, 0);
 	public Facing facing = Facing.Up;
+	public float pushDuration = 1;
 	public Stack<T> Elements { get; protected set; }
 	public int Count {
 		get {
@@ -28,7 +29,7 @@ public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where 
 		}
 		Quaternion dropRotation = Quaternion.Euler(dropEulerAngles);
 
-		yield return element.MoveTowards(dropPosition, dropRotation);
+		yield return element.MoveTowards(dropPosition, dropRotation, pushDuration);
 
 		Elements.Push(element);
 		element.transform.parent = transform;

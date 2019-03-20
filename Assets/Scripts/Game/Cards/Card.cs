@@ -14,27 +14,20 @@ public abstract class Card : MonoBehaviour, IMoveable {
 		rigidbody = GetComponent<Rigidbody>();
 	}
 
-	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation) {
+	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation, float duration) {
 		collider.enabled = false;
 		rigidbody.useGravity = false;
 		rigidbody.isKinematic = true;
 
-		float sqrDistance = Vector3.SqrMagnitude(targetPosition - transform.position);
-		float angleDiff = Quaternion.Angle(transform.rotation, targetRotation);
-		while (sqrDistance > Constant.DistanceEpsilon * Constant.DistanceEpsilon || angleDiff > Constant.AngleEpsilon) {
-			float deltaDistance = TranslateSpeed * Time.deltaTime;
-			Vector3 deltaPosition = (targetPosition - transform.position).normalized * deltaDistance;
-			if (deltaDistance * deltaDistance > sqrDistance) {
-				// Overshot, set position to target position
-				transform.position = targetPosition;
-			} else {
-				transform.position += deltaPosition;
-			}
-			sqrDistance = Vector3.SqrMagnitude(targetPosition - transform.position);
+		Vector3 initialPosition = transform.position;
+		Quaternion initialRotation = transform.rotation;
 
-			float deltaAngle = RotateSpeed * Time.deltaTime;
-			transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, deltaAngle);
-			angleDiff = Quaternion.Angle(transform.rotation, targetRotation);
+		float progress = 0;
+		while (progress < 1) {
+			progress = Mathf.Min(progress + Time.deltaTime / duration, 1);
+			
+			transform.position = Vector3.Lerp(initialPosition, targetPosition, progress);
+			transform.rotation = Quaternion.Slerp(initialRotation, targetRotation, progress);
 
 			yield return null;
 		}
