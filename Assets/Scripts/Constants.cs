@@ -25,3 +25,9 @@ public class LevelName {
 	public const string Game = "game";
 
 }
+
+public class LayerName {
+
+	public const string Table = "Table";
+
+}
