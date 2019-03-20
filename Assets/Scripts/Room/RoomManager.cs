@@ -9,6 +9,7 @@ public class RoomManager : MonoBehaviourPunCallbacks {
 	private const string StartingText = "Starting";
 	private const string ReadyKey = "ready";
 	private const string PosKey = "pos";
+	private const string MatchSeedKey = "match_seed";
 
 	public Toggle readyToggle;
 	public Button startGameButton;
@@ -95,6 +96,10 @@ public class RoomManager : MonoBehaviourPunCallbacks {
 
 		PhotonNetwork.CurrentRoom.IsOpen = false;
 		PhotonNetwork.CurrentRoom.IsVisible = false;
+
+		// Set match seed
+		SetMatchSeed(new System.Random().Next());
+
 		PhotonNetwork.LoadLevel(LevelName.Game);
 	}
 
@@ -124,6 +129,12 @@ public class RoomManager : MonoBehaviourPunCallbacks {
 		ExitGames.Client.Photon.Hashtable customProperties = player.CustomProperties;
 		customProperties[PosKey] = pos;
 		player.SetCustomProperties(customProperties);
+	}
+
+	private void SetMatchSeed(int matchSeed) {
+		ExitGames.Client.Photon.Hashtable customProperties = PhotonNetwork.CurrentRoom.CustomProperties;
+		customProperties[MatchSeedKey] = matchSeed;
+		PhotonNetwork.CurrentRoom.SetCustomProperties(customProperties);
 	}
 
 	private RoomPlayer CreatePlayer(Photon.Realtime.PhotonPlayer photonPlayer) {

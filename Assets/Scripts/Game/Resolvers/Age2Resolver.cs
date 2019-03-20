@@ -20,8 +20,12 @@ public class Age2Resolver : IResolvable {
 		}
 
 		// Simulate all players discarding easternmost card
-		foreach (Player player in GameManager.Instance.players) {
-			yield return GameManager.Instance.discardPile.Push(player.hand.PopAt(player.hand.displayPiles.Length - 1));
+		for (int i = 0; i < GameManager.Instance.players.Length; i++) {
+			yield return GameManager.Instance.discardPile.Push(
+				GameManager.Instance.players[i].hand.PopAt(
+					GameManager.Instance.players[i].hand.displayPiles.Length - 1
+				)
+			);
 		}
 		
 		for (int i = 0; i < TurnCount - 1; i++) {
@@ -44,8 +48,12 @@ public class Age2Resolver : IResolvable {
 			}
 
 			// Simulate all players discarding easternmost card
-			foreach (Player player in GameManager.Instance.players) {
-				yield return GameManager.Instance.discardPile.Push(player.hand.PopAt(player.hand.displayPiles.Length - 1));
+			for (int j = 0; j < GameManager.Instance.players.Length; j++) {
+				yield return GameManager.Instance.discardPile.Push(
+					GameManager.Instance.players[j].hand.PopAt(
+						GameManager.Instance.players[j].hand.displayPiles.Length - 1
+					)
+				);
 			}
 		}
 		

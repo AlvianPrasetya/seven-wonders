@@ -1,8 +1,11 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviourPun {
+
+	private const string MatchSeedKey = "match_seed";
 
 	[System.Serializable]
 	public class StockEntry {
@@ -34,7 +37,10 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Start() {
-		resolverQueue.Enqueue(new MatchResolver(), 1);
+		resolverQueue.Enqueue(
+			new MatchResolver((int)PhotonNetwork.CurrentRoom.CustomProperties[MatchSeedKey]),
+			1
+		);
 		StartCoroutine(Resolve());
 	}
 

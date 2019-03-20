@@ -20,8 +20,10 @@ public class Age3Resolver : IResolvable {
 		}
 
 		// Simulate all players discarding westernmost card
-		foreach (Player player in GameManager.Instance.players) {
-			yield return GameManager.Instance.discardPile.Push(player.hand.PopAt(0));
+		for (int i = GameManager.Instance.players.Length - 1; i >= 0; i--) {
+			yield return GameManager.Instance.discardPile.Push(
+				GameManager.Instance.players[i].hand.PopAt(0)
+			);
 		}
 		
 		for (int i = 0; i < TurnCount - 1; i++) {
@@ -44,8 +46,10 @@ public class Age3Resolver : IResolvable {
 			}
 
 			// Simulate all players discarding westernmost card
-			foreach (Player player in GameManager.Instance.players) {
-				yield return GameManager.Instance.discardPile.Push(player.hand.PopAt(0));
+			for (int j = GameManager.Instance.players.Length - 1; j >= 0; j--) {
+				yield return GameManager.Instance.discardPile.Push(
+					GameManager.Instance.players[j].hand.PopAt(0)
+				);
 			}
 		}
 		
