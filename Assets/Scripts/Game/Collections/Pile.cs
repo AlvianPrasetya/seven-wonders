@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Pile represents a collection of moveable elements arranged in a stack-like manner.
-public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where T : MonoBehaviour, IMoveable {
+public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T>, IPeekable<T> where T : MonoBehaviour, IMoveable {
 
 	public Vector3 dropSpacing = new Vector3(0, 0.1f, 0);
 	public Facing facing = Facing.Up;
@@ -56,6 +56,14 @@ public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where 
 		}
 
 		return poppedElements.ToArray();
+	}
+
+	public T Peek() {
+		if (Elements.Count == 0) {
+			return null;
+		}
+
+		return Elements.Peek();
 	}
 
 }

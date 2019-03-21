@@ -1,12 +1,23 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class StructureCard : Card, IBuildable, IBuriable, IDiscardable, IBeginDragHandler, IDragHandler, IEndDragHandler {
+public class StructureCard : Card, IBuildable, IBuriable, IDiscardable {
 
 	public int minPlayers;
 	public Age age;
-	
-	private Vector3 dragStartPosition;
+
+	public override void OnEndDrag(PointerEventData eventData) {
+		base.OnEndDrag(eventData);
+
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit hitInfo;
+		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask(LayerName.PlayArea))) {
+			PlayArea playArea = hitInfo.transform.GetComponent<PlayArea>();
+			playArea.Play(this);
+		} else {
+			transform.position = dragStartPosition;
+		}
+	}
 	
 	public void Build() {
 	}
@@ -15,32 +26,6 @@ public class StructureCard : Card, IBuildable, IBuriable, IDiscardable, IBeginDr
 	}
 
 	public void Discard() {
-	}
-
-	public void OnBeginDrag(PointerEventData eventData) {
-		collider.enabled = false;
-		rigidbody.useGravity = false;
-		rigidbody.isKinematic = true;
-
-		dragStartPosition = transform.position;
-	}
-
-	public void OnDrag(PointerEventData eventData) {
-		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		RaycastHit hitInfo;
-		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask(LayerName.Table))) {
-			transform.position = new Vector3(
-				hitInfo.point.x,
-				dragStartPosition.y,
-				hitInfo.point.z
-			);
-		}
-	}
-
-	public void OnEndDrag(PointerEventData eventData) {
-		collider.enabled = true;
-		rigidbody.useGravity = true;
-		rigidbody.isKinematic = false;
 	}
 
 }

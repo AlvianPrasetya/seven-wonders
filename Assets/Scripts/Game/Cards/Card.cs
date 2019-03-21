@@ -1,10 +1,14 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public abstract class Card : MonoBehaviour, IMoveable {
+public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragHandler, IEndDragHandler {
+
+	public float dragHeight = 2;
 
 	protected new Collider collider;
 	protected new Rigidbody rigidbody;
+	protected Vector3 dragStartPosition;
 
 	void Awake() {
 		collider = GetComponent<Collider>();
@@ -29,6 +33,28 @@ public abstract class Card : MonoBehaviour, IMoveable {
 			yield return null;
 		}
 
+		collider.enabled = true;
+		rigidbody.useGravity = true;
+		rigidbody.isKinematic = false;
+	}
+
+	public virtual void OnBeginDrag(PointerEventData eventData) {
+		collider.enabled = false;
+		rigidbody.useGravity = false;
+		rigidbody.isKinematic = true;
+
+		dragStartPosition = transform.position;
+	}
+
+	public virtual void OnDrag(PointerEventData eventData) {
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit hitInfo;
+		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask(LayerName.Table))) {
+			transform.position = hitInfo.point - dragHeight * ray.direction;
+		}
+	}
+
+	public virtual void OnEndDrag(PointerEventData eventData) {
 		collider.enabled = true;
 		rigidbody.useGravity = true;
 		rigidbody.isKinematic = false;

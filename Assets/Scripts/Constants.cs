@@ -29,6 +29,7 @@ public class LevelName {
 public class LayerName {
 
 	public const string Table = "Table";
+	public const string PlayArea = "Play Area";
 
 }
 

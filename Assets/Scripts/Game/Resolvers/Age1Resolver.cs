@@ -19,6 +19,10 @@ public class Age1Resolver : IResolvable {
 			yield return unloadDecks.Dequeue();
 		}
 
+		GameManager.Instance.Player.IsPlayable = true;
+		yield return new WaitForSeconds(30);
+		GameManager.Instance.Player.IsPlayable = false;
+
 		// Simulate all players discarding westernmost card
 		for (int i = GameManager.Instance.Players.Count - 1; i >= 0; i--) {
 			yield return GameManager.Instance.discardPile.Push(

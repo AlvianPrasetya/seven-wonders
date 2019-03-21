@@ -111,4 +111,14 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 		yield return targetDeck.PushMany(PopMany(Count, popDirection));
 	}
 
+	public int GetPosition(Card card) {
+		for (int i = 0; i < displayPiles.Length; i++) {
+			if (displayPiles[i].Peek() == card) {
+				return i;
+			}
+		}
+
+		throw new UnityException("The specified card could not be found");
+	}
+
 }

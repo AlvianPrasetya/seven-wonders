@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviourPun {
 	public Dictionary<StockType, Stock> Stocks { get; private set; }
 	public List<Player> Players { get; private set; }
 	public Dictionary<int, Player> PlayersByActorID { get; private set; }
+	public Player Player { get; private set; }
 
 	private ResolverQueue resolverQueue;
 
@@ -44,15 +45,19 @@ public class GameManager : MonoBehaviourPun {
 		Player[] playersByPos = new Player[7];
 		for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++) {
 			int pos = (int)PhotonNetwork.PlayerList[i].CustomProperties[PlayerProperty.Pos];
-			float playerAngle = pos * 2 * Mathf.PI / 7;
+			float playerAngle = pos * 360f / 7;
 			Vector3 playerPosition = new Vector3(
-				Mathf.Sin(playerAngle) * 35,
+				Mathf.Sin(Mathf.Deg2Rad * playerAngle) * 35,
 				0,
-				-Mathf.Cos(playerAngle) * 35
+				-Mathf.Cos(Mathf.Deg2Rad * playerAngle) * 35
 			);
 			Quaternion playerRotation = Quaternion.Euler(0, -playerAngle, 0);
+			
 			Player player = Instantiate(playerPrefab, playerPosition, playerRotation);
 			playersByPos[pos] = player;
+			if (PhotonNetwork.PlayerList[i].IsLocal) {
+				Player = player;
+			}
 		}
 
 		// Store players in a compact list ordered by pos
