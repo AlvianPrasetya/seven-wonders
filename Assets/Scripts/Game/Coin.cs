@@ -3,9 +3,6 @@ using UnityEngine;
 
 public class Coin : MonoBehaviour, IMoveable {
 
-	private const float TranslateSpeed = 100;
-	private const float RotateSpeed = 1440;
-
 	private new Collider collider;
 	private new Rigidbody rigidbody;
 

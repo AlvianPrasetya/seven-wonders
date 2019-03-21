@@ -3,9 +3,6 @@ using UnityEngine;
 
 public abstract class Card : MonoBehaviour, IMoveable {
 
-	private const float TranslateSpeed = 150;
-	private const float RotateSpeed = 1440;
-
 	protected new Collider collider;
 	protected new Rigidbody rigidbody;
 

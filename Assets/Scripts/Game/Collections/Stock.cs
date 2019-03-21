@@ -9,8 +9,14 @@ public class Stock : CardPile, ILoadable, IShuffleable, IDealable {
 	public CardPile[] shuffleCardPiles;
 
 	public virtual IEnumerator Load() {
-		for (int i = 0; i < initialCardPrefabs.Length; i++) {
-			Card card = Instantiate(initialCardPrefabs[i], transform.position, transform.rotation);
+		foreach (Card initialCardPrefab in initialCardPrefabs) {
+			if (initialCardPrefab is StructureCard &&
+				((StructureCard)initialCardPrefab).minPlayers > GameManager.Instance.Players.Count
+			) {
+				continue;
+			}
+
+			Card card = Instantiate(initialCardPrefab, transform.position, transform.rotation);
 			yield return Push(card);
 		}
 	}

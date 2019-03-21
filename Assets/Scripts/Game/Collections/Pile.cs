@@ -33,7 +33,6 @@ public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where 
 
 		Elements.Push(element);
 		element.transform.parent = transform;
-		yield return null;
 	}
 
 	public IEnumerator PushMany(T[] elements) {
