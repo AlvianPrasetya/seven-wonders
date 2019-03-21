@@ -50,7 +50,7 @@ public class PreGameResolver : IResolvable {
 		yield return loadMilitaryStock;
 		yield return loadAndShuffleGuildStock;
 
-		GameManager.Instance.StartCoroutine(
+		Coroutine moveCameraShuffle = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.gameCamera.MoveTowards(new Vector3(0, 40, -20), Quaternion.Euler(75, 0, 0), 10)
 		);
 		
@@ -67,7 +67,8 @@ public class PreGameResolver : IResolvable {
 			GameManager.Instance.Stocks[StockType.Age1].Shuffle(5, age1RandomSeed)
 		);
 
-		GameManager.Instance.StartCoroutine(
+		yield return moveCameraShuffle;
+		Coroutine moveCameraDeal = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.gameCamera.MoveTowards(new Vector3(0, 85, 0), Quaternion.Euler(90, 0, 0), 10)
 		);
 
@@ -79,6 +80,13 @@ public class PreGameResolver : IResolvable {
 		yield return GameManager.Instance.Stocks[StockType.Age1].Deal(DeckType.Age1);
 		
 		yield return loadBank;
+
+		yield return moveCameraDeal;
+		yield return GameManager.Instance.gameCamera.MoveTowards(
+			GameManager.Instance.Player.transform.position + new Vector3(0, 25, 0),
+			Quaternion.Euler(90, GameManager.Instance.Player.transform.rotation.eulerAngles.y, 0),
+			2
+		);
 	}
 
 	private IEnumerator LoadAndShuffle(StockType stockType, int numIterations, int randomSeed) {
