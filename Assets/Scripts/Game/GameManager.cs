@@ -19,17 +19,20 @@ public class GameManager : MonoBehaviourPun {
 	public Bank bank;
 	public Deck discardPile;
 	public StockEntry[] stocks;
-	public Player[] players;
+	public Player playerPrefab;
 
 	public static GameManager Instance { get; private set; }
 	public Dictionary<StockType, Stock> Stocks { get; private set; }
+	public List<Player> Players { get; private set; }
+	public Dictionary<int, Player> PlayersByActorID { get; private set; }
 
 	private ResolverQueue resolverQueue;
 
 	void Awake() {
 		Instance = this;
-
 		Stocks = new Dictionary<StockType, Stock>();
+		Players = new List<Player>();
+		PlayersByActorID = new Dictionary<int, Player>();
 		foreach (StockEntry stockEntry in stocks) {
 			Stocks.Add(stockEntry.stockType, stockEntry.stock);
 		}
@@ -37,6 +40,34 @@ public class GameManager : MonoBehaviourPun {
 	}
 
 	void Start() {
+		// Create player at location determined by player pos
+		Player[] playersByPos = new Player[7];
+		for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++) {
+			int pos = (int)PhotonNetwork.PlayerList[i].CustomProperties[PlayerProperty.Pos];
+			float playerAngle = pos * 2 * Mathf.PI / 7;
+			Vector3 playerPosition = new Vector3(
+				Mathf.Sin(playerAngle) * 35,
+				0,
+				-Mathf.Cos(playerAngle) * 35
+			);
+			Quaternion playerRotation = Quaternion.Euler(0, -playerAngle, 0);
+			Player player = Instantiate(playerPrefab, playerPosition, playerRotation);
+			playersByPos[pos] = player;
+		}
+
+		// Store players in a compact list ordered by pos
+		for (int i = 0; i < playersByPos.Length; i++) {
+			if (playersByPos[i] != null) {
+				Players.Add(playersByPos[i]);
+			}
+		}
+
+		// Assign neighbours
+		for (int i = 0; i < Players.Count; i++) {
+			Players[i].westNeighbour = Players[(Players.Count + i - 1) % Players.Count];
+			Players[i].eastNeighbour = Players[(i + 1) % Players.Count];
+		}
+
 		resolverQueue.Enqueue(
 			new MatchResolver((int)PhotonNetwork.CurrentRoom.CustomProperties[MatchSeedKey]),
 			1

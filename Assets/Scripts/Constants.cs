@@ -31,3 +31,16 @@ public class LayerName {
 	public const string Table = "Table";
 
 }
+
+public class RoomProperty {
+
+	public const string MatchSeed = "match_seed";
+
+}
+
+public class PlayerProperty {
+
+	public const string Ready = "ready";
+	public const string Pos = "pos";
+	
+}

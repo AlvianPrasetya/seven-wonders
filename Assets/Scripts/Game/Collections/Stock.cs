@@ -39,8 +39,8 @@ public class Stock : CardPile, ILoadable, IShuffleable, IDealable {
 	public IEnumerator Deal(DeckType deckType) {
 		int playerIndex = 0;
 		while (Elements.Count != 0) {
-			yield return GameManager.Instance.players[playerIndex].Decks[deckType].Push(Pop());
-			playerIndex = (playerIndex + 1) % GameManager.Instance.players.Length;
+			yield return GameManager.Instance.Players[playerIndex].Decks[deckType].Push(Pop());
+			playerIndex = (playerIndex + 1) % GameManager.Instance.Players.Count;
 		}
 	}
 

@@ -7,9 +7,6 @@ public class RoomManager : MonoBehaviourPunCallbacks {
 
 	private const string StartText = "Start";
 	private const string StartingText = "Starting";
-	private const string ReadyKey = "ready";
-	private const string PosKey = "pos";
-	private const string MatchSeedKey = "match_seed";
 
 	public Toggle readyToggle;
 	public Button startGameButton;
@@ -66,10 +63,10 @@ public class RoomManager : MonoBehaviourPunCallbacks {
 		RoomPlayer player = playersByActorID[target.ActorNumber];
 
 		object ready;
-		player.IsReady = changedProps.TryGetValue(ReadyKey, out ready) && (bool)ready;
+		player.IsReady = changedProps.TryGetValue(PlayerProperty.Ready, out ready) && (bool)ready;
 
 		object pos;
-		if (changedProps.TryGetValue(PosKey, out pos)) {
+		if (changedProps.TryGetValue(PlayerProperty.Pos, out pos)) {
 			player.Occupy(slots[(int)pos]);
 		}
 
@@ -121,19 +118,19 @@ public class RoomManager : MonoBehaviourPunCallbacks {
 
 	private void SetPlayerReady(Photon.Realtime.PhotonPlayer player, bool ready) {
 		ExitGames.Client.Photon.Hashtable customProperties = player.CustomProperties;
-		customProperties[ReadyKey] = ready;
+		customProperties[PlayerProperty.Ready] = ready;
 		player.SetCustomProperties(customProperties);
 	}
 
 	private void SetPlayerPos(Photon.Realtime.PhotonPlayer player, int pos) {
 		ExitGames.Client.Photon.Hashtable customProperties = player.CustomProperties;
-		customProperties[PosKey] = pos;
+		customProperties[PlayerProperty.Pos] = pos;
 		player.SetCustomProperties(customProperties);
 	}
 
 	private void SetMatchSeed(int matchSeed) {
 		ExitGames.Client.Photon.Hashtable customProperties = PhotonNetwork.CurrentRoom.CustomProperties;
-		customProperties[MatchSeedKey] = matchSeed;
+		customProperties[RoomProperty.MatchSeed] = matchSeed;
 		PhotonNetwork.CurrentRoom.SetCustomProperties(customProperties);
 	}
 
