@@ -84,6 +84,36 @@ public class GameManager : MonoBehaviourPun {
 		resolverQueue.Enqueue(resolver, priority);
 	}
 
+	public void PlayBuild(int positionInHand) {
+		photonView.RPC("PlayBuild", RpcTarget.All, positionInHand);
+	}
+
+	public void PlayBury(int positionInHand, int wonderStage) {
+		photonView.RPC("PlayBury", RpcTarget.All, positionInHand, wonderStage);
+	}
+
+	public void PlayDiscard(int positionInHand) {
+		photonView.RPC("PlayDiscard", RpcTarget.All, positionInHand);
+	}
+
+	[PunRPC]
+	private void PlayBuild(int positionInHand, PhotonMessageInfo info) {
+		Player player = PlayersByActorID[info.Sender.ActorNumber];
+		StartCoroutine(player.PrepareBuild(positionInHand));
+	}
+
+	[PunRPC]
+	private void PlayBury(int positionInHand, int wonderStage, PhotonMessageInfo info) {
+		Player player = PlayersByActorID[info.Sender.ActorNumber];
+		StartCoroutine(player.PrepareBury(positionInHand, wonderStage));
+	}
+
+	[PunRPC]
+	private void PlayDiscard(int positionInHand, PhotonMessageInfo info) {
+		Player player = PlayersByActorID[info.Sender.ActorNumber];
+		StartCoroutine(player.PrepareDiscard(positionInHand));
+	}
+
 	private IEnumerator Resolve() {
 		while (resolverQueue.Size() != 0) {
 			yield return resolverQueue.Dequeue().Resolve();

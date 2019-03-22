@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,8 +12,11 @@ public class Player : MonoBehaviour {
 
 	}
 
+	private delegate IEnumerator Action(Card card);
+
 	public DeckEntry[] decks;
 	public Hand hand;
+	public CardSlot preparedCardSlot;
 	public Player westNeighbour;
 	public Player eastNeighbour;
 	public PlayArea buildPlayArea;
@@ -27,6 +31,7 @@ public class Player : MonoBehaviour {
 			wonder.IsPlayable = value;
 		}
 	}
+	private Action action;
 
 	void Awake() {
 		Decks = new Dictionary<DeckType, Deck>();
@@ -36,15 +41,45 @@ public class Player : MonoBehaviour {
 	}
 
 	public void PlayBuild(Card card) {
-
+		int positionInHand = hand.GetPosition(card);
+		GameManager.Instance.PlayBuild(positionInHand);
 	}
 
 	public void PlayBury(Card card, int wonderStage) {
-
+		int positionInHand = hand.GetPosition(card);
+		GameManager.Instance.PlayBury(positionInHand, wonderStage);
 	}
 
 	public void PlayDiscard(Card card) {
+		int positionInHand = hand.GetPosition(card);
+		GameManager.Instance.PlayDiscard(positionInHand);
+	}
 
+	public IEnumerator PrepareBuild(int positionInHand) {
+		yield return preparedCardSlot.Push(hand.PopAt(positionInHand));
+		action = Build;
+	}
+
+	public IEnumerator PrepareBury(int positionInHand, int wonderStage) {
+		yield return preparedCardSlot.Push(hand.PopAt(positionInHand));
+		action = wonder.wonderStages[wonderStage].Build;
+	}
+
+	public IEnumerator PrepareDiscard(int positionInHand) {
+		yield return preparedCardSlot.Push(hand.PopAt(positionInHand));
+		action = Discard;
+	}
+
+	public IEnumerator PerformAction() {
+		yield return action(preparedCardSlot.Pop());
+	}
+
+	public IEnumerator Build(Card card) {
+		yield return null;
+	}
+
+	public IEnumerator Discard(Card card) {
+		yield return GameManager.Instance.discardPile.Push(card);
 	}
 
 }
