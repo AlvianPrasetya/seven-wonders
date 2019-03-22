@@ -7,59 +7,22 @@ public class Age2Resolver : IResolvable {
 	private const int TurnCount = 6;
 
 	public IEnumerator Resolve() {
-		Queue<Coroutine> unloadHands = new Queue<Coroutine>();
-		Queue<Coroutine> unloadDecks = new Queue<Coroutine>();
-		
-		foreach (Player player in GameManager.Instance.Players) {
-			unloadDecks.Enqueue(GameManager.Instance.StartCoroutine(
-				player.Decks[DeckType.Age2].Unload(player.hand, Direction.East)
-			));
-		}
-		while (unloadDecks.Count != 0) {
-			yield return unloadDecks.Dequeue();
-		}
-
-		// Simulate all players discarding easternmost card
-		for (int i = 0; i < GameManager.Instance.Players.Count; i++) {
-			yield return GameManager.Instance.discardPile.Push(
-				GameManager.Instance.Players[i].hand.PopAt(
-					GameManager.Instance.Players[i].hand.displayPiles.Length - 1
-				)
-			);
-		}
-		
+		GameManager.Instance.EnqueueResolver(new UnloadDeckResolver(DeckType.Age2, Direction.East), 3);
+		GameManager.Instance.EnqueueResolver(new DecideActionResolver(30), 3);
+		GameManager.Instance.EnqueueResolver(new WaitActionResolver(), 3);
+		GameManager.Instance.EnqueueResolver(new RevealActionResolver(Direction.East), 3);
+		GameManager.Instance.EnqueueResolver(new PerformActionResolver(Direction.East), 3);
 		for (int i = 0; i < TurnCount - 1; i++) {
-			foreach (Player player in GameManager.Instance.Players) {
-				unloadHands.Enqueue(GameManager.Instance.StartCoroutine(
-					player.hand.Unload(player.eastNeighbour.Decks[DeckType.WestDeck], Direction.East)
-				));
-			}
-			while (unloadHands.Count != 0) {
-				yield return unloadHands.Dequeue();
-			}
-
-			foreach (Player player in GameManager.Instance.Players) {
-				unloadDecks.Enqueue(GameManager.Instance.StartCoroutine(
-					player.Decks[DeckType.WestDeck].Unload(player.hand, Direction.East)
-				));
-			}
-			while (unloadDecks.Count != 0) {
-				yield return unloadDecks.Dequeue();
-			}
-
-			// Simulate all players discarding easternmost card
-			for (int j = 0; j < GameManager.Instance.Players.Count; j++) {
-				yield return GameManager.Instance.discardPile.Push(
-					GameManager.Instance.Players[j].hand.PopAt(
-						GameManager.Instance.Players[j].hand.displayPiles.Length - 1
-					)
-				);
-			}
+			GameManager.Instance.EnqueueResolver(new UnloadHandResolver(DeckType.WestDeck, Direction.East), 3);
+			GameManager.Instance.EnqueueResolver(new UnloadDeckResolver(DeckType.WestDeck, Direction.East), 3);
+			GameManager.Instance.EnqueueResolver(new DecideActionResolver(30), 3);
+			GameManager.Instance.EnqueueResolver(new WaitActionResolver(), 3);
+			GameManager.Instance.EnqueueResolver(new RevealActionResolver(Direction.East), 3);
+			GameManager.Instance.EnqueueResolver(new PerformActionResolver(Direction.East), 3);
 		}
-		
-		foreach (Player player in GameManager.Instance.Players) {
-			yield return player.hand.Unload(GameManager.Instance.discardPile, Direction.East);
-		}
+		GameManager.Instance.EnqueueResolver(new UnloadHandResolver(DeckType.Discard, Direction.East), 3);
+
+		yield return null;
 	}
 
 }

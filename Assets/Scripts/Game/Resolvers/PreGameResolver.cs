@@ -82,11 +82,6 @@ public class PreGameResolver : IResolvable {
 		yield return loadBank;
 
 		yield return moveCameraDeal;
-		yield return GameManager.Instance.gameCamera.MoveTowards(
-			GameManager.Instance.Player.transform.position + new Vector3(0, 25, 0),
-			Quaternion.Euler(90, GameManager.Instance.Player.transform.rotation.eulerAngles.y, 0),
-			2
-		);
 	}
 
 	private IEnumerator LoadAndShuffle(StockType stockType, int numIterations, int randomSeed) {

@@ -11,9 +11,9 @@ public class StructureCard : Card, IBuildable, IBuriable, IDiscardable {
 
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hitInfo;
-		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask(LayerName.PlayArea))) {
-			PlayArea playArea = hitInfo.transform.GetComponent<PlayArea>();
-			playArea.Play(this);
+		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask(LayerName.DropArea))) {
+			DropArea<Card> cardDropArea = hitInfo.transform.GetComponent<DropArea<Card>>();
+			cardDropArea.Drop(this);
 		} else {
 			transform.position = dragStartPosition;
 		}

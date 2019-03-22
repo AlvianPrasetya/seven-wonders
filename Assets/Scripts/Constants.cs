@@ -4,7 +4,7 @@ public enum StockType {
 	Age1, Age2, Age3
 }
 public enum DeckType {
-	Wonder, Age1, Age2, Age3, WestDeck, EastDeck
+	Wonder, Age1, Age2, Age3, WestDeck, EastDeck, Discard
 }
 public enum Structure { RawMaterial, ManufacturedGoods, Civilian, Scientific, Commercial, Military, Guild, City, Leader, Wonder };
 public enum Age { Age1, Age2, Age3 };
@@ -29,7 +29,7 @@ public class LevelName {
 public class LayerName {
 
 	public const string Table = "Table";
-	public const string PlayArea = "Play Area";
+	public const string DropArea = "Drop Area";
 
 }
 

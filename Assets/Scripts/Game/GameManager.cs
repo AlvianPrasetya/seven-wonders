@@ -54,10 +54,12 @@ public class GameManager : MonoBehaviourPun {
 			Quaternion playerRotation = Quaternion.Euler(0, -playerAngle, 0);
 			
 			Player player = Instantiate(playerPrefab, playerPosition, playerRotation);
-			playersByPos[pos] = player;
+			PlayersByActorID[PhotonNetwork.PlayerList[i].ActorNumber] = player;
 			if (PhotonNetwork.PlayerList[i].IsLocal) {
 				Player = player;
 			}
+
+			playersByPos[pos] = player;
 		}
 
 		// Store players in a compact list ordered by pos
@@ -69,8 +71,8 @@ public class GameManager : MonoBehaviourPun {
 
 		// Assign neighbours
 		for (int i = 0; i < Players.Count; i++) {
-			Players[i].westNeighbour = Players[(Players.Count + i - 1) % Players.Count];
-			Players[i].eastNeighbour = Players[(i + 1) % Players.Count];
+			Players[i].Neighbours[Direction.West] = Players[(Players.Count + i - 1) % Players.Count];
+			Players[i].Neighbours[Direction.East] = Players[(i + 1) % Players.Count];
 		}
 
 		resolverQueue.Enqueue(
@@ -84,32 +86,32 @@ public class GameManager : MonoBehaviourPun {
 		resolverQueue.Enqueue(resolver, priority);
 	}
 
-	public void PlayBuild(int positionInHand) {
-		photonView.RPC("PlayBuild", RpcTarget.All, positionInHand);
+	public void DecideBuild(int positionInHand) {
+		photonView.RPC("DecideBuild", RpcTarget.All, positionInHand);
 	}
 
-	public void PlayBury(int positionInHand, int wonderStage) {
-		photonView.RPC("PlayBury", RpcTarget.All, positionInHand, wonderStage);
+	public void DecideBury(int positionInHand, int wonderStage) {
+		photonView.RPC("DecideBury", RpcTarget.All, positionInHand, wonderStage);
 	}
 
-	public void PlayDiscard(int positionInHand) {
-		photonView.RPC("PlayDiscard", RpcTarget.All, positionInHand);
+	public void DecideDiscard(int positionInHand) {
+		photonView.RPC("DecideDiscard", RpcTarget.All, positionInHand);
 	}
 
 	[PunRPC]
-	private void PlayBuild(int positionInHand, PhotonMessageInfo info) {
+	private void DecideBuild(int positionInHand, PhotonMessageInfo info) {
 		Player player = PlayersByActorID[info.Sender.ActorNumber];
 		StartCoroutine(player.PrepareBuild(positionInHand));
 	}
 
 	[PunRPC]
-	private void PlayBury(int positionInHand, int wonderStage, PhotonMessageInfo info) {
+	private void DecideBury(int positionInHand, int wonderStage, PhotonMessageInfo info) {
 		Player player = PlayersByActorID[info.Sender.ActorNumber];
 		StartCoroutine(player.PrepareBury(positionInHand, wonderStage));
 	}
 
 	[PunRPC]
-	private void PlayDiscard(int positionInHand, PhotonMessageInfo info) {
+	private void DecideDiscard(int positionInHand, PhotonMessageInfo info) {
 		Player player = PlayersByActorID[info.Sender.ActorNumber];
 		StartCoroutine(player.PrepareDiscard(positionInHand));
 	}

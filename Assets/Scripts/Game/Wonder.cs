@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class Wonder : MonoBehaviour {
 
-	public PlayArea[] buryPlayAreas;
+	public BuryDropArea[] buryDropAreas;
 	public WonderStage[] wonderStages;
 
 	public bool IsPlayable {
 		set {
-			foreach (PlayArea buryPlayArea in buryPlayAreas) {
-				buryPlayArea.IsPlayable = value;
+			foreach (BuryDropArea buryDropArea in buryDropAreas) {
+				buryDropArea.IsActive = value;
 			}
 		}
 	}

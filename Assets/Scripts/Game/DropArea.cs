@@ -1,12 +1,12 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public abstract class PlayArea : MonoBehaviour {
+public abstract class DropArea<T> : MonoBehaviour {
 
 	private new Renderer renderer;
 	private new Collider collider;
 	
-	public bool IsPlayable {
+	public bool IsActive {
 		set {
 			renderer.enabled = value;
 			collider.enabled = value;
@@ -18,6 +18,6 @@ public abstract class PlayArea : MonoBehaviour {
 		collider = GetComponent<Collider>();
 	}
 
-	public abstract void Play(Card card);
+	public abstract void Drop(T droppedItem);
 
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class Slot<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where T : MonoBehaviour, IMoveable {
 
-	public Vector3 dropSpacing = new Vector3(0, 0.1f, 0);
+	public Vector3 dropSpacing = new Vector3(0, 1, 0);
 	public Facing facing = Facing.Up;
 	public float pushDuration = 1;
 	public T Element { get; private set; }
@@ -37,6 +37,13 @@ public abstract class Slot<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where 
 
 	public T[] PopMany(int count) {
 		throw new NotImplementedException("PopMany is not supported for Slot");
+	}
+
+	public IEnumerator Flip() {
+		facing = (facing == Facing.Up) ? Facing.Down : Facing.Up;
+		if (Element != null) {
+			yield return Push(Pop());
+		}
 	}
 
 }
