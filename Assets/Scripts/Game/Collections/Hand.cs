@@ -121,4 +121,18 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 		throw new UnityException("The specified card could not be found");
 	}
 
+	/// <summary>
+	/// Returns a random card in this hand.
+	/// </summary>
+	public Card GetRandom() {
+		List<Card> cards = new List<Card>();
+		foreach (CardPile displayPile in displayPiles) {
+			if (displayPile.Count != 0) {
+				cards.Add(displayPile.Peek());
+			}
+		}
+
+		return cards[Random.Range(0, cards.Count)];
+	}
+
 }

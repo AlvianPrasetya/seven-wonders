@@ -27,7 +27,6 @@ public class PerformActionResolver : IResolvable {
 	public IEnumerator ResolveForPlayer(Player player) {
 		yield return GameManager.Instance.gameCamera.Focus(player);
 		yield return player.PerformAction();
-		yield return player.preparedCardSlot.Flip();
 		yield return new WaitForSeconds(1);
 	}
 

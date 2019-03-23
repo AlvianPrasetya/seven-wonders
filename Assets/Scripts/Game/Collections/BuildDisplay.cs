@@ -8,17 +8,17 @@ public class BuildDisplay : MonoBehaviour, IPushable<Card> {
 	public class DisplayPileEntry {
 
 		public DisplayType displayType;
-		public CardPile cardPile;
+		public DisplayPile displayPile;
 
 	}
 
-	public DisplayPileEntry[] displayPiles;
-	public Dictionary<DisplayType, CardPile> DisplayPiles { get; private set; }
+	public DisplayPileEntry[] displayPileEntries;
+	public Dictionary<DisplayType, DisplayPile> DisplayPiles { get; private set; }
 
 	void Awake() {
-		DisplayPiles = new Dictionary<DisplayType, CardPile>();
-		foreach (DisplayPileEntry displayPile in displayPiles) {
-			DisplayPiles.Add(displayPile.displayType, displayPile.cardPile);
+		DisplayPiles = new Dictionary<DisplayType, DisplayPile>();
+		foreach (DisplayPileEntry displayPileEntry in displayPileEntries) {
+			DisplayPiles.Add(displayPileEntry.displayType, displayPileEntry.displayPile);
 		}
 	}
 

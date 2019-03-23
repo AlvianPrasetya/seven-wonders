@@ -61,4 +61,10 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 		rigidbody.isKinematic = false;
 	}
 
+	public IEnumerator Flip() {
+		Vector3 targetEulerAngles = transform.eulerAngles + new Vector3(0, 0, 180);
+		Quaternion targetRotation = Quaternion.Euler(targetEulerAngles);
+		yield return MoveTowards(transform.position, targetRotation, 0.2f);
+	}
+
 }

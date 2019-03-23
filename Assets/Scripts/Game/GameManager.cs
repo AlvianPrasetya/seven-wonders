@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviourPun {
 	public List<Player> Players { get; private set; }
 	public Dictionary<int, Player> PlayersByActorID { get; private set; }
 	public Player Player { get; private set; }
+	public Queue<int> SyncQueue { get; private set; }
 
 	private ResolverQueue resolverQueue;
 
@@ -38,6 +39,7 @@ public class GameManager : MonoBehaviourPun {
 			Stocks.Add(stockEntry.stockType, stockEntry.stock);
 		}
 		resolverQueue = new ResolverQueue();
+		SyncQueue = new Queue<int>();
 	}
 
 	void Start() {
@@ -98,6 +100,10 @@ public class GameManager : MonoBehaviourPun {
 		photonView.RPC("DecideDiscard", RpcTarget.All, positionInHand);
 	}
 
+	public void Sync() {
+		photonView.RPC("Sync", RpcTarget.All);
+	}
+
 	[PunRPC]
 	private void DecideBuild(int positionInHand, PhotonMessageInfo info) {
 		Player player = PlayersByActorID[info.Sender.ActorNumber];
@@ -114,6 +120,11 @@ public class GameManager : MonoBehaviourPun {
 	private void DecideDiscard(int positionInHand, PhotonMessageInfo info) {
 		Player player = PlayersByActorID[info.Sender.ActorNumber];
 		StartCoroutine(player.PrepareDiscard(positionInHand));
+	}
+
+	[PunRPC]
+	private void Sync(PhotonMessageInfo info) {
+		SyncQueue.Enqueue(info.Sender.ActorNumber);
 	}
 
 	private IEnumerator Resolve() {

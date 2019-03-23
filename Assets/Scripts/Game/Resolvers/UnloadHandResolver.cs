@@ -13,8 +13,10 @@ public class UnloadHandResolver : IResolvable {
 	}
 
 	public IEnumerator Resolve() {
-		Queue<Coroutine> unloadHands = new Queue<Coroutine>();
+		// Focus on local player when unloading hand
+		yield return GameManager.Instance.gameCamera.Focus(GameManager.Instance.Player);
 
+		Queue<Coroutine> unloadHands = new Queue<Coroutine>();
 		foreach (Player player in GameManager.Instance.Players) {
 			if (deckType == DeckType.Discard) {
 				unloadHands.Enqueue(GameManager.Instance.StartCoroutine(
@@ -26,7 +28,6 @@ public class UnloadHandResolver : IResolvable {
 				));
 			}
 		}
-
 		while (unloadHands.Count != 0) {
 			yield return unloadHands.Dequeue();
 		}

@@ -77,6 +77,8 @@ public class Player : MonoBehaviour {
 	}
 
 	public IEnumerator Build(Card card) {
+		yield return card.Flip();
+		yield return new WaitForSeconds(1);
 		yield return buildDisplay.Push(card);
 	}
 

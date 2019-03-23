@@ -17,13 +17,11 @@ public class UnloadDeckResolver : IResolvable {
 		yield return GameManager.Instance.gameCamera.Focus(GameManager.Instance.Player);
 
 		Queue<Coroutine> unloadDecks = new Queue<Coroutine>();
-
 		foreach (Player player in GameManager.Instance.Players) {
 			unloadDecks.Enqueue(GameManager.Instance.StartCoroutine(
 				player.Decks[deckType].Unload(player.hand, pushDirection)
 			));
 		}
-		
 		while (unloadDecks.Count != 0) {
 			yield return unloadDecks.Dequeue();
 		}

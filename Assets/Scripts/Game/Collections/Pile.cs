@@ -19,7 +19,7 @@ public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T>, IPeek
 		Elements = new Stack<T>();
 	}
 
-	public IEnumerator Push(T element) {
+	public virtual IEnumerator Push(T element) {
 		Vector3 dropPosition = transform.position + 
 			transform.right * dropSpacing.x * (Elements.Count + 1) +
 			transform.up * dropSpacing.y * (Elements.Count + 1) + 
@@ -49,7 +49,9 @@ public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T>, IPeek
 			return null;
 		}
 
-		return Elements.Pop();
+		T poppedElement = Elements.Pop();
+		poppedElement.transform.parent = null;
+		return poppedElement;
 	}
 
 	public T[] PopMany(int count) {
