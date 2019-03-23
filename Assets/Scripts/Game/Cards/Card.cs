@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragHandler, IEndDragHandler {
 
 	public float dragHeight = 2;
+	public DisplayType displayType;
 
 	protected new Collider collider;
 	protected new Rigidbody rigidbody;

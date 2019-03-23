@@ -9,6 +9,7 @@ public enum DeckType {
 public enum Structure { RawMaterial, ManufacturedGoods, Civilian, Scientific, Commercial, Military, Guild, City, Leader, Wonder };
 public enum Age { Age1, Age2, Age3 };
 public enum Facing { Up, Down };
+public enum DisplayType { Resource, Point, Scientific, Military };
 
 public class Constant {
 	

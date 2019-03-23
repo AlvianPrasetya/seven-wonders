@@ -3,8 +3,10 @@ using UnityEngine;
 
 public class WonderStage : MonoBehaviour {
 
+	public CardSlot buildCardSlot;
+
 	public IEnumerator Build(Card card) {
-		yield return null;
+		yield return buildCardSlot.Push(card);
 	}
 	
 }

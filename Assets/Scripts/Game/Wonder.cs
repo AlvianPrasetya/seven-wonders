@@ -8,8 +8,10 @@ public class Wonder : MonoBehaviour {
 
 	public bool IsPlayable {
 		set {
-			foreach (BuryDropArea buryDropArea in buryDropAreas) {
-				buryDropArea.IsActive = value;
+			for (int i = 0; i < buryDropAreas.Length; i++) {
+				if (wonderStages[i].buildCardSlot.Element == null) {
+					buryDropAreas[i].IsActive = value;
+				}
 			}
 		}
 	}

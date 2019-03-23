@@ -20,7 +20,10 @@ public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T>, IPeek
 	}
 
 	public IEnumerator Push(T element) {
-		Vector3 dropPosition = transform.position + dropSpacing * (Elements.Count + 1);
+		Vector3 dropPosition = transform.position + 
+			transform.right * dropSpacing.x * (Elements.Count + 1) +
+			transform.up * dropSpacing.y * (Elements.Count + 1) + 
+			transform.forward * dropSpacing.z * (Elements.Count + 1);
 		Vector3 dropEulerAngles = transform.rotation.eulerAngles;
 		if (facing == Facing.Up) {
 			dropEulerAngles.z = 0.0f;

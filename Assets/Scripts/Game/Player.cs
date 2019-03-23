@@ -17,6 +17,7 @@ public class Player : MonoBehaviour {
 	public DeckEntry[] decks;
 	public Hand hand;
 	public CardSlot preparedCardSlot;
+	public BuildDisplay buildDisplay;
 	public BuildDropArea buildDropArea;
 	public DiscardDropArea discardDropArea;
 	public Wonder wonder;
@@ -76,7 +77,7 @@ public class Player : MonoBehaviour {
 	}
 
 	public IEnumerator Build(Card card) {
-		yield return null;
+		yield return buildDisplay.Push(card);
 	}
 
 	public IEnumerator Discard(Card card) {
