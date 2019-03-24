@@ -11,6 +11,7 @@ public enum Age { Age1, Age2, Age3 };
 public enum Facing { Up, Down };
 public enum DisplayType { Resource, Point, OneOff, Military, Scientific };
 public enum CardType { RawMaterial, ManufacturedGoods, Civilian, Scientific, Commercial, Military, Guild, City };
+public enum Target { Self, Neighbours, Neighbourhood, Others, Everyone };
 
 public class Constant {
 	
@@ -46,4 +47,11 @@ public class PlayerProperty {
 	public const string Ready = "ready";
 	public const string Pos = "pos";
 	
+}
+
+public class GameOptions {
+
+	public const int InitialCoinAmount = 3;
+	public const int DiscardCoinAmount = 3;
+
 }

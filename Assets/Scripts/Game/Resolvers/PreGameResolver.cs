@@ -84,7 +84,7 @@ public class PreGameResolver : IResolvable {
 		yield return moveCameraDeal;
 
 		foreach (Player player in GameManager.Instance.Players) {
-			yield return player.GainCoin(3);
+			yield return player.GainCoin(GameOptions.InitialCoinAmount);
 		}
 	}
 

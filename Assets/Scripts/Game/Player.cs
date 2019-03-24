@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,6 +34,7 @@ public class Player : MonoBehaviour {
 		}
 	}
 	public TurnAction Action { get; private set; }
+	public Dictionary<CardType, List<Card>> BuiltCardsByType { get; private set; }
 
 	void Awake() {
 		Decks = new Dictionary<DeckType, Deck>();
@@ -40,6 +42,10 @@ public class Player : MonoBehaviour {
 			Decks.Add(deckEntry.deckType, deckEntry.deck);
 		}
 		Neighbours = new Dictionary<Direction, Player>();
+		BuiltCardsByType = new Dictionary<CardType, List<Card>>();
+		foreach (CardType cardType in Enum.GetValues(typeof(CardType))) {
+			BuiltCardsByType[cardType] = new List<Card>();
+		}
 	}
 
 	public void PlayBuild(Card card) {
@@ -81,10 +87,18 @@ public class Player : MonoBehaviour {
 		yield return card.Flip();
 		yield return new WaitForSeconds(1);
 		yield return buildDisplay.Push(card);
+
+		BuiltCardsByType[card.cardType].Add(card);
+		foreach (OnBuildEffect onBuildEffect in card.onBuildEffects) {
+			onBuildEffect.Effect(this);
+		}
 	}
 
 	public IEnumerator Discard(Card card) {
 		yield return GameManager.Instance.discardPile.Push(card);
+		GameManager.Instance.EnqueueResolver(
+			new GainCoinsResolver(this, GameOptions.DiscardCoinAmount), 5
+		);
 	}
 
 	public IEnumerator GainCoin(int amount) {

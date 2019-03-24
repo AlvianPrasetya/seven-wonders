@@ -8,6 +8,7 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	public CardType cardType;
 	public DisplayType displayType;
 	public float dragHeight = 2;
+	public OnBuildEffect[] onBuildEffects;
 
 	protected new Collider collider;
 	protected new Rigidbody rigidbody;

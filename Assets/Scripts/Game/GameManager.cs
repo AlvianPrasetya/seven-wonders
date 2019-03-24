@@ -47,11 +47,11 @@ public class GameManager : MonoBehaviourPun {
 		Player[] playersByPos = new Player[7];
 		for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++) {
 			int pos = (int)PhotonNetwork.PlayerList[i].CustomProperties[PlayerProperty.Pos];
-			float playerAngle = pos * 360f / 7;
+			float playerAngle = pos * 360f / PhotonNetwork.PlayerList.Length;
 			Vector3 playerPosition = new Vector3(
-				Mathf.Sin(Mathf.Deg2Rad * playerAngle) * 35,
+				Mathf.Sin(Mathf.Deg2Rad * playerAngle) * 40,
 				0,
-				-Mathf.Cos(Mathf.Deg2Rad * playerAngle) * 35
+				-Mathf.Cos(Mathf.Deg2Rad * playerAngle) * 40
 			);
 			Quaternion playerRotation = Quaternion.Euler(0, -playerAngle, 0);
 			

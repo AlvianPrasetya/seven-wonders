@@ -1,11 +1,11 @@
 using System.Collections;
 
-public class GainCoinResolver : IResolvable {
+public class GainCoinsResolver : IResolvable {
 
 	private Player player;
 	private int amount;
 
-	public GainCoinResolver(Player player, int amount) {
+	public GainCoinsResolver(Player player, int amount) {
 		this.player = player;
 		this.amount = amount;
 	}

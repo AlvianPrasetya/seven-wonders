@@ -13,21 +13,23 @@ public class PerformActionResolver : IResolvable {
 		switch (performDirection) {
 			case Direction.West:
 				for (int i = GameManager.Instance.Players.Count - 1; i >= 0; i--) {
-					yield return ResolveForPlayer(GameManager.Instance.Players[i]);
+					GameManager.Instance.EnqueueResolver(
+						new PerformPlayerActionResolver(GameManager.Instance.Players[i]),
+						4
+					);
 				}
 				break;
 			case Direction.East:
 				for (int i = 0; i < GameManager.Instance.Players.Count; i++) {
-					yield return ResolveForPlayer(GameManager.Instance.Players[i]);
+					GameManager.Instance.EnqueueResolver(
+						new PerformPlayerActionResolver(GameManager.Instance.Players[i]),
+						4
+					);
 				}
 				break;
 		}
-	}
 
-	public IEnumerator ResolveForPlayer(Player player) {
-		yield return GameManager.Instance.gameCamera.Focus(player);
-		yield return player.PerformAction();
-		yield return new WaitForSeconds(1);
+		yield return null;
 	}
 
 }
