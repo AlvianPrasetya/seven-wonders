@@ -4,8 +4,10 @@ using UnityEngine.EventSystems;
 
 public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragHandler, IEndDragHandler {
 
-	public float dragHeight = 2;
+	public string cardName;
+	public CardType cardType;
 	public DisplayType displayType;
+	public float dragHeight = 2;
 
 	protected new Collider collider;
 	protected new Rigidbody rigidbody;
