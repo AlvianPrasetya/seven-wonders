@@ -21,6 +21,7 @@ public class Player : MonoBehaviour {
 	public BuildDropArea buildDropArea;
 	public DiscardDropArea discardDropArea;
 	public Wonder wonder;
+	public Bank bank;
 
 	public Dictionary<DeckType, Deck> Decks { get; private set; }
 	public Dictionary<Direction, Player> Neighbours { get; private set; }
@@ -84,6 +85,10 @@ public class Player : MonoBehaviour {
 
 	public IEnumerator Discard(Card card) {
 		yield return GameManager.Instance.discardPile.Push(card);
+	}
+
+	public IEnumerator GainCoin(int amount) {
+		yield return bank.PushMany(GameManager.Instance.bank.PopMany(amount));
 	}
 
 }

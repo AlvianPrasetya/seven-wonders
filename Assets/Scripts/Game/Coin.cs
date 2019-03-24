@@ -46,9 +46,11 @@ public class Coin : MonoBehaviour, IMoveable {
 			Vector3 position = Vector3.Lerp(initialPositionXZ, targetPositionXZ, progress);
 			// Sphere equation: (x - a)^2 + (y - b)^2 + (z - c)^2 = r^2
 			position.y = Mathf.Sqrt(
-				Mathf.Pow(sphereRadius, 2) - 
-				Mathf.Pow(position.x - sphereCenter.x, 2) - 
-				Mathf.Pow(position.z - sphereCenter.z, 2)
+				Mathf.Max(
+					Mathf.Pow(sphereRadius, 2) - 
+					Mathf.Pow(position.x - sphereCenter.x, 2) - 
+					Mathf.Pow(position.z - sphereCenter.z, 2)
+				, 0)
 			) + sphereCenter.y;
 			transform.position = position;
 

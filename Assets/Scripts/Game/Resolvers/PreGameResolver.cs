@@ -82,6 +82,10 @@ public class PreGameResolver : IResolvable {
 		yield return loadBank;
 
 		yield return moveCameraDeal;
+
+		foreach (Player player in GameManager.Instance.Players) {
+			yield return player.GainCoin(3);
+		}
 	}
 
 	private IEnumerator LoadAndShuffle(StockType stockType, int numIterations, int randomSeed) {
