@@ -16,6 +16,7 @@ public class PreGameResolver : IResolvable {
 		int age3RandomSeed = random.Next();
 		int age2RandomSeed = random.Next();
 		int age1RandomSeed = random.Next();
+		int wonderRandomSeed = random.Next();
 
 		Coroutine loadBank = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.bank.Load()
@@ -78,11 +79,10 @@ public class PreGameResolver : IResolvable {
 		yield return GameManager.Instance.Stocks[StockType.Age2].Deal(DeckType.Age2);
 		yield return shuffleAge1;
 		yield return GameManager.Instance.Stocks[StockType.Age1].Deal(DeckType.Age1);
-		
-		yield return loadBank;
 
 		yield return moveCameraDeal;
-
+		
+		yield return loadBank;
 		foreach (Player player in GameManager.Instance.Players) {
 			yield return player.GainCoin(GameOptions.InitialCoinAmount);
 		}

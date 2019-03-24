@@ -36,8 +36,8 @@ public class Stock : CardPile, ILoadable, IShuffleable, IDealable {
 			}
 
 			// Merge all shuffle stocks
-			foreach (CardPile shuffleCardPiles in shuffleCardPiles) {
-				yield return PushMany(shuffleCardPiles.PopMany(shuffleCardPiles.Count));
+			foreach (CardPile shuffleCardPile in shuffleCardPiles) {
+				yield return PushMany(shuffleCardPile.PopMany(shuffleCardPile.Count));
 			}
 		}
 	}
