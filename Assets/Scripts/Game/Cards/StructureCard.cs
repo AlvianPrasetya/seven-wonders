@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class StructureCard : Card, IBuildable, IBuriable, IDiscardable {
+public class StructureCard : Card {
 
 	public int minPlayers;
 	public Age age;
@@ -17,15 +17,6 @@ public class StructureCard : Card, IBuildable, IBuriable, IDiscardable {
 		} else {
 			transform.position = dragStartPosition;
 		}
-	}
-	
-	public void Build() {
-	}
-
-	public void Bury() {
-	}
-
-	public void Discard() {
 	}
 
 }

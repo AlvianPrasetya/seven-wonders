@@ -12,11 +12,16 @@ public class PreGameResolver : IResolvable {
 
 	public IEnumerator Resolve() {
 		System.Random random = new System.Random(randomSeed);
+		int wonderRandomSeed = random.Next();
 		int guildRandomSeed = random.Next();
 		int age3RandomSeed = random.Next();
 		int age2RandomSeed = random.Next();
 		int age1RandomSeed = random.Next();
-		int wonderRandomSeed = random.Next();
+
+		yield return GameManager.Instance.wonderStock.Load(wonderRandomSeed);
+		yield return GameManager.Instance.wonderStock.Shuffle(5, wonderRandomSeed);
+		yield return GameManager.Instance.wonderStock.Deal();
+		yield return GameManager.Instance.wonderStock.Dump();
 
 		Coroutine loadBank = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.bank.Load()

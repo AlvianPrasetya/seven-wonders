@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviourPun {
 	public GameCamera gameCamera;
 	public Bank bank;
 	public Deck discardPile;
+	public WonderStock wonderStock;
 	public StockEntry[] stocks;
 	public Player playerPrefab;
 

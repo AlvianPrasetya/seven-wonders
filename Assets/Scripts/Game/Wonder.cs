@@ -2,8 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 public class Wonder : MonoBehaviour, IMoveable {
-
-	public BuryDropArea[] buryDropAreas;
+	
 	public WonderStage[] wonderStages;
 
 	protected new Collider collider;
@@ -11,13 +10,10 @@ public class Wonder : MonoBehaviour, IMoveable {
 
 	void Awake() {
 		collider = GetComponent<Collider>();
-		rigidbody = GetComponent<Rigidbody>();
 	}
 
 	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation, float duration) {
 		collider.enabled = false;
-		rigidbody.useGravity = false;
-		rigidbody.isKinematic = true;
 
 		Vector3 initialPosition = transform.position;
 		Quaternion initialRotation = transform.rotation;
@@ -33,16 +29,12 @@ public class Wonder : MonoBehaviour, IMoveable {
 		}
 
 		collider.enabled = true;
-		rigidbody.useGravity = true;
-		rigidbody.isKinematic = false;
 	}
 
-	public bool IsPlayable {
+	public bool IsActive {
 		set {
-			for (int i = 0; i < buryDropAreas.Length; i++) {
-				if (wonderStages[i].buildCardSlot.Element == null) {
-					buryDropAreas[i].IsActive = value;
-				}
+			foreach (WonderStage wonderStage in wonderStages) {
+				wonderStage.IsActive = !wonderStage.IsBuilt && value;
 			}
 		}
 	}

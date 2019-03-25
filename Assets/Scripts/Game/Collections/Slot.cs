@@ -10,7 +10,10 @@ public abstract class Slot<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where 
 	public T Element { get; private set; }
 
 	public IEnumerator Push(T element) {
-		Vector3 dropPosition = transform.position + dropSpacing;
+		Vector3 dropPosition = transform.position + 
+			transform.right * dropSpacing.x +
+			transform.up * dropSpacing.y + 
+			transform.forward * dropSpacing.z;
 		Vector3 dropEulerAngles = transform.rotation.eulerAngles;
 		if (facing == Facing.Up) {
 			dropEulerAngles.z = 0.0f;

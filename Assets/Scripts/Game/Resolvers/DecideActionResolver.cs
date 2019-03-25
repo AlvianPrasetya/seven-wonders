@@ -21,8 +21,10 @@ public class DecideActionResolver : IResolvable {
 		GameManager.Instance.Player.IsActive = false;
 		if (GameManager.Instance.Player.Action == null) {
 			// Player has yet to decide on an action, discard a random card
-			GameManager.Instance.Player.PlayDiscard(GameManager.Instance.Player.hand.GetRandom());
+			GameManager.Instance.Player.DecideDiscard(GameManager.Instance.Player.hand.GetRandom());
 		}
+
+		yield return new WaitForSeconds(1);
 	}
 
 }

@@ -13,7 +13,9 @@ public class Player : MonoBehaviour {
 
 	}
 
-	public delegate IEnumerator TurnAction(Card card);
+	public delegate IEnumerator TurnAction(
+		Card card, params object[] args
+	);
 
 	public DeckEntry[] decks;
 	public Hand hand;
@@ -21,16 +23,21 @@ public class Player : MonoBehaviour {
 	public BuildDisplay buildDisplay;
 	public BuildDropArea buildDropArea;
 	public DiscardDropArea discardDropArea;
-	public Wonder wonder;
+	public WonderSlot wonderSlot;
 	public Bank bank;
 
 	public Dictionary<DeckType, Deck> Decks { get; private set; }
 	public Dictionary<Direction, Player> Neighbours { get; private set; }
+	public Wonder Wonder {
+		get {
+			return wonderSlot.Element;
+		}
+	}
 	public bool IsActive {
 		set {
 			buildDropArea.IsActive = value;
 			discardDropArea.IsActive = value;
-			wonder.IsPlayable = value;
+			Wonder.IsActive = value;
 		}
 	}
 	public TurnAction Action { get; private set; }
@@ -48,44 +55,47 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	public void PlayBuild(Card card) {
+	public void DecideBuild(Card card) {
 		int positionInHand = hand.GetPosition(card);
 		GameManager.Instance.DecideBuild(positionInHand);
 	}
 
-	public void PlayBury(Card card, int wonderStage) {
+	public void DecideBury(Card card, int wonderStage) {
 		int positionInHand = hand.GetPosition(card);
 		GameManager.Instance.DecideBury(positionInHand, wonderStage);
 	}
 
-	public void PlayDiscard(Card card) {
+	public void DecideDiscard(Card card) {
 		int positionInHand = hand.GetPosition(card);
 		GameManager.Instance.DecideDiscard(positionInHand);
 	}
 
 	public IEnumerator PrepareBuild(int positionInHand) {
-		yield return preparedCardSlot.Push(hand.PopAt(positionInHand));
+		Card card = hand.PopAt(positionInHand);
+		yield return preparedCardSlot.Push(card);
 		Action = Build;
 	}
 
 	public IEnumerator PrepareBury(int positionInHand, int wonderStage) {
-		yield return preparedCardSlot.Push(hand.PopAt(positionInHand));
-		Action = wonder.wonderStages[wonderStage].Build;
+		Card card = hand.PopAt(positionInHand);
+		yield return preparedCardSlot.Push(card);
+		Action = Bury;
 	}
 
 	public IEnumerator PrepareDiscard(int positionInHand) {
-		yield return preparedCardSlot.Push(hand.PopAt(positionInHand));
+		Card card = hand.PopAt(positionInHand);
+		yield return preparedCardSlot.Push(card);
 		Action = Discard;
 	}
 
 	public IEnumerator PerformAction() {
-		yield return Action(preparedCardSlot.Pop());
+		Card card = preparedCardSlot.Pop();
+		yield return Action(card);
 		Action = null;
 	}
 
-	public IEnumerator Build(Card card) {
+	public IEnumerator Build(Card card, object unused) {
 		yield return card.Flip();
-		yield return new WaitForSeconds(1);
 		yield return buildDisplay.Push(card);
 
 		BuiltCardsByType[card.cardType].Add(card);
@@ -94,7 +104,14 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	public IEnumerator Discard(Card card) {
+	public IEnumerator Bury(Card card, object wonderStage) {
+		yield return Wonder.wonderStages[(int)wonderStage].buildCardSlot.Push(card);
+		foreach (OnBuildEffect onBuildEffect in Wonder.wonderStages[(int)wonderStage].onBuildEffects) {
+			onBuildEffect.Effect(this);
+		}
+	}
+
+	public IEnumerator Discard(Card card, object unused) {
 		yield return GameManager.Instance.discardPile.Push(card);
 		GameManager.Instance.EnqueueResolver(
 			new GainCoinsResolver(this, GameOptions.DiscardCoinAmount), 5
