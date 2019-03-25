@@ -20,11 +20,13 @@ public class GameManager : MonoBehaviourPun {
 	public Deck discardPile;
 	public WonderStock wonderStock;
 	public StockEntry[] stocks;
-	public Player playerPrefab;
+	public Human humanPrefab;
+	public Bot botPrefab;
 
 	public static GameManager Instance { get; private set; }
 	public Dictionary<StockType, Stock> Stocks { get; private set; }
 	public List<Player> Players { get; private set; }
+	public List<Bot> Bots { get; private set; }
 	public Dictionary<int, Player> PlayersByActorID { get; private set; }
 	public Player Player { get; private set; }
 	public Queue<int> SyncQueue { get; private set; }
@@ -35,6 +37,7 @@ public class GameManager : MonoBehaviourPun {
 		Instance = this;
 		Stocks = new Dictionary<StockType, Stock>();
 		Players = new List<Player>();
+		Bots = new List<Bot>();
 		PlayersByActorID = new Dictionary<int, Player>();
 		foreach (StockEntry stockEntry in stocks) {
 			Stocks.Add(stockEntry.stockType, stockEntry.stock);
@@ -48,7 +51,7 @@ public class GameManager : MonoBehaviourPun {
 		Player[] playersByPos = new Player[7];
 		for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++) {
 			int pos = (int)PhotonNetwork.PlayerList[i].CustomProperties[PlayerProperty.Pos];
-			float playerAngle = pos * 360f / PhotonNetwork.PlayerList.Length;
+			float playerAngle = pos * 360f / 7;
 			Vector3 playerPosition = new Vector3(
 				Mathf.Sin(Mathf.Deg2Rad * playerAngle) * 40,
 				0,
@@ -56,13 +59,29 @@ public class GameManager : MonoBehaviourPun {
 			);
 			Quaternion playerRotation = Quaternion.Euler(0, -playerAngle, 0);
 			
-			Player player = Instantiate(playerPrefab, playerPosition, playerRotation);
+			Player player = Instantiate(humanPrefab, playerPosition, playerRotation);
 			PlayersByActorID[PhotonNetwork.PlayerList[i].ActorNumber] = player;
 			if (PhotonNetwork.PlayerList[i].IsLocal) {
 				Player = player;
 			}
 
 			playersByPos[pos] = player;
+		}
+
+		// Create bots to fill in remaining pos
+		for (int pos = PhotonNetwork.PlayerList.Length; pos < 7; pos++) {
+			float playerAngle = pos * 360f / 7;
+			Vector3 playerPosition = new Vector3(
+				Mathf.Sin(Mathf.Deg2Rad * playerAngle) * 40,
+				0,
+				-Mathf.Cos(Mathf.Deg2Rad * playerAngle) * 40
+			);
+			Quaternion playerRotation = Quaternion.Euler(0, -playerAngle, 0);
+			
+			Bot bot = Instantiate(botPrefab, playerPosition, playerRotation);
+			Bots.Add(bot);
+
+			playersByPos[pos] = bot;
 		}
 
 		// Store players in a compact list ordered by pos
@@ -101,6 +120,39 @@ public class GameManager : MonoBehaviourPun {
 		photonView.RPC("DecideDiscard", RpcTarget.All, positionInHand);
 	}
 
+	public void DecideBotBuild(Bot bot, int positionInHand) {
+		int botIndex = 0;
+		for (int i = 0; i < Bots.Count; i++) {
+			if (bot == Bots[i]) {
+				botIndex = i;
+				break;
+			}
+		}
+		photonView.RPC("DecideBotBuild", RpcTarget.All, botIndex, positionInHand);
+	}
+
+	public void DecideBotBury(Bot bot, int positionInHand, int wonderStage) {
+		int botIndex = 0;
+		for (int i = 0; i < Bots.Count; i++) {
+			if (bot == Bots[i]) {
+				botIndex = i;
+				break;
+			}
+		}
+		photonView.RPC("DecideBotBury", RpcTarget.All, botIndex, positionInHand, wonderStage);
+	}
+
+	public void DecideBotDiscard(Bot bot, int positionInHand) {
+		int botIndex = 0;
+		for (int i = 0; i < Bots.Count; i++) {
+			if (bot == Bots[i]) {
+				botIndex = i;
+				break;
+			}
+		}
+		photonView.RPC("DecideBotDiscard", RpcTarget.All, botIndex, positionInHand);
+	}
+
 	public void Sync() {
 		photonView.RPC("Sync", RpcTarget.All);
 	}
@@ -120,6 +172,24 @@ public class GameManager : MonoBehaviourPun {
 	[PunRPC]
 	private void DecideDiscard(int positionInHand, PhotonMessageInfo info) {
 		Player player = PlayersByActorID[info.Sender.ActorNumber];
+		StartCoroutine(player.PrepareDiscard(positionInHand));
+	}
+
+	[PunRPC]
+	private void DecideBotBuild(int botIndex, int positionInHand) {
+		Player player = Bots[botIndex];
+		StartCoroutine(player.PrepareBuild(positionInHand));
+	}
+
+	[PunRPC]
+	private void DecideBotBury(int botIndex, int positionInHand, int wonderStage) {
+		Player player = Bots[botIndex];
+		StartCoroutine(player.PrepareBury(positionInHand, wonderStage));
+	}
+
+	[PunRPC]
+	private void DecideBotDiscard(int botIndex, int positionInHand) {
+		Player player = Bots[botIndex];
 		StartCoroutine(player.PrepareDiscard(positionInHand));
 	}
 

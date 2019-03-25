@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour {
+public abstract class Player : MonoBehaviour {
 
 	[System.Serializable]
 	public class DeckEntry {
@@ -55,20 +55,11 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	public void DecideBuild(Card card) {
-		int positionInHand = hand.GetPosition(card);
-		GameManager.Instance.DecideBuild(positionInHand);
-	}
+	public abstract void DecideBuild(Card card);
 
-	public void DecideBury(Card card, int wonderStage) {
-		int positionInHand = hand.GetPosition(card);
-		GameManager.Instance.DecideBury(positionInHand, wonderStage);
-	}
+	public abstract void DecideBury(Card card, int wonderStage);
 
-	public void DecideDiscard(Card card) {
-		int positionInHand = hand.GetPosition(card);
-		GameManager.Instance.DecideDiscard(positionInHand);
-	}
+	public abstract void DecideDiscard(Card card);
 
 	public IEnumerator PrepareBuild(int positionInHand) {
 		Card card = hand.PopAt(positionInHand);
