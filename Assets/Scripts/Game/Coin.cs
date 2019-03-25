@@ -3,19 +3,7 @@ using UnityEngine;
 
 public class Coin : MonoBehaviour, IMoveable {
 
-	private new Collider collider;
-	private new Rigidbody rigidbody;
-
-	void Awake() {
-		collider = GetComponent<Collider>();
-		rigidbody = GetComponent<Rigidbody>();
-	}
-
 	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation, float duration) {
-		collider.enabled = false;
-		rigidbody.useGravity = false;
-		rigidbody.isKinematic = true;
-
 		Vector3 initialPosition = transform.position;
 		Quaternion initialRotation = transform.rotation;
 		float initialDistance = Vector3.Distance(initialPosition, targetPosition);
@@ -56,10 +44,6 @@ public class Coin : MonoBehaviour, IMoveable {
 
 			yield return null;
 		}
-
-		collider.enabled = true;
-		rigidbody.useGravity = true;
-		rigidbody.isKinematic = false;
 	}
 
 }

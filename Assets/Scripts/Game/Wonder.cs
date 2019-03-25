@@ -3,18 +3,11 @@ using UnityEngine;
 
 public class Wonder : MonoBehaviour, IMoveable {
 	
+	public Bank bank;
+	public CardSlot preparedCardSlot;
 	public WonderStage[] wonderStages;
 
-	protected new Collider collider;
-	protected new Rigidbody rigidbody;
-
-	void Awake() {
-		collider = GetComponent<Collider>();
-	}
-
 	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation, float duration) {
-		collider.enabled = false;
-
 		Vector3 initialPosition = transform.position;
 		Quaternion initialRotation = transform.rotation;
 
@@ -27,8 +20,6 @@ public class Wonder : MonoBehaviour, IMoveable {
 
 			yield return null;
 		}
-
-		collider.enabled = true;
 	}
 
 	public bool IsActive {

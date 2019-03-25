@@ -12,7 +12,6 @@ public class PerformPlayerActionResolver : IResolvable {
 	public IEnumerator Resolve() {
 		yield return GameManager.Instance.gameCamera.Focus(player);
 		yield return player.PerformAction();
-		yield return new WaitForSeconds(1);
 	}
 
 }

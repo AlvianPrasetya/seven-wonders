@@ -50,17 +50,11 @@ public class WonderStock : WonderPile, IRandomLoadable, IShuffleable {
 		foreach (Player player in GameManager.Instance.Players) {
 			Wonder wonder = Pop();
 			yield return player.wonderSlot.Push(wonder);
+			player.bank = wonder.bank;
+			player.preparedCardSlot = wonder.preparedCardSlot;
 			foreach (WonderStage wonderStage in wonder.wonderStages) {
 				wonderStage.buryDropArea.onDropEvent.AddListener(player.DecideBury);
 			}
-		}
-	}
-
-	public IEnumerator Dump() {
-		while (Elements.Count != 0) {
-			Wonder wonder = Elements.Pop();
-			Destroy(wonder.gameObject);
-			yield return new WaitForSeconds(pushDuration);
 		}
 	}
 

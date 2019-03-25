@@ -9,21 +9,10 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	public DisplayType displayType;
 	public float dragHeight = 2;
 	public OnBuildEffect[] onBuildEffects;
-
-	protected new Collider collider;
-	protected new Rigidbody rigidbody;
+	
 	protected Vector3 dragStartPosition;
 
-	void Awake() {
-		collider = GetComponent<Collider>();
-		rigidbody = GetComponent<Rigidbody>();
-	}
-
 	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation, float duration) {
-		collider.enabled = false;
-		rigidbody.useGravity = false;
-		rigidbody.isKinematic = true;
-
 		Vector3 initialPosition = transform.position;
 		Quaternion initialRotation = transform.rotation;
 
@@ -36,17 +25,9 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 
 			yield return null;
 		}
-
-		collider.enabled = true;
-		rigidbody.useGravity = true;
-		rigidbody.isKinematic = false;
 	}
 
 	public virtual void OnBeginDrag(PointerEventData eventData) {
-		collider.enabled = false;
-		rigidbody.useGravity = false;
-		rigidbody.isKinematic = true;
-
 		dragStartPosition = transform.position;
 	}
 
@@ -59,9 +40,6 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	}
 
 	public virtual void OnEndDrag(PointerEventData eventData) {
-		collider.enabled = true;
-		rigidbody.useGravity = true;
-		rigidbody.isKinematic = false;
 	}
 
 	public IEnumerator Flip() {
