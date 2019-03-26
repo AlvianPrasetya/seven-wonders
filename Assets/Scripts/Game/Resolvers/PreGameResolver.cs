@@ -56,10 +56,6 @@ public class PreGameResolver : IResolvable {
 		yield return loadCommercialStock;
 		yield return loadMilitaryStock;
 		yield return loadAndShuffleGuildStock;
-
-		Coroutine moveCameraShuffle = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.gameCamera.MoveTowards(new Vector3(0, 40, -20), Quaternion.Euler(75, 0, 0), 10)
-		);
 		
 		yield return GameManager.Instance.Stocks[StockType.Age3].Load();
 		Coroutine shuffleAge3 = GameManager.Instance.StartCoroutine(
@@ -74,26 +70,18 @@ public class PreGameResolver : IResolvable {
 			GameManager.Instance.Stocks[StockType.Age1].Shuffle(5, age1RandomSeed)
 		);
 
-		yield return moveCameraShuffle;
-		Coroutine moveCameraDeal = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.gameCamera.MoveTowards(new Vector3(0, 85, 0), Quaternion.Euler(90, 0, 0), 10)
-		);
-
 		yield return shuffleAge3;
 		yield return GameManager.Instance.Stocks[StockType.Age3].Deal(DeckType.Age3);
 		yield return shuffleAge2;
 		yield return GameManager.Instance.Stocks[StockType.Age2].Deal(DeckType.Age2);
 		yield return shuffleAge1;
 		yield return GameManager.Instance.Stocks[StockType.Age1].Deal(DeckType.Age1);
-
-		yield return moveCameraDeal;
 		
 		yield return loadBank;
-
 		Queue<Coroutine> gainCoins = new Queue<Coroutine>();
 		foreach (Player player in GameManager.Instance.Players) {
 			gainCoins.Enqueue(GameManager.Instance.StartCoroutine(
-				player.GainCoin(3)
+				player.GainCoin(GameOptions.InitialCoinAmount)
 			));
 		}
 		while (gainCoins.Count != 0) {

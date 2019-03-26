@@ -27,11 +27,11 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 		}
 	}
 
-	public virtual void OnBeginDrag(PointerEventData eventData) {
+	public void OnBeginDrag(PointerEventData eventData) {
 		dragStartPosition = transform.position;
 	}
 
-	public virtual void OnDrag(PointerEventData eventData) {
+	public void OnDrag(PointerEventData eventData) {
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hitInfo;
 		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask(LayerName.Table))) {
@@ -39,7 +39,15 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 		}
 	}
 
-	public virtual void OnEndDrag(PointerEventData eventData) {
+	public void OnEndDrag(PointerEventData eventData) {
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit hitInfo;
+		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask(LayerName.DropArea))) {
+			DropArea<Card> cardDropArea = hitInfo.transform.GetComponent<DropArea<Card>>();
+			cardDropArea.Drop(this);
+		} else {
+			transform.position = dragStartPosition;
+		}
 	}
 
 	public IEnumerator Flip() {
