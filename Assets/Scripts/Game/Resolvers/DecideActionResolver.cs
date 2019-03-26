@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using UnityEngine;
 
@@ -24,8 +25,11 @@ public class DecideActionResolver : IResolvable {
 			GameManager.Instance.Player.DecideDiscard(GameManager.Instance.Player.hand.GetRandom());
 		}
 
-		foreach (Bot bot in GameManager.Instance.Bots) {
-			bot.DecideDiscard(bot.hand.GetRandom());
+		if (PhotonNetwork.IsMasterClient) {
+			// Master client determines the bots' moves (TODO: Simple AI)
+			foreach (Bot bot in GameManager.Instance.Bots) {
+				bot.DecideDiscard(bot.hand.GetRandom());
+			}
 		}
 
 		yield return new WaitForSeconds(1);
