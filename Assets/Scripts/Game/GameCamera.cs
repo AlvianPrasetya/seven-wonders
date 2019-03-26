@@ -3,8 +3,11 @@ using UnityEngine;
 
 public class GameCamera : MonoBehaviour {
 
-	public float PlayerFocusDistance = 30;
-	public float PlayerFocusAngle = 60;
+	public Vector3 selfFocusOffset = new Vector3(0, 25, -7);
+	public float selfFocusAngle = 75;
+	public Vector3 othersFocusOffset = new Vector3(0, 25, 0);
+	public float othersFocusAngle = 75;
+	public float refocusDuration = 1;
 
 	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation, float duration) {
 		Vector3 initialPosition = transform.position;
@@ -25,13 +28,23 @@ public class GameCamera : MonoBehaviour {
 	/// Focuses the camera on the specified player.
 	/// </summary>
 	public IEnumerator Focus(Player player) {
-		yield return MoveTowards(
-			player.transform.position +
-				player.transform.up * Mathf.Sin(Mathf.Deg2Rad * PlayerFocusAngle) * PlayerFocusDistance +
-				player.transform.forward * -Mathf.Cos(Mathf.Deg2Rad * PlayerFocusAngle) * PlayerFocusDistance,
-			Quaternion.Euler(PlayerFocusAngle, player.transform.rotation.eulerAngles.y, 0),
-			1
-		);
+		Vector3 targetPosition;
+		Quaternion targetRotation;
+		if (player == GameManager.Instance.Player) {
+			targetPosition = player.transform.position +
+				player.transform.right * selfFocusOffset.x +
+				player.transform.up * selfFocusOffset.y +
+				player.transform.forward * selfFocusOffset.z;
+			targetRotation = Quaternion.Euler(selfFocusAngle, player.transform.rotation.eulerAngles.y, 0);
+		} else {	
+			targetPosition = player.transform.position +
+				player.transform.right * othersFocusOffset.x +
+				player.transform.up * othersFocusOffset.y +
+				player.transform.forward * othersFocusOffset.z;
+			targetRotation = Quaternion.Euler(othersFocusAngle, player.transform.rotation.eulerAngles.y, 0);
+		}
+
+		yield return MoveTowards(targetPosition, targetRotation, refocusDuration);
 	}
 
 }
