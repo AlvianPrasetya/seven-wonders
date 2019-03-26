@@ -10,8 +10,12 @@ public class PerformPlayerActionResolver : IResolvable {
 	}
 
 	public IEnumerator Resolve() {
-		yield return GameManager.Instance.gameCamera.Focus(player);
-		yield return player.PerformAction();
+		if (player == GameManager.Instance.Player) {
+			yield return GameManager.Instance.gameCamera.Focus(player);
+			yield return player.PerformAction();
+		} else {
+			GameManager.Instance.StartCoroutine(player.PerformAction());
+		}
 	}
 
 }

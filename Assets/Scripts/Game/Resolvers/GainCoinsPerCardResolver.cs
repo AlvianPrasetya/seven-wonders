@@ -15,22 +15,22 @@ public class GainCoinsPerCardResolver : IResolvable {
 	}
 
 	public IEnumerator Resolve() {
-		yield return GameManager.Instance.gameCamera.Focus(player);
+		IEnumerator gainCoin = null;
 		switch (countTarget) {
 			case Target.Self:
-				yield return player.GainCoin(
+				gainCoin = player.GainCoin(
 					amountPerCard * player.BuiltCardsByType[cardType].Count
 				);
 				break;
 			case Target.Neighbours:
-				yield return player.GainCoin(
+				gainCoin = player.GainCoin(
 					amountPerCard * 
 						(player.Neighbours[Direction.West].BuiltCardsByType[cardType].Count +
 						player.Neighbours[Direction.East].BuiltCardsByType[cardType].Count)
 				);
 				break;
 			case Target.Neighbourhood:
-				yield return player.GainCoin(
+				gainCoin = player.GainCoin(
 					amountPerCard *
 						(player.Neighbours[Direction.West].BuiltCardsByType[cardType].Count +
 						player.BuiltCardsByType[cardType].Count +
@@ -41,6 +41,13 @@ public class GainCoinsPerCardResolver : IResolvable {
 				break;
 			case Target.Everyone:
 				break;
+		}
+
+		if (player == GameManager.Instance.Player) {
+			yield return GameManager.Instance.gameCamera.Focus(player);
+			yield return gainCoin;
+		} else {
+			GameManager.Instance.StartCoroutine(gainCoin);
 		}
 	}
 
