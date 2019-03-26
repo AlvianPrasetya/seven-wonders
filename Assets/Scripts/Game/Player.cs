@@ -16,6 +16,7 @@ public abstract class Player : MonoBehaviour {
 	public interface IActionable {
 
 		IEnumerator Action(Player player);
+		void Effect(Player player);
 
 	}
 
@@ -28,7 +29,15 @@ public abstract class Player : MonoBehaviour {
 		}
 
 		public IEnumerator Action(Player player) {
-			yield return player.Build(card);
+			yield return card.Flip();
+			yield return player.buildDisplay.Push(card);
+			player.BuiltCardsByType[card.cardType].Add(card);
+		}
+
+		public void Effect(Player player) {
+			foreach (OnBuildEffect onBuildEffect in card.onBuildEffects) {
+				onBuildEffect.Effect(player);
+			}
 		}
 
 	}
@@ -44,7 +53,13 @@ public abstract class Player : MonoBehaviour {
 		}
 
 		public IEnumerator Action(Player player) {
-			yield return player.Bury(card, wonderStage);
+			yield return player.Wonder.wonderStages[wonderStage].buildCardSlot.Push(card);
+		}
+
+		public void Effect(Player player) {
+			foreach (OnBuildEffect onBuildEffect in player.Wonder.wonderStages[wonderStage].onBuildEffects) {
+				onBuildEffect.Effect(player);
+			}
 		}
 
 	}
@@ -58,7 +73,13 @@ public abstract class Player : MonoBehaviour {
 		}
 
 		public IEnumerator Action(Player player) {
-			yield return player.Discard(card);
+			yield return GameManager.Instance.discardPile.Push(card);
+		}
+
+		public void Effect(Player player) {
+			GameManager.Instance.EnqueueResolver(
+				new GainCoinsResolver(player, GameOptions.DiscardCoinAmount), 5
+			);
 		}
 
 	}
@@ -83,14 +104,10 @@ public abstract class Player : MonoBehaviour {
 			return wonderSlot.Element;
 		}
 	}
-	public bool IsActive {
-		set {
-			buildDropArea.IsActive = value;
-			discardDropArea.IsActive = value;
-			Wonder.IsActive = value;
-		}
+	public abstract bool IsPlayable {
+		set;
 	}
-	public IActionable Action { get; private set; }
+	public IActionable Action { get; protected set; }
 	public Dictionary<CardType, List<Card>> BuiltCardsByType { get; private set; }
 
 	void Awake() {
@@ -132,31 +149,10 @@ public abstract class Player : MonoBehaviour {
 	public IEnumerator PerformAction() {
 		Card card = preparedCardSlot.Pop();
 		yield return Action.Action(this);
-		Action = null;
 	}
-
-	public IEnumerator Build(Card card) {
-		yield return card.Flip();
-		yield return buildDisplay.Push(card);
-
-		BuiltCardsByType[card.cardType].Add(card);
-		foreach (OnBuildEffect onBuildEffect in card.onBuildEffects) {
-			onBuildEffect.Effect(this);
-		}
-	}
-
-	public IEnumerator Bury(Card card, int wonderStage) {
-		yield return Wonder.wonderStages[wonderStage].buildCardSlot.Push(card);
-		foreach (OnBuildEffect onBuildEffect in Wonder.wonderStages[wonderStage].onBuildEffects) {
-			onBuildEffect.Effect(this);
-		}
-	}
-
-	public IEnumerator Discard(Card card) {
-		yield return GameManager.Instance.discardPile.Push(card);
-		GameManager.Instance.EnqueueResolver(
-			new GainCoinsResolver(this, GameOptions.DiscardCoinAmount), 5
-		);
+	
+	public void EffectAction() {
+		Action.Effect(this);
 	}
 
 	public IEnumerator GainCoin(int amount) {

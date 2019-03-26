@@ -25,7 +25,7 @@ public class Wonder : MonoBehaviour, IMoveable {
 	public bool IsActive {
 		set {
 			foreach (WonderStage wonderStage in wonderStages) {
-				wonderStage.IsActive = !wonderStage.IsBuilt && value;
+				wonderStage.IsPlayable = !wonderStage.IsBuilt && value;
 			}
 		}
 	}

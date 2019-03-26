@@ -5,13 +5,6 @@ public class GainCoinsPerCardOnBuild : OnBuildEffect {
 	public Target countTarget;
 
 	public override void Effect(Player player) {
-		int priority;
-		if (countTarget == Target.Self) {
-			priority = 5;
-		} else {
-			priority = 4;
-		}
-
 		GameManager.Instance.EnqueueResolver(
 			new GainCoinsPerCardResolver(
 				player,
@@ -19,7 +12,7 @@ public class GainCoinsPerCardOnBuild : OnBuildEffect {
 				cardType,
 				countTarget
 			),
-			priority
+			4
 		);
 	}
 

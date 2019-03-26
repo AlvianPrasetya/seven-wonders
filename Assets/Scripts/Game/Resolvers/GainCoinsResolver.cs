@@ -11,13 +11,7 @@ public class GainCoinsResolver : IResolvable {
 	}
 
 	public IEnumerator Resolve() {
-		IEnumerator gainCoin = player.GainCoin(amount);
-		if (player == GameManager.Instance.Player) {
-			yield return GameManager.Instance.gameCamera.Focus(player);
-			yield return gainCoin;
-		} else {
-			GameManager.Instance.StartCoroutine(gainCoin);
-		}
+		yield return player.GainCoin(amount);
 	}
 
 }

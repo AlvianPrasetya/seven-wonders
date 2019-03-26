@@ -6,7 +6,7 @@ public abstract class DropArea<T> : MonoBehaviour {
 	private new Renderer renderer;
 	private new Collider collider;
 	
-	public bool IsActive {
+	public bool IsPlayable {
 		set {
 			renderer.enabled = value;
 			collider.enabled = value;

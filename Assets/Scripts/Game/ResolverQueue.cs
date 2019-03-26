@@ -87,8 +87,10 @@ public class ResolverQueue {
 		}
 
 		Debug.Log(string.Format(
-			"Dequeued resolver with priority {0} and enqueue index {1}",
-			resolverArray[0].priority, resolverArray[0].enqueueIndex
+			"Dequeued {0} with priority {1} and enqueue index {2}",
+			resolverArray[0].resolver.GetType().FullName,
+			resolverArray[0].priority,
+			resolverArray[0].enqueueIndex
 		));
 
 		IResolvable resolver = resolverArray[0].resolver;

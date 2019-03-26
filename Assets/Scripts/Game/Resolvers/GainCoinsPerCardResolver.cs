@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEngine;
 
 public class GainCoinsPerCardResolver : IResolvable {
 
@@ -15,27 +16,21 @@ public class GainCoinsPerCardResolver : IResolvable {
 	}
 
 	public IEnumerator Resolve() {
-		IEnumerator gainCoin = null;
+		int amount = 0;
 		switch (countTarget) {
 			case Target.Self:
-				gainCoin = player.GainCoin(
-					amountPerCard * player.BuiltCardsByType[cardType].Count
-				);
+				amount = amountPerCard * player.BuiltCardsByType[cardType].Count;
 				break;
 			case Target.Neighbours:
-				gainCoin = player.GainCoin(
-					amountPerCard * 
-						(player.Neighbours[Direction.West].BuiltCardsByType[cardType].Count +
-						player.Neighbours[Direction.East].BuiltCardsByType[cardType].Count)
-				);
+				amount = amountPerCard * 
+					(player.Neighbours[Direction.West].BuiltCardsByType[cardType].Count +
+					player.Neighbours[Direction.East].BuiltCardsByType[cardType].Count);
 				break;
 			case Target.Neighbourhood:
-				gainCoin = player.GainCoin(
-					amountPerCard *
-						(player.Neighbours[Direction.West].BuiltCardsByType[cardType].Count +
-						player.BuiltCardsByType[cardType].Count +
-						player.Neighbours[Direction.East].BuiltCardsByType[cardType].Count)
-				);
+				amount = amountPerCard *
+					(player.Neighbours[Direction.West].BuiltCardsByType[cardType].Count +
+					player.BuiltCardsByType[cardType].Count +
+					player.Neighbours[Direction.East].BuiltCardsByType[cardType].Count);
 				break;
 			case Target.Others:
 				break;
@@ -43,12 +38,8 @@ public class GainCoinsPerCardResolver : IResolvable {
 				break;
 		}
 
-		if (player == GameManager.Instance.Player) {
-			yield return GameManager.Instance.gameCamera.Focus(player);
-			yield return gainCoin;
-		} else {
-			GameManager.Instance.StartCoroutine(gainCoin);
-		}
+		Debug.LogFormat("Gain {0} coins", amount);
+		yield return player.GainCoin(amount);
 	}
 
 }

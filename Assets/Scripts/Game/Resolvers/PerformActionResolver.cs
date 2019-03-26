@@ -1,35 +1,17 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PerformActionResolver : IResolvable {
 
-	private Direction performDirection;
-
-	public PerformActionResolver(Direction performDirection) {
-		this.performDirection = performDirection;
-	}
-
 	public IEnumerator Resolve() {
-		switch (performDirection) {
-			case Direction.West:
-				for (int i = GameManager.Instance.Players.Count - 1; i >= 0; i--) {
-					GameManager.Instance.EnqueueResolver(
-						new PerformPlayerActionResolver(GameManager.Instance.Players[i]),
-						4
-					);
-				}
-				break;
-			case Direction.East:
-				for (int i = 0; i < GameManager.Instance.Players.Count; i++) {
-					GameManager.Instance.EnqueueResolver(
-						new PerformPlayerActionResolver(GameManager.Instance.Players[i]),
-						4
-					);
-				}
-				break;
+		Queue<Coroutine> performActions = new Queue<Coroutine>();
+		foreach (Player player in GameManager.Instance.Players) {
+			performActions.Enqueue(GameManager.Instance.StartCoroutine(player.PerformAction()));
 		}
-
-		yield return null;
+		while (performActions.Count != 0) {
+			yield return performActions.Dequeue();
+		}
 	}
 
 }

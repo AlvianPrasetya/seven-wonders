@@ -10,7 +10,12 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	public float dragHeight = 2;
 	public OnBuildEffect[] onBuildEffects;
 	
-	protected Vector3 dragStartPosition;
+	private Vector3 dragStartPosition;
+	private new Collider collider;
+
+	void Awake() {
+		collider = GetComponent<Collider>();
+	}
 
 	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation, float duration) {
 		Vector3 initialPosition = transform.position;
@@ -47,6 +52,12 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 			cardDropArea.Drop(this);
 		} else {
 			transform.position = dragStartPosition;
+		}
+	}
+
+	public bool IsPlayable {
+		set {
+			collider.enabled = value;
 		}
 	}
 

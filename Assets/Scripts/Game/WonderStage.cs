@@ -11,9 +11,9 @@ public class WonderStage : MonoBehaviour {
 			return buildCardSlot.Element != null;
 		}
 	}
-	public bool IsActive {
+	public bool IsPlayable {
 		set {
-			buryDropArea.IsActive = value;
+			buryDropArea.IsPlayable = value;
 		}
 	}
 	

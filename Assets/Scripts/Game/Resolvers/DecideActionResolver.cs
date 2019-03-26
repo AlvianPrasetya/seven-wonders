@@ -11,7 +11,13 @@ public class DecideActionResolver : IResolvable {
 	}
 
 	public IEnumerator Resolve() {
-		GameManager.Instance.Player.IsActive = true;
+		GameManager.Instance.Player.IsPlayable = true;
+		if (PhotonNetwork.IsMasterClient) {
+			// Master client triggers the bot decisions
+			foreach (Bot bot in GameManager.Instance.Bots) {
+				bot.IsPlayable = true;
+			}
+		}
 
 		float remainingTime = decideTime;
 		while (remainingTime > 0 && GameManager.Instance.Player.Action == null) {
@@ -19,19 +25,7 @@ public class DecideActionResolver : IResolvable {
 			yield return null;
 		}
 		
-		GameManager.Instance.Player.IsActive = false;
-		if (GameManager.Instance.Player.Action == null) {
-			// Player has yet to decide on an action, discard a random card
-			GameManager.Instance.Player.DecideDiscard(GameManager.Instance.Player.hand.GetRandom());
-		}
-
-		if (PhotonNetwork.IsMasterClient) {
-			// Master client determines the bots' moves (TODO: Simple AI)
-			foreach (Bot bot in GameManager.Instance.Bots) {
-				bot.DecideDiscard(bot.hand.GetRandom());
-			}
-		}
-
+		GameManager.Instance.Player.IsPlayable = false;
 		yield return new WaitForSeconds(1);
 	}
 

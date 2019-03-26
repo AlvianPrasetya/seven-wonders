@@ -1,5 +1,15 @@
 public class Bot : Player {
 
+	public override bool IsPlayable {
+		set {
+			if (value) {
+				Action = null;
+				// TODO: Simple AI
+				DecideDiscard(hand.GetRandom());
+			}
+		}
+	}
+
 	public override void DecideBuild(Card card) {
 		int positionInHand = hand.GetPosition(card);
 		GameManager.Instance.DecideBotBuild(this, positionInHand);
