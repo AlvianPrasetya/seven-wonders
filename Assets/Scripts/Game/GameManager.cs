@@ -26,9 +26,10 @@ public class GameManager : MonoBehaviourPun {
 	public static GameManager Instance { get; private set; }
 	public Dictionary<StockType, Stock> Stocks { get; private set; }
 	public List<Player> Players { get; private set; }
-	public List<Bot> Bots { get; private set; }
-	public Dictionary<int, Player> PlayersByActorID { get; private set; }
+	public Dictionary<int, Player> HumansByActorID { get; private set; }
 	public Player Player { get; private set; }
+	public List<Human> Humans { get; private set; }
+	public List<Bot> Bots { get; private set; }
 	public Queue<int> SyncQueue { get; private set; }
 
 	private ResolverQueue resolverQueue;
@@ -37,13 +38,14 @@ public class GameManager : MonoBehaviourPun {
 		Instance = this;
 		Stocks = new Dictionary<StockType, Stock>();
 		Players = new List<Player>();
-		Bots = new List<Bot>();
-		PlayersByActorID = new Dictionary<int, Player>();
+		HumansByActorID = new Dictionary<int, Player>();
 		foreach (StockEntry stockEntry in stocks) {
 			Stocks.Add(stockEntry.stockType, stockEntry.stock);
 		}
-		resolverQueue = new ResolverQueue();
+		Humans = new List<Human>();
+		Bots = new List<Bot>();
 		SyncQueue = new Queue<int>();
+		resolverQueue = new ResolverQueue();
 	}
 
 	void Start() {
@@ -59,13 +61,14 @@ public class GameManager : MonoBehaviourPun {
 			);
 			Quaternion playerRotation = Quaternion.Euler(0, -playerAngle, 0);
 			
-			Player player = Instantiate(humanPrefab, playerPosition, playerRotation);
-			PlayersByActorID[PhotonNetwork.PlayerList[i].ActorNumber] = player;
+			Human human = Instantiate(humanPrefab, playerPosition, playerRotation);
+			HumansByActorID[PhotonNetwork.PlayerList[i].ActorNumber] = human;
 			if (PhotonNetwork.PlayerList[i].IsLocal) {
-				Player = player;
+				Player = human;
 			}
+			Humans.Add(human);
 
-			playersByPos[pos] = player;
+			playersByPos[pos] = human;
 		}
 
 		// Create bots to fill in remaining pos
@@ -159,19 +162,19 @@ public class GameManager : MonoBehaviourPun {
 
 	[PunRPC]
 	private void DecideBuild(int positionInHand, PhotonMessageInfo info) {
-		Player player = PlayersByActorID[info.Sender.ActorNumber];
+		Player player = HumansByActorID[info.Sender.ActorNumber];
 		StartCoroutine(player.PrepareBuild(positionInHand));
 	}
 
 	[PunRPC]
 	private void DecideBury(int positionInHand, int wonderStage, PhotonMessageInfo info) {
-		Player player = PlayersByActorID[info.Sender.ActorNumber];
+		Player player = HumansByActorID[info.Sender.ActorNumber];
 		StartCoroutine(player.PrepareBury(positionInHand, wonderStage));
 	}
 
 	[PunRPC]
 	private void DecideDiscard(int positionInHand, PhotonMessageInfo info) {
-		Player player = PlayersByActorID[info.Sender.ActorNumber];
+		Player player = HumansByActorID[info.Sender.ActorNumber];
 		StartCoroutine(player.PrepareDiscard(positionInHand));
 	}
 
