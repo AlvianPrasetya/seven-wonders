@@ -12,6 +12,7 @@ public enum Facing { Up, Down };
 public enum DisplayType { Resource, Point, OneOff, Military, Scientific };
 public enum CardType { RawMaterial, ManufacturedGoods, Civilian, Scientific, Commercial, Military, Guild, City };
 public enum Target { Self, Neighbours, Neighbourhood, Others, Everyone };
+public enum Resource { Lumber, Ore, Clay, Stone, Loom, Glassworks, Press };
 
 public class Constant {
 	
