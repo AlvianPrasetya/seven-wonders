@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PreGameResolver : IResolvable {
@@ -88,8 +89,15 @@ public class PreGameResolver : IResolvable {
 		yield return moveCameraDeal;
 		
 		yield return loadBank;
+
+		Queue<Coroutine> gainCoins = new Queue<Coroutine>();
 		foreach (Player player in GameManager.Instance.Players) {
-			yield return player.GainCoin(GameOptions.InitialCoinAmount);
+			gainCoins.Enqueue(GameManager.Instance.StartCoroutine(
+				player.GainCoin(3)
+			));
+		}
+		while (gainCoins.Count != 0) {
+			yield return gainCoins.Dequeue();
 		}
 	}
 
