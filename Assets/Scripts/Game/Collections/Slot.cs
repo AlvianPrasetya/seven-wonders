@@ -22,10 +22,9 @@ public abstract class Slot<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where 
 		}
 		Quaternion dropRotation = Quaternion.Euler(dropEulerAngles);
 
-		yield return element.MoveTowards(dropPosition, dropRotation, pushDuration);
-
 		Element = element;
 		element.transform.parent = transform;
+		yield return element.MoveTowards(dropPosition, dropRotation, pushDuration);
 	}
 
 	public IEnumerator PushMany(T[] elements) {

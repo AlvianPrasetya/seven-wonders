@@ -32,10 +32,9 @@ public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T>, IPeek
 		}
 		Quaternion dropRotation = Quaternion.Euler(dropEulerAngles);
 
-		yield return element.MoveTowards(dropPosition, dropRotation, pushDuration);
-
 		Elements.Push(element);
 		element.transform.parent = transform;
+		yield return element.MoveTowards(dropPosition, dropRotation, pushDuration);
 	}
 
 	public IEnumerator PushMany(T[] elements) {
