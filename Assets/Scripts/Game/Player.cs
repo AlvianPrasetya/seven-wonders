@@ -147,7 +147,7 @@ public abstract class Player : MonoBehaviour {
 
 	public IEnumerator Bury(Card card, int wonderStage) {
 		yield return Wonder.wonderStages[wonderStage].buildCardSlot.Push(card);
-		foreach (OnBuildEffect onBuildEffect in Wonder.wonderStages[(int)wonderStage].onBuildEffects) {
+		foreach (OnBuildEffect onBuildEffect in Wonder.wonderStages[wonderStage].onBuildEffects) {
 			onBuildEffect.Effect(this);
 		}
 	}
