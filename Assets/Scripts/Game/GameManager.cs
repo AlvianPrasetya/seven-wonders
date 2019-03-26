@@ -91,6 +91,8 @@ public class GameManager : MonoBehaviourPun {
 		for (int i = 0; i < playersByPos.Length; i++) {
 			if (playersByPos[i] != null) {
 				Players.Add(playersByPos[i]);
+				// Set hand facing down for other players
+				playersByPos[i].hand.Facing = (playersByPos[i] == Player) ? Facing.Up : Facing.Down;
 			}
 		}
 

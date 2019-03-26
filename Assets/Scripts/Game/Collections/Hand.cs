@@ -5,6 +5,13 @@ using UnityEngine;
 public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 
 	public CardPile[] displayPiles;
+	public Facing Facing {
+		set {
+			foreach (CardPile displayPile in displayPiles) {
+				displayPile.facing = value;
+			}
+		}
+	}
 
 	public int Count {
 		get {
