@@ -3,6 +3,9 @@ using UnityEngine.Events;
 
 public abstract class DropArea<T> : MonoBehaviour {
 
+	public Material normalMaterial;
+	public Material highlightedMaterial;
+
 	private new Renderer renderer;
 	private new Collider collider;
 	
@@ -10,6 +13,12 @@ public abstract class DropArea<T> : MonoBehaviour {
 		set {
 			renderer.enabled = value;
 			collider.enabled = value;
+		}
+	}
+
+	public bool IsHighlighted {
+		set {
+			renderer.material = (value) ? highlightedMaterial : normalMaterial;
 		}
 	}
 

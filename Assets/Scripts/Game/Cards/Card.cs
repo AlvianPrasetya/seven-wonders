@@ -14,6 +14,7 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	
 	private Vector3 dragStartPosition;
 	private new Collider collider;
+	private DropArea<Card> lastDropArea;
 
 	void Awake() {
 		collider = GetComponent<Collider>();
@@ -44,14 +45,21 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask(LayerName.Table))) {
 			transform.position = hitInfo.point - dragHeight * ray.direction;
 		}
+
+		if (lastDropArea != null) {
+			lastDropArea.IsHighlighted = false;
+			lastDropArea = null;
+		}
+		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask(LayerName.DropArea))) {
+			lastDropArea = hitInfo.transform.GetComponent<DropArea<Card>>();
+			lastDropArea.IsHighlighted = true;
+		}
 	}
 
 	public void OnEndDrag(PointerEventData eventData) {
-		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		RaycastHit hitInfo;
-		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask(LayerName.DropArea))) {
-			DropArea<Card> cardDropArea = hitInfo.transform.GetComponent<DropArea<Card>>();
-			cardDropArea.Drop(this);
+		if (lastDropArea) {
+			lastDropArea.Drop(this);
+			lastDropArea = null;
 		} else {
 			transform.position = dragStartPosition;
 		}
