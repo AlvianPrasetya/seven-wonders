@@ -16,6 +16,7 @@ public class DecideActionResolver : IResolvable {
 			// Master client triggers the bot decisions
 			foreach (Bot bot in GameManager.Instance.Bots) {
 				bot.IsPlayable = true;
+				bot.IsPlayable = false;
 			}
 		}
 

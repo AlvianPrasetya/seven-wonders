@@ -14,7 +14,7 @@ public class GameCamera : MonoBehaviour {
 	public float selfFocusAngle = 75;
 	public Vector3 othersFocusOffset = new Vector3(0, 25, 0);
 	public float othersFocusAngle = 75;
-	public float refocusDuration = 1;
+	public float refocusDuration = 0.5f;
 	public OnDefocusedEvent onDefocusedEvent;
 	public OnFocusedEvent onFocusedEvent;
 
