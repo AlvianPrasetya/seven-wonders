@@ -59,6 +59,7 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	public void OnEndDrag(PointerEventData eventData) {
 		if (lastDropArea) {
 			lastDropArea.Drop(this);
+			lastDropArea.IsHighlighted = false;
 			lastDropArea = null;
 		} else {
 			transform.position = dragStartPosition;

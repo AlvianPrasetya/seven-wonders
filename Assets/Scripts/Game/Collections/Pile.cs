@@ -5,9 +5,10 @@ using UnityEngine;
 // Pile represents a collection of moveable elements arranged in a stack-like manner.
 public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T>, IPeekable<T>, IDumpable<T> where T : MonoBehaviour, IMoveable {
 
-	public Vector3 dropSpacing = new Vector3(0, 0.1f, 0);
+	public Vector3 initialSpacing = new Vector3(0, 0.025f, 0);
+	public Vector3 spacing = new Vector3(0, 0.05f, 0);
 	public Facing facing = Facing.Up;
-	public float pushDuration = 1;
+	public float pushDuration = 0.5f;
 	public Stack<T> Elements { get; protected set; }
 	public int Count {
 		get {
@@ -21,9 +22,9 @@ public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T>, IPeek
 
 	public virtual IEnumerator Push(T element) {
 		Vector3 dropPosition = transform.position + 
-			transform.right * dropSpacing.x * (Elements.Count + 1) +
-			transform.up * dropSpacing.y * (Elements.Count + 1) + 
-			transform.forward * dropSpacing.z * (Elements.Count + 1);
+			transform.right * (initialSpacing.x + spacing.x * (Elements.Count)) +
+			transform.up * (initialSpacing.y + spacing.y * (Elements.Count)) + 
+			transform.forward * (initialSpacing.z + spacing.z * (Elements.Count));
 		Vector3 dropEulerAngles = transform.rotation.eulerAngles;
 		if (facing == Facing.Up) {
 			dropEulerAngles.z = 0.0f;

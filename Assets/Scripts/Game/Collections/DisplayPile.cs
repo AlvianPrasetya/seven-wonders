@@ -15,9 +15,9 @@ public class DisplayPile : CardPile {
 		while (tempStack.Count != 0) {
 			Card card = tempStack.Pop();
 			Vector3 dropPosition = transform.position + 
-				transform.right * dropSpacing.x * (Elements.Count + 1) +
-				transform.up * dropSpacing.y * (tempStack.Count + 1) + 
-				transform.forward * dropSpacing.z * (Elements.Count + 1);
+				transform.right * (initialSpacing.x + spacing.x * (Elements.Count)) +
+				transform.up * (initialSpacing.y + spacing.y * (tempStack.Count)) + 
+				transform.forward * (initialSpacing.z + spacing.z * (Elements.Count));
 			Vector3 dropEulerAngles = transform.rotation.eulerAngles;
 			if (facing == Facing.Up) {
 				dropEulerAngles.z = 0.0f;

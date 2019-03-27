@@ -30,6 +30,17 @@ public abstract class Player : MonoBehaviour {
 
 		public IEnumerator Action(Player player) {
 			yield return card.Flip();
+
+			int maxCardCount = 0;
+			foreach (KeyValuePair<DisplayType, DisplayPile> kv in player.buildDisplay.DisplayPiles) {
+				DisplayPile displayPile = kv.Value;
+				if (displayPile.Count > maxCardCount) {
+					maxCardCount = displayPile.Count;
+				}
+			}
+			player.wonderSlot.spacing = new Vector3(0, 0.2f + (maxCardCount + 1) * 0.05f, 0);
+			yield return player.wonderSlot.Push(player.wonderSlot.Pop());
+
 			yield return player.buildDisplay.Push(card);
 			player.BuiltCardsByType[card.cardType].Add(card);
 		}
@@ -96,7 +107,6 @@ public abstract class Player : MonoBehaviour {
 	public DiscardDropArea discardDropArea;
 	public WonderSlot wonderSlot;
 	public Bank bank;
-
 	public Dictionary<DeckType, Deck> Decks { get; private set; }
 	public Dictionary<Direction, Player> Neighbours { get; private set; }
 	public Wonder Wonder {

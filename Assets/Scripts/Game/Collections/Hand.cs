@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 
-	public CardPile[] displayPiles;
+	public CardPile[] cardPiles;
 	public Facing Facing {
 		set {
-			foreach (CardPile displayPile in displayPiles) {
+			foreach (CardPile displayPile in cardPiles) {
 				displayPile.facing = value;
 			}
 		}
@@ -16,7 +16,7 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 	public int Count {
 		get {
 			int count = 0;
-			foreach (CardPile displayPile in displayPiles) {
+			foreach (CardPile displayPile in cardPiles) {
 				count += displayPile.Count;
 			}
 			
@@ -33,20 +33,20 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 		switch (pushTowards) {
 			case Direction.West:
 				// Try to find westernmost empty display pile, put on easternmost pile if not found
-				targetPile = displayPiles[displayPiles.Length - 1];
-				for (int i = 0; i < displayPiles.Length; i++) {
-					if (displayPiles[i].Count == 0) {
-						targetPile = displayPiles[i];
+				targetPile = cardPiles[cardPiles.Length - 1];
+				for (int i = 0; i < cardPiles.Length; i++) {
+					if (cardPiles[i].Count == 0) {
+						targetPile = cardPiles[i];
 						break;
 					}
 				}
 				break;
 			case Direction.East:
 				// Try to find easternmost empty display pile, put on westernmost pile if not found
-				targetPile = displayPiles[0];
-				for (int i = displayPiles.Length - 1; i >= 0; i--) {
-					if (displayPiles[i].Count == 0) {
-						targetPile = displayPiles[i];
+				targetPile = cardPiles[0];
+				for (int i = cardPiles.Length - 1; i >= 0; i--) {
+					if (cardPiles[i].Count == 0) {
+						targetPile = cardPiles[i];
 						break;
 					}
 				}
@@ -75,16 +75,16 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 	public Card Pop(Direction popFrom) {
 		switch (popFrom) {
 			case Direction.West:
-				for (int i = 0; i < displayPiles.Length; i++) {
-					if (displayPiles[i].Count != 0) {
-						return displayPiles[i].Pop();
+				for (int i = 0; i < cardPiles.Length; i++) {
+					if (cardPiles[i].Count != 0) {
+						return cardPiles[i].Pop();
 					}
 				}
 				break;
 			case Direction.East:
-				for (int i = displayPiles.Length - 1; i >= 0; i--) {
-					if (displayPiles[i].Count != 0) {
-						return displayPiles[i].Pop();
+				for (int i = cardPiles.Length - 1; i >= 0; i--) {
+					if (cardPiles[i].Count != 0) {
+						return cardPiles[i].Pop();
 					}
 				}
 				break;
@@ -94,11 +94,11 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 	}
 
 	public Card PopAt(int pileIndex) {
-		if (pileIndex < 0 || pileIndex >= displayPiles.Length) {
+		if (pileIndex < 0 || pileIndex >= cardPiles.Length) {
 			return null;
 		}
 
-		return displayPiles[pileIndex].Pop();
+		return cardPiles[pileIndex].Pop();
 	}
 
 	public Card[] PopMany(int count) {
@@ -119,8 +119,8 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 	}
 
 	public int GetPosition(Card card) {
-		for (int i = 0; i < displayPiles.Length; i++) {
-			if (displayPiles[i].Peek() == card) {
+		for (int i = 0; i < cardPiles.Length; i++) {
+			if (cardPiles[i].Peek() == card) {
 				return i;
 			}
 		}
@@ -133,7 +133,7 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 	/// </summary>
 	public Card GetRandom() {
 		List<Card> cards = new List<Card>();
-		foreach (CardPile displayPile in displayPiles) {
+		foreach (CardPile displayPile in cardPiles) {
 			if (displayPile.Count != 0) {
 				cards.Add(displayPile.Peek());
 			}

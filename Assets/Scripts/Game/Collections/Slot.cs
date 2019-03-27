@@ -4,16 +4,16 @@ using UnityEngine;
 
 public abstract class Slot<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where T : MonoBehaviour, IMoveable {
 
-	public Vector3 dropSpacing = new Vector3(0, 0.1f, 0);
+	public Vector3 spacing = new Vector3(0, 0.025f, 0);
 	public Facing facing = Facing.Up;
 	public float pushDuration = 1;
 	public T Element { get; private set; }
 
 	public IEnumerator Push(T element) {
 		Vector3 dropPosition = transform.position + 
-			transform.right * dropSpacing.x +
-			transform.up * dropSpacing.y + 
-			transform.forward * dropSpacing.z;
+			transform.right * spacing.x +
+			transform.up * spacing.y + 
+			transform.forward * spacing.z;
 		Vector3 dropEulerAngles = transform.rotation.eulerAngles;
 		if (facing == Facing.Up) {
 			dropEulerAngles.z = 0.0f;

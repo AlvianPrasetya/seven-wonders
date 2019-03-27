@@ -2,7 +2,7 @@ public class Human : Player {
 
 	public override bool IsPlayable {
 		set {
-			foreach (CardPile displayPile in hand.displayPiles) {
+			foreach (CardPile displayPile in hand.cardPiles) {
 				if (displayPile.Count != 0) {
 					displayPile.Peek().IsPlayable = value;
 				}
@@ -10,7 +10,7 @@ public class Human : Player {
 
 			buildDropArea.IsPlayable = value;
 			discardDropArea.IsPlayable = value;
-			Wonder.IsActive = value;
+			Wonder.IsPlayable = value;
 
 			if (value) {
 				Action = null;
