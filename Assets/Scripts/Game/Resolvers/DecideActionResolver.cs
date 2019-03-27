@@ -20,11 +20,13 @@ public class DecideActionResolver : IResolvable {
 			}
 		}
 
+		UIManager.Instance.StartTimer(decideTime);
 		float remainingTime = decideTime;
 		while (remainingTime > 0 && GameManager.Instance.Player.Action == null) {
 			remainingTime -= Time.deltaTime;
 			yield return null;
 		}
+		UIManager.Instance.StopTimer();
 		
 		GameManager.Instance.Player.IsPlayable = false;
 		yield return new WaitForSeconds(1);

@@ -61,6 +61,8 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 			lastDropArea.Drop(this);
 			lastDropArea.IsHighlighted = false;
 			lastDropArea = null;
+
+			IsPlayable = false;
 		} else {
 			transform.position = dragStartPosition;
 		}

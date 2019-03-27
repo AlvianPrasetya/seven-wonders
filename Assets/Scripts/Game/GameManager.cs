@@ -22,7 +22,6 @@ public class GameManager : MonoBehaviourPun {
 	public StockEntry[] stocks;
 	public Human humanPrefab;
 	public Bot botPrefab;
-
 	public static GameManager Instance { get; private set; }
 	public Dictionary<StockType, Stock> Stocks { get; private set; }
 	public List<Player> Players { get; private set; }
