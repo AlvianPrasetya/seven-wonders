@@ -121,6 +121,8 @@ public abstract class Player : MonoBehaviour {
 	public Dictionary<CardType, List<Card>> BuiltCardsByType { get; private set; }
 	public string Nickname { get; set; }
 
+	private List<ResourceOptions> resources;
+
 	void Awake() {
 		Decks = new Dictionary<DeckType, Deck>();
 		foreach (DeckEntry deckEntry in decks) {
@@ -131,6 +133,7 @@ public abstract class Player : MonoBehaviour {
 		foreach (CardType cardType in Enum.GetValues(typeof(CardType))) {
 			BuiltCardsByType[cardType] = new List<Card>();
 		}
+		resources = new List<ResourceOptions>();
 	}
 
 	public abstract void DecideBuild(Card card);
@@ -168,6 +171,10 @@ public abstract class Player : MonoBehaviour {
 
 	public IEnumerator GainCoin(int amount) {
 		yield return bank.PushMany(GameManager.Instance.bank.PopMany(amount));
+	}
+
+	public void AddResource(ResourceOptions resourceOptions) {
+		resources.Add(resourceOptions);
 	}
 
 }
