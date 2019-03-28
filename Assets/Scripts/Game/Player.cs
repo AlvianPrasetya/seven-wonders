@@ -177,4 +177,30 @@ public abstract class Player : MonoBehaviour {
 		resources.Add(resourceOptions);
 	}
 
+	public void EvaluatePlayability(Card card) {
+		Multiset<Resource> cardResourceCost = new Multiset<Resource>(card.resourceCost);
+		foreach (Multiset<Resource> resourceSet in GetResourceSets(0, new Multiset<Resource>())) {
+			Multiset<Resource> missingResources = cardResourceCost.ExceptWith(resourceSet);
+			if (missingResources.Count == 0) {
+				// TODO: Set build drop area as playable with 0 cost
+				break;
+			}
+		}
+	}
+
+	private IEnumerable<Multiset<Resource>> GetResourceSets(int pos, Multiset<Resource> resourceSet) {
+		if (pos >= resources.Count) {
+			yield return resourceSet;
+			yield break;
+		}
+
+		foreach (Resource resource in resources[pos].resources) {
+			resourceSet.Add(resource);
+			foreach (Multiset<Resource> set in GetResourceSets(pos + 1, resourceSet)) {
+				yield return set;
+			}
+			resourceSet.Remove(resource);
+		}
+	}
+
 }

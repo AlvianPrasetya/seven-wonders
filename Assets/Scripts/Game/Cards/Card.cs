@@ -37,6 +37,8 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 
 	public void OnBeginDrag(PointerEventData eventData) {
 		dragStartPosition = transform.position;
+
+		GameManager.Instance.Player.EvaluatePlayability(this);
 	}
 
 	public void OnDrag(PointerEventData eventData) {
