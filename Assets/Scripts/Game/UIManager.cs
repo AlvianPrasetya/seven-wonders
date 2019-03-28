@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour {
 
 	public static UIManager Instance { get; private set; }
+	public PlayerNav[] playerNavs;
 	public Text timerText;
 
 	private Coroutine countdown;

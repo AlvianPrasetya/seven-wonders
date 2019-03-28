@@ -119,6 +119,7 @@ public abstract class Player : MonoBehaviour {
 	}
 	public IActionable Action { get; protected set; }
 	public Dictionary<CardType, List<Card>> BuiltCardsByType { get; private set; }
+	public string Nickname { get; set; }
 
 	void Awake() {
 		Decks = new Dictionary<DeckType, Deck>();

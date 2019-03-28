@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviourPun {
 			Quaternion playerRotation = Quaternion.Euler(0, -playerAngle, 0);
 			
 			Human human = Instantiate(humanPrefab, playerPosition, playerRotation);
+			human.Nickname = PhotonNetwork.PlayerList[i].NickName;
 			HumansByActorID[PhotonNetwork.PlayerList[i].ActorNumber] = human;
 			if (PhotonNetwork.PlayerList[i].IsLocal) {
 				Player = human;
@@ -81,6 +82,7 @@ public class GameManager : MonoBehaviourPun {
 			Quaternion playerRotation = Quaternion.Euler(0, -playerAngle, 0);
 			
 			Bot bot = Instantiate(botPrefab, playerPosition, playerRotation);
+			bot.Nickname = string.Format("Bot {0}", pos + 1 - PhotonNetwork.PlayerList.Length);
 			Bots.Add(bot);
 
 			playersByPos[pos] = bot;
@@ -99,6 +101,12 @@ public class GameManager : MonoBehaviourPun {
 		for (int i = 0; i < Players.Count; i++) {
 			Players[i].Neighbours[Direction.West] = Players[(Players.Count + i - 1) % Players.Count];
 			Players[i].Neighbours[Direction.East] = Players[(i + 1) % Players.Count];
+		}
+
+		int playerPos = (int)PhotonNetwork.LocalPlayer.CustomProperties[PlayerProperty.Pos];
+		for (int i = -Players.Count / 2; i < Players.Count / 2f; i++) {
+			Player player = playersByPos[(playerPos + i + Players.Count) % Players.Count];
+			UIManager.Instance.playerNavs[i + Players.Count / 2].Player = player;
 		}
 
 		resolverQueue.Enqueue(
