@@ -99,6 +99,15 @@ public abstract class Player : MonoBehaviour {
 		Card card, params object[] args
 	);
 
+	private struct PlayerResource {
+		public Player player;
+		public Resource resource;
+		public PlayerResource(Player player, Resource resource) {
+			this.player = player;
+			this.resource = resource;
+		}
+	}
+
 	public DeckEntry[] decks;
 	public Hand hand;
 	public CardSlot preparedCardSlot;
@@ -120,6 +129,18 @@ public abstract class Player : MonoBehaviour {
 	public IActionable Action { get; protected set; }
 	public Dictionary<CardType, List<Card>> BuiltCardsByType { get; private set; }
 	public string Nickname { get; set; }
+	public List<ResourceOptions> ProducedResources {
+		get {
+			List<ResourceOptions> producedResources = new List<ResourceOptions>();
+			foreach (ResourceOptions resource in resources) {
+				if (resource.produced) {
+					producedResources.Add(resource);
+				}
+			}
+
+			return producedResources;
+		}
+	}
 
 	private List<ResourceOptions> resources;
 
@@ -179,27 +200,81 @@ public abstract class Player : MonoBehaviour {
 
 	public void EvaluatePlayability(Card card) {
 		Multiset<Resource> cardResourceCost = new Multiset<Resource>(card.resourceCost);
-		foreach (Multiset<Resource> resourceSet in GetResourceSets(0, new Multiset<Resource>())) {
-			Multiset<Resource> missingResources = cardResourceCost.ExceptWith(resourceSet);
-			if (missingResources.Count == 0) {
-				// TODO: Set build drop area as playable with 0 cost
-				break;
+		foreach (Multiset<PlayerResource> boughtResourceSet in GetBoughtResourceSets(0, cardResourceCost, new Multiset<PlayerResource>())) {
+			string str = "";
+			foreach (PlayerResource boughtResource in boughtResourceSet) {
+				str += string.Format("Buy {0} from {1}, ", boughtResource.resource, boughtResource.player.Nickname);
 			}
+			Debug.Log(str);
 		}
 	}
 
-	private IEnumerable<Multiset<Resource>> GetResourceSets(int pos, Multiset<Resource> resourceSet) {
-		if (pos >= resources.Count) {
-			yield return resourceSet;
+	// TODO: Refactor
+	private IEnumerable<Multiset<PlayerResource>> GetBoughtResourceSets(
+		int pos, Multiset<Resource> resourceCost, Multiset<PlayerResource> toBuy
+	) {
+		if (resourceCost.Count == 0) {
+			yield return toBuy;
 			yield break;
 		}
 
-		foreach (Resource resource in resources[pos].resources) {
-			resourceSet.Add(resource);
-			foreach (Multiset<Resource> set in GetResourceSets(pos + 1, resourceSet)) {
+		if (pos < resources.Count) {
+			// Use own resources first
+			bool usable = false;
+			foreach (Resource resource in resources[pos].resources) {
+				if (resourceCost.Contains(resource)) {
+					usable = true;
+					resourceCost.Remove(resource);
+					foreach (Multiset<PlayerResource> set in GetBoughtResourceSets(pos + 1, resourceCost, toBuy)) {
+						yield return set;
+					}
+					resourceCost.Add(resource);
+				}
+			}
+			if (!usable) {
+				foreach (Multiset<PlayerResource> set in GetBoughtResourceSets(pos + 1, resourceCost, toBuy)) {
+					yield return set;
+				}
+			}
+
+			yield break;
+		}
+
+		Dictionary<Direction, List<ResourceOptions>> neighbourResources =
+			new Dictionary<Direction, List<ResourceOptions>>();
+		neighbourResources[Direction.West] = Neighbours[Direction.West].ProducedResources;
+		neighbourResources[Direction.East] = Neighbours[Direction.East].ProducedResources;
+
+		Direction buyDirection = Direction.West;
+		int resourcePos = 0;
+		if (pos < resources.Count + neighbourResources[Direction.West].Count) {
+			buyDirection = Direction.West;
+			resourcePos = pos - resources.Count;
+		} else if (pos < resources.Count + neighbourResources[Direction.West].Count + neighbourResources[Direction.East].Count) {
+			buyDirection = Direction.East;
+			resourcePos = pos - resources.Count - neighbourResources[Direction.West].Count;
+		} else {
+			yield break;
+		}
+
+		ResourceOptions resourceOptions = neighbourResources[buyDirection][resourcePos];
+		foreach (Resource resource in resourceOptions.resources) {
+			if (!resourceCost.Contains(resource)) {
+				continue;
+			}
+
+			PlayerResource playerResource = new PlayerResource(Neighbours[buyDirection], resource);
+			resourceCost.Remove(resource);
+			toBuy.Add(playerResource);
+			foreach (Multiset<PlayerResource> set in GetBoughtResourceSets(pos + 1, resourceCost, toBuy)) {
 				yield return set;
 			}
-			resourceSet.Remove(resource);
+			resourceCost.Add(resource);
+			toBuy.Remove(playerResource);
+		}
+
+		foreach (Multiset<PlayerResource> set in GetBoughtResourceSets(pos + 1, resourceCost, toBuy)) {
+			yield return set;
 		}
 	}
 

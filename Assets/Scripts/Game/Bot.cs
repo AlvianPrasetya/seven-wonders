@@ -5,7 +5,7 @@ public class Bot : Player {
 			if (value) {
 				Action = null;
 				// TODO: Simple AI
-				DecideDiscard(hand.GetRandom());
+				DecideBuild(hand.GetRandom());
 			}
 		}
 	}
