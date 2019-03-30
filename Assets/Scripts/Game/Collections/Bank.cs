@@ -70,9 +70,20 @@ public class Bank : MonoBehaviour, IPushable<Coin>, IPoppable<Coin>, ILoadable {
 	}
 
 	public IEnumerator Load() {
+		Queue<Coroutine> pushCoins = new Queue<Coroutine>();
 		for (int i = 0; i < initialCoinCount; i++) {
 			Coin coin = Instantiate(coinPrefab, transform.position, transform.rotation);
-			yield return Push(coin);
+			pushCoins.Enqueue(StartCoroutine(Push(coin)));
+
+			if (pushCoins.Count == coinPiles.Length) {
+				// Deal to all the piles at a time
+				while (pushCoins.Count != 0) {
+					yield return pushCoins.Dequeue();
+				}
+			}
+		}
+		while (pushCoins.Count != 0) {
+			yield return pushCoins.Dequeue();
 		}
 	}
 

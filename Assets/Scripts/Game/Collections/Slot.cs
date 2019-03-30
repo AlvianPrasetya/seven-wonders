@@ -34,7 +34,7 @@ public abstract class Slot<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where 
 	public T Pop() {
 		T poppedElement = Element;
 		Element = null;
-		poppedElement.transform.parent = null;
+ 		poppedElement.transform.parent = null;
 		return poppedElement;
 	}
 

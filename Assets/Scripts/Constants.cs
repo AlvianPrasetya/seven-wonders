@@ -54,5 +54,6 @@ public class GameOptions {
 
 	public const int InitialCoinAmount = 3;
 	public const int DiscardCoinAmount = 3;
+	public const int InitialBuyCost = 2;
 
 }

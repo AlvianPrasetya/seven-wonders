@@ -38,7 +38,7 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	public void OnBeginDrag(PointerEventData eventData) {
 		dragStartPosition = transform.position;
 
-		GameManager.Instance.Player.EvaluatePlayability(this);
+		GameManager.Instance.Player.EnableBuildAreas(this);
 	}
 
 	public void OnDrag(PointerEventData eventData) {
@@ -63,11 +63,11 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 			lastDropArea.Drop(this);
 			lastDropArea.IsHighlighted = false;
 			lastDropArea = null;
-
-			IsPlayable = false;
 		} else {
 			transform.position = dragStartPosition;
 		}
+
+		GameManager.Instance.Player.DisableBuildAreas();
 	}
 
 	public bool IsPlayable {

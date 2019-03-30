@@ -1,4 +1,5 @@
 ﻿using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -99,8 +100,16 @@ public class GameManager : MonoBehaviourPun {
 
 		// Assign neighbours
 		for (int i = 0; i < Players.Count; i++) {
-			Players[i].Neighbours[Direction.West] = Players[(Players.Count + i - 1) % Players.Count];
-			Players[i].Neighbours[Direction.East] = Players[(i + 1) % Players.Count];
+			Player westPlayer = Players[(Players.Count + i - 1) % Players.Count];
+			Player eastPlayer = Players[(i + 1) % Players.Count];
+			Players[i].Neighbours[Direction.West] = westPlayer;
+			Players[i].Neighbours[Direction.East] = eastPlayer;
+
+			// Set initial buying costs
+			foreach (Resource resource in Enum.GetValues(typeof(Resource))) {
+				Players[i].ResourceBuyCosts[new Player.PlayerResource(westPlayer, resource)] = GameOptions.InitialBuyCost;
+				Players[i].ResourceBuyCosts[new Player.PlayerResource(eastPlayer, resource)] = GameOptions.InitialBuyCost;
+			}
 		}
 
 		int playerPos = (int)PhotonNetwork.LocalPlayer.CustomProperties[PlayerProperty.Pos];
@@ -120,19 +129,33 @@ public class GameManager : MonoBehaviourPun {
 		resolverQueue.Enqueue(resolver, priority);
 	}
 
-	public void DecideBuild(int positionInHand) {
-		photonView.RPC("DecideBuild", RpcTarget.All, positionInHand);
+	public void DecideBuild(int positionInHand, Payment payment) {
+		Debug.LogFormat(
+			"Paying bank: {0}, west: {1}, east: {2}",
+			payment.PayBankAmount, payment.PayWestAmount, payment.PayEastAmount
+		);
+		photonView.RPC(
+			"DecideBuild", RpcTarget.All, positionInHand,
+			payment.PayBankAmount, payment.PayWestAmount, payment.PayEastAmount
+		);
 	}
 
-	public void DecideBury(int positionInHand, int wonderStage) {
-		photonView.RPC("DecideBury", RpcTarget.All, positionInHand, wonderStage);
+	public void DecideBury(int positionInHand, int wonderStage, Payment payment) {
+		Debug.LogFormat(
+			"Paying bank: {0}, west: {1}, east: {2}",
+			payment.PayBankAmount, payment.PayWestAmount, payment.PayEastAmount
+		);
+		photonView.RPC(
+			"DecideBury", RpcTarget.All, positionInHand, wonderStage,
+			payment.PayBankAmount, payment.PayWestAmount, payment.PayEastAmount
+		);
 	}
 
 	public void DecideDiscard(int positionInHand) {
 		photonView.RPC("DecideDiscard", RpcTarget.All, positionInHand);
 	}
 
-	public void DecideBotBuild(Bot bot, int positionInHand) {
+	public void DecideBotBuild(Bot bot, int positionInHand, Payment payment) {
 		int botIndex = 0;
 		for (int i = 0; i < Bots.Count; i++) {
 			if (bot == Bots[i]) {
@@ -140,10 +163,13 @@ public class GameManager : MonoBehaviourPun {
 				break;
 			}
 		}
-		photonView.RPC("DecideBotBuild", RpcTarget.All, botIndex, positionInHand);
+		photonView.RPC(
+			"DecideBotBuild", RpcTarget.All, botIndex, positionInHand,
+			payment.PayBankAmount, payment.PayWestAmount, payment.PayEastAmount
+		);
 	}
 
-	public void DecideBotBury(Bot bot, int positionInHand, int wonderStage) {
+	public void DecideBotBury(Bot bot, int positionInHand, int wonderStage, Payment payment) {
 		int botIndex = 0;
 		for (int i = 0; i < Bots.Count; i++) {
 			if (bot == Bots[i]) {
@@ -151,7 +177,10 @@ public class GameManager : MonoBehaviourPun {
 				break;
 			}
 		}
-		photonView.RPC("DecideBotBury", RpcTarget.All, botIndex, positionInHand, wonderStage);
+		photonView.RPC(
+			"DecideBotBury", RpcTarget.All, botIndex, positionInHand, wonderStage,
+			payment.PayBankAmount, payment.PayWestAmount, payment.PayEastAmount
+		);
 	}
 
 	public void DecideBotDiscard(Bot bot, int positionInHand) {
@@ -170,15 +199,25 @@ public class GameManager : MonoBehaviourPun {
 	}
 
 	[PunRPC]
-	private void DecideBuild(int positionInHand, PhotonMessageInfo info) {
+	private void DecideBuild(
+		int positionInHand,
+		int payBankAmount, int payWestAmount, int payEastAmount,
+		PhotonMessageInfo info
+	) {
 		Player player = HumansByActorID[info.Sender.ActorNumber];
-		StartCoroutine(player.PrepareBuild(positionInHand));
+		Payment payment = new Payment(payBankAmount, payWestAmount, payEastAmount);
+		StartCoroutine(player.PrepareBuild(positionInHand, payment));
 	}
 
 	[PunRPC]
-	private void DecideBury(int positionInHand, int wonderStage, PhotonMessageInfo info) {
+	private void DecideBury(
+		int positionInHand, int wonderStage,
+		int payBankAmount, int payWestAmount, int payEastAmount,
+		PhotonMessageInfo info
+	) {
 		Player player = HumansByActorID[info.Sender.ActorNumber];
-		StartCoroutine(player.PrepareBury(positionInHand, wonderStage));
+		Payment payment = new Payment(payBankAmount, payWestAmount, payEastAmount);
+		StartCoroutine(player.PrepareBury(positionInHand, wonderStage, payment));
 	}
 
 	[PunRPC]
@@ -188,15 +227,23 @@ public class GameManager : MonoBehaviourPun {
 	}
 
 	[PunRPC]
-	private void DecideBotBuild(int botIndex, int positionInHand) {
+	private void DecideBotBuild(
+		int botIndex, int positionInHand,
+		int payBankAmount, int payWestAmount, int payEastAmount
+	) {
 		Player player = Bots[botIndex];
-		StartCoroutine(player.PrepareBuild(positionInHand));
+		Payment payment = new Payment(payBankAmount, payWestAmount, payEastAmount);
+		StartCoroutine(player.PrepareBuild(positionInHand, payment));
 	}
 
 	[PunRPC]
-	private void DecideBotBury(int botIndex, int positionInHand, int wonderStage) {
+	private void DecideBotBury(
+		int botIndex, int positionInHand, int wonderStage,
+		int payBankAmount, int payWestAmount, int payEastAmount
+	) {
 		Player player = Bots[botIndex];
-		StartCoroutine(player.PrepareBury(positionInHand, wonderStage));
+		Payment payment = new Payment(payBankAmount, payWestAmount, payEastAmount);
+		StartCoroutine(player.PrepareBury(positionInHand, wonderStage, payment));
 	}
 
 	[PunRPC]

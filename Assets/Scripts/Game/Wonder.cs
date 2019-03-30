@@ -22,15 +22,14 @@ public class Wonder : MonoBehaviour, IMoveable {
 		}
 	}
 
-	public virtual bool IsPlayable {
-		set {
-			foreach (WonderStage wonderStage in wonderStages) {
-				wonderStage.IsPlayable = !wonderStage.IsBuilt && value;
-				if (!wonderStage.IsBuilt && value) {
-					break;
-				}
+	public virtual WonderStage[] GetBuildableStages() {
+		foreach (WonderStage wonderStage in wonderStages) {
+			if (!wonderStage.IsBuilt) {
+				return new WonderStage[]{ wonderStage };
 			}
 		}
+
+		return new WonderStage[0];
 	}
 
 }

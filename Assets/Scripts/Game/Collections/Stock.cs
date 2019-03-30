@@ -44,9 +44,22 @@ public class Stock : CardPile, ILoadable, IShuffleable, IDealable {
 
 	public IEnumerator Deal(DeckType deckType) {
 		int playerIndex = 0;
+		Queue<Coroutine> dealCoins = new Queue<Coroutine>();
 		while (Elements.Count != 0) {
-			yield return GameManager.Instance.Players[playerIndex].Decks[deckType].Push(Pop());
+			dealCoins.Enqueue(StartCoroutine(
+				GameManager.Instance.Players[playerIndex].Decks[deckType].Push(Pop())
+			));
 			playerIndex = (playerIndex + 1) % GameManager.Instance.Players.Count;
+
+			if (dealCoins.Count == GameManager.Instance.Players.Count) {
+				// Deal to all players at a time
+				while (dealCoins.Count != 0) {
+					yield return dealCoins.Dequeue();
+				}
+			}
+		}
+		while (dealCoins.Count != 0) {
+			yield return dealCoins.Dequeue();
 		}
 	}
 

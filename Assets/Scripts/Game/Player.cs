@@ -15,7 +15,7 @@ public abstract class Player : MonoBehaviour {
 
 	public interface IActionable {
 
-		IEnumerator Action(Player player);
+		IEnumerator Perform(Player player);
 		void Effect(Player player);
 
 	}
@@ -23,12 +23,14 @@ public abstract class Player : MonoBehaviour {
 	public class BuildAction : IActionable {
 
 		private Card card;
+		private Payment payment;
 
-		public BuildAction(Card card) {
+		public BuildAction(Card card, Payment payment) {
 			this.card = card;
+			this.payment = payment;
 		}
 
-		public IEnumerator Action(Player player) {
+		public IEnumerator Perform(Player player) {
 			yield return card.Flip();
 
 			int maxCardCount = 0;
@@ -43,6 +45,17 @@ public abstract class Player : MonoBehaviour {
 
 			yield return player.buildDisplay.Push(card);
 			player.BuiltCardsByType[card.cardType].Add(card);
+
+			// Pay bank and neighbours
+			yield return GameManager.Instance.bank.PushMany(
+				player.bank.PopMany(payment.PayBankAmount)
+			);
+			yield return player.Neighbours[Direction.West].bank.PushMany(
+				player.bank.PopMany(payment.PayWestAmount)
+			);
+			yield return player.Neighbours[Direction.East].bank.PushMany(
+				player.bank.PopMany(payment.PayEastAmount)
+			);
 		}
 
 		public void Effect(Player player) {
@@ -57,14 +70,27 @@ public abstract class Player : MonoBehaviour {
 
 		private Card card;
 		private int wonderStage;
+		private Payment payment;
 
-		public BuryAction(Card card, int wonderStage) {
+		public BuryAction(Card card, int wonderStage, Payment payment) {
 			this.card = card;
 			this.wonderStage = wonderStage;
+			this.payment = payment;
 		}
 
-		public IEnumerator Action(Player player) {
+		public IEnumerator Perform(Player player) {
 			yield return player.Wonder.wonderStages[wonderStage].buildCardSlot.Push(card);
+
+			// Pay bank and neighbours
+			yield return GameManager.Instance.bank.PushMany(
+				player.bank.PopMany(payment.PayBankAmount)
+			);
+			yield return player.Neighbours[Direction.West].bank.PushMany(
+				player.bank.PopMany(payment.PayWestAmount)
+			);
+			yield return player.Neighbours[Direction.East].bank.PushMany(
+				player.bank.PopMany(payment.PayEastAmount)
+			);
 		}
 
 		public void Effect(Player player) {
@@ -83,7 +109,7 @@ public abstract class Player : MonoBehaviour {
 			this.card = card;
 		}
 
-		public IEnumerator Action(Player player) {
+		public IEnumerator Perform(Player player) {
 			yield return GameManager.Instance.discardPile.Push(card);
 		}
 
@@ -99,7 +125,7 @@ public abstract class Player : MonoBehaviour {
 		Card card, params object[] args
 	);
 
-	private struct PlayerResource {
+	public struct PlayerResource {
 		public Player player;
 		public Resource resource;
 		public PlayerResource(Player player, Resource resource) {
@@ -133,7 +159,7 @@ public abstract class Player : MonoBehaviour {
 		get {
 			List<ResourceOptions> producedResources = new List<ResourceOptions>();
 			foreach (ResourceOptions resource in resources) {
-				if (resource.produced) {
+				if (resource.IsProduced) {
 					producedResources.Add(resource);
 				}
 			}
@@ -141,6 +167,7 @@ public abstract class Player : MonoBehaviour {
 			return producedResources;
 		}
 	}
+	public Dictionary<PlayerResource, int> ResourceBuyCosts { get; private set; }
 
 	private List<ResourceOptions> resources;
 
@@ -154,25 +181,26 @@ public abstract class Player : MonoBehaviour {
 		foreach (CardType cardType in Enum.GetValues(typeof(CardType))) {
 			BuiltCardsByType[cardType] = new List<Card>();
 		}
+		ResourceBuyCosts = new Dictionary<PlayerResource, int>();
 		resources = new List<ResourceOptions>();
 	}
 
-	public abstract void DecideBuild(Card card);
+	public abstract void DecideBuild(Card card, Payment payment);
 
-	public abstract void DecideBury(Card card, int wonderStage);
+	public abstract void DecideBury(Card card, int wonderStage, Payment payment);
 
 	public abstract void DecideDiscard(Card card);
 
-	public IEnumerator PrepareBuild(int positionInHand) {
+	public IEnumerator PrepareBuild(int positionInHand, Payment payment) {
 		Card card = hand.PopAt(positionInHand);
 		yield return preparedCardSlot.Push(card);
-		Action = new BuildAction(card);
+		Action = new BuildAction(card, payment);
 	}
 
-	public IEnumerator PrepareBury(int positionInHand, int wonderStage) {
+	public IEnumerator PrepareBury(int positionInHand, int wonderStage, Payment payment) {
 		Card card = hand.PopAt(positionInHand);
 		yield return preparedCardSlot.Push(card);
-		Action = new BuryAction(card, wonderStage);
+		Action = new BuryAction(card, wonderStage, payment);
 	}
 
 	public IEnumerator PrepareDiscard(int positionInHand) {
@@ -183,7 +211,7 @@ public abstract class Player : MonoBehaviour {
 
 	public IEnumerator PerformAction() {
 		Card card = preparedCardSlot.Pop();
-		yield return Action.Action(this);
+		yield return Action.Perform(this);
 	}
 	
 	public void EffectAction() {
@@ -198,19 +226,57 @@ public abstract class Player : MonoBehaviour {
 		resources.Add(resourceOptions);
 	}
 
-	public void EvaluatePlayability(Card card) {
+	public void EnableBuildAreas(Card card) {
 		Multiset<Resource> cardResourceCost = new Multiset<Resource>(card.resourceCost);
-		foreach (Multiset<PlayerResource> boughtResourceSet in GetBoughtResourceSets(0, cardResourceCost, new Multiset<PlayerResource>())) {
-			string str = "";
-			foreach (PlayerResource boughtResource in boughtResourceSet) {
-				str += string.Format("Buy {0} from {1}, ", boughtResource.resource, boughtResource.player.Nickname);
+
+		Multiset<PlayerResource> cheapestBoughtResources;
+		int cheapestCost = card.coinCost + GetCheapestBoughtResources(cardResourceCost, out cheapestBoughtResources);
+		if (cheapestCost <= bank.Count) {
+			int westPayAmount = 0;
+			int eastPayAmount = 0;
+			foreach (PlayerResource boughtResource in cheapestBoughtResources) {
+				if (boughtResource.player == Neighbours[Direction.West]) {
+					westPayAmount += ResourceBuyCosts[boughtResource];
+				} else if (boughtResource.player == Neighbours[Direction.East]) {
+					eastPayAmount += ResourceBuyCosts[boughtResource];
+				}
 			}
-			Debug.Log(str);
+			buildDropArea.payment = new Payment(card.coinCost, westPayAmount, eastPayAmount);
+			buildDropArea.IsPlayable = true;
 		}
+
+		WonderStage[] buildableStages = Wonder.GetBuildableStages();
+		foreach (WonderStage stage in buildableStages) {
+			Multiset<Resource> stageResourceCost = new Multiset<Resource>(stage.resourceCost);
+			cheapestCost = card.coinCost + GetCheapestBoughtResources(stageResourceCost, out cheapestBoughtResources);
+			if (cheapestCost <= bank.Count) {
+				int westPayAmount = 0;
+				int eastPayAmount = 0;
+				foreach (PlayerResource boughtResource in cheapestBoughtResources) {
+					if (boughtResource.player == Neighbours[Direction.West]) {
+						westPayAmount += ResourceBuyCosts[boughtResource];
+					} else if (boughtResource.player == Neighbours[Direction.East]) {
+						eastPayAmount += ResourceBuyCosts[boughtResource];
+					}
+				}
+				stage.buryDropArea.payment = new Payment(stage.coinCost, westPayAmount, eastPayAmount);
+				stage.buryDropArea.IsPlayable = true;
+			}
+		}
+
+		discardDropArea.IsPlayable = true;
+	}
+
+	public void DisableBuildAreas() {
+		buildDropArea.IsPlayable = false;
+		foreach (WonderStage wonderStage in Wonder.wonderStages) {
+			wonderStage.IsPlayable = false;
+		}
+		discardDropArea.IsPlayable = false;
 	}
 
 	// TODO: Refactor
-	private IEnumerable<Multiset<PlayerResource>> GetBoughtResourceSets(
+	protected IEnumerable<Multiset<PlayerResource>> GetBoughtResourceSets(
 		int pos, Multiset<Resource> resourceCost, Multiset<PlayerResource> toBuy
 	) {
 		if (resourceCost.Count == 0) {
@@ -221,7 +287,7 @@ public abstract class Player : MonoBehaviour {
 		if (pos < resources.Count) {
 			// Use own resources first
 			bool usable = false;
-			foreach (Resource resource in resources[pos].resources) {
+			foreach (Resource resource in resources[pos].Resources) {
 				if (resourceCost.Contains(resource)) {
 					usable = true;
 					resourceCost.Remove(resource);
@@ -258,7 +324,7 @@ public abstract class Player : MonoBehaviour {
 		}
 
 		ResourceOptions resourceOptions = neighbourResources[buyDirection][resourcePos];
-		foreach (Resource resource in resourceOptions.resources) {
+		foreach (Resource resource in resourceOptions.Resources) {
 			if (!resourceCost.Contains(resource)) {
 				continue;
 			}
@@ -276,6 +342,25 @@ public abstract class Player : MonoBehaviour {
 		foreach (Multiset<PlayerResource> set in GetBoughtResourceSets(pos + 1, resourceCost, toBuy)) {
 			yield return set;
 		}
+	}
+
+	protected int GetCheapestBoughtResources(
+		Multiset<Resource> resourceCost, out Multiset<PlayerResource> cheapestBoughtResources
+	) {
+		int cheapestCost = int.MaxValue;
+		cheapestBoughtResources = null;
+		foreach (Multiset<PlayerResource> boughtResources in GetBoughtResourceSets(0, resourceCost, new Multiset<PlayerResource>())) {
+			int cost = 0;
+			foreach (PlayerResource playerResource in boughtResources) {
+				cost += ResourceBuyCosts[playerResource];
+			}
+			if (cost < cheapestCost) {
+				cheapestCost = cost;
+				cheapestBoughtResources = new Multiset<PlayerResource>(boughtResources);
+			}
+		}
+		
+		return cheapestCost;
 	}
 
 }
