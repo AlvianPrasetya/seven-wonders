@@ -5,18 +5,25 @@ using UnityEngine;
 // Stock represents a pile of cards to be dealt.
 public class Stock : CardPile, ILoadable, IShuffleable, IDealable {
 
-	public Card[] initialCardPrefabs;
+	[System.Serializable]
+	public class CardEntry {
+
+		public Card cardPrefab;
+		public int minPlayers;
+
+	}
+
+	public CardEntry[] initialCardEntries;
 	public CardPile[] shuffleCardPiles;
 
 	public virtual IEnumerator Load() {
-		foreach (Card initialCardPrefab in initialCardPrefabs) {
-			if (initialCardPrefab is StructureCard &&
-				((StructureCard)initialCardPrefab).minPlayers > GameManager.Instance.Players.Count
-			) {
+		foreach (CardEntry cardEntry in initialCardEntries) {
+			if (cardEntry.minPlayers > GameManager.Instance.Players.Count) {
+				// Not enough players to put this card into play
 				continue;
 			}
 
-			Card card = Instantiate(initialCardPrefab, transform.position, transform.rotation);
+			Card card = Instantiate(cardEntry.cardPrefab, transform.position, transform.rotation);
 			yield return Push(card);
 		}
 	}
