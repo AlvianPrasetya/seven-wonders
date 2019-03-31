@@ -191,6 +191,19 @@ public abstract class Player : MonoBehaviour {
 
 	public abstract void DecideDiscard(Card card);
 
+	public IEnumerator SetWonder(Wonder wonder) {
+		yield return wonderSlot.Push(wonder);
+		bank = wonder.bank;
+		preparedCardSlot = wonder.preparedCardSlot;
+		foreach (WonderStage wonderStage in wonder.wonderStages) {
+			wonderStage.buryDropArea.onDropEvent.AddListener(DecideBury);
+		}
+
+		foreach (OnBuildEffect onBuildEffect in wonder.onBuildEffects) {
+			onBuildEffect.Effect(this);
+		}
+	}
+
 	public IEnumerator PrepareBuild(int positionInHand, Payment payment) {
 		Card card = hand.PopAt(positionInHand);
 		yield return preparedCardSlot.Push(card);
@@ -348,7 +361,7 @@ public abstract class Player : MonoBehaviour {
 		Multiset<Resource> resourceCost, out Multiset<PlayerResource> cheapestBoughtResources
 	) {
 		int cheapestCost = int.MaxValue;
-		cheapestBoughtResources = null;
+		cheapestBoughtResources = new Multiset<PlayerResource>();
 		foreach (Multiset<PlayerResource> boughtResources in GetBoughtResourceSets(0, resourceCost, new Multiset<PlayerResource>())) {
 			int cost = 0;
 			foreach (PlayerResource playerResource in boughtResources) {

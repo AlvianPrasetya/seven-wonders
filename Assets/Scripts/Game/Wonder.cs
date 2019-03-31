@@ -6,6 +6,7 @@ public class Wonder : MonoBehaviour, IMoveable {
 	public Bank bank;
 	public CardSlot preparedCardSlot;
 	public WonderStage[] wonderStages;
+	public OnBuildEffect[] onBuildEffects;
 
 	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation, float duration) {
 		Vector3 initialPosition = transform.position;

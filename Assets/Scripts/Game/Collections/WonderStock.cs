@@ -49,12 +49,7 @@ public class WonderStock : WonderPile, IRandomLoadable, IShuffleable {
 	public IEnumerator Deal() {
 		foreach (Player player in GameManager.Instance.Players) {
 			Wonder wonder = Pop();
-			yield return player.wonderSlot.Push(wonder);
-			player.bank = wonder.bank;
-			player.preparedCardSlot = wonder.preparedCardSlot;
-			foreach (WonderStage wonderStage in wonder.wonderStages) {
-				wonderStage.buryDropArea.onDropEvent.AddListener(player.DecideBury);
-			}
+			yield return player.SetWonder(wonder);
 		}
 	}
 
