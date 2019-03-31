@@ -231,8 +231,12 @@ public abstract class Player : MonoBehaviour {
 		Action.Effect(this);
 	}
 
-	public IEnumerator GainCoin(int amount) {
+	public IEnumerator GainCoins(int amount) {
 		yield return bank.PushMany(GameManager.Instance.bank.PopMany(amount));
+	}
+
+	public IEnumerator GainPoints(PointType pointType, int amount) {
+		yield return null;
 	}
 
 	public void AddResource(ResourceOptions resourceOptions) {

@@ -81,7 +81,7 @@ public class PreGameResolver : IResolvable {
 		Queue<Coroutine> gainCoins = new Queue<Coroutine>();
 		foreach (Player player in GameManager.Instance.Players) {
 			gainCoins.Enqueue(GameManager.Instance.StartCoroutine(
-				player.GainCoin(GameOptions.InitialCoinAmount)
+				player.GainCoins(GameOptions.InitialCoinAmount)
 			));
 		}
 		while (gainCoins.Count != 0) {

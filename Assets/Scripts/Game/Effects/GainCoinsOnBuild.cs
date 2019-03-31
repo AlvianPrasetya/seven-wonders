@@ -1,4 +1,4 @@
-public class GainFlatCoinsOnBuild : OnBuildEffect {
+public class GainCoinsOnBuild : OnBuildEffect {
 
 	public int amount;
 

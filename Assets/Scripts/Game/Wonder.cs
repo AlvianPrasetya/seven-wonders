@@ -33,4 +33,17 @@ public class Wonder : MonoBehaviour, IMoveable {
 		return new WonderStage[0];
 	}
 
+	public int BuiltStagesCount {
+		get {
+			int count = 0;
+			foreach (WonderStage wonderStage in wonderStages) {
+				if (wonderStage.IsBuilt) {
+					count++;
+				}
+			}
+
+			return count;
+		}
+	}
+
 }

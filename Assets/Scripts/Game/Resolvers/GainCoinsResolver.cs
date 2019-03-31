@@ -11,7 +11,7 @@ public class GainCoinsResolver : IResolvable {
 	}
 
 	public IEnumerator Resolve() {
-		yield return player.GainCoin(amount);
+		yield return player.GainCoins(amount);
 	}
 
 }
