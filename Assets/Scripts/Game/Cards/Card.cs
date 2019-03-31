@@ -12,6 +12,7 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	public Resource[] resourceCost;
 	public OnBuildEffect[] onBuildEffects;
 	
+	private bool dragged;
 	private Vector3 dragStartPosition;
 	private new Collider collider;
 	private DropArea<Card> lastDropArea;
@@ -36,12 +37,16 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	}
 
 	public void OnBeginDrag(PointerEventData eventData) {
+		dragged = true;
 		dragStartPosition = transform.position;
-
 		GameManager.Instance.Player.EnableBuildAreas(this);
 	}
 
 	public void OnDrag(PointerEventData eventData) {
+		if (!dragged) {
+			return;
+		}
+
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hitInfo;
 		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask(LayerName.Table))) {
@@ -59,6 +64,10 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	}
 
 	public void OnEndDrag(PointerEventData eventData) {
+		if (!dragged) {
+			return;
+		}
+		
 		if (lastDropArea) {
 			lastDropArea.Drop(this);
 			lastDropArea.IsHighlighted = false;
@@ -67,12 +76,19 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 			transform.position = dragStartPosition;
 		}
 
+		dragged = false;
 		GameManager.Instance.Player.DisableBuildAreas();
 	}
 
 	public bool IsPlayable {
 		set {
 			collider.enabled = value;
+
+			if (!value && dragged) {
+				// Forcefully return card to hand
+				lastDropArea = null;
+				OnEndDrag(null);
+			}
 		}
 	}
 
