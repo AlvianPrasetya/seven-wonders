@@ -25,7 +25,7 @@ public class GainPointsPerWonderStageOnBuild : OnBuildEffect {
 				break;
 		}
 		GameManager.Instance.EnqueueResolver(
-			new GainPointsPerCountResolver(player, pointType, amountPerWonderStage, count), 4
+			new GainPointsPerCountResolver(player, pointType, amountPerWonderStage, count), 2
 		);
 	}
 

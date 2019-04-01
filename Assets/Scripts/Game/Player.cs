@@ -236,7 +236,7 @@ public abstract class Player : MonoBehaviour {
 	}
 
 	public IEnumerator GainPoints(PointType pointType, int amount) {
-		yield return null;
+		yield return UIManager.Instance.scoreboard.AddPoints(this, pointType, amount);
 	}
 
 	public void AddResource(ResourceOptions resourceOptions) {

@@ -26,7 +26,7 @@ public class GainPointsPerCardOnBuild : OnBuildEffect {
 				break;
 		}
 		GameManager.Instance.EnqueueResolver(
-			new GainPointsPerCountResolver(player, pointType, amountPerCard, count), 4
+			new GainPointsPerCountResolver(player, pointType, amountPerCard, count), 2
 		);
 	}
 
