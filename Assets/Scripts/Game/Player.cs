@@ -265,7 +265,7 @@ public abstract class Player : MonoBehaviour {
 		WonderStage[] buildableStages = Wonder.GetBuildableStages();
 		foreach (WonderStage stage in buildableStages) {
 			Multiset<Resource> stageResourceCost = new Multiset<Resource>(stage.resourceCost);
-			cheapestCost = card.coinCost + GetCheapestBoughtResources(stageResourceCost, out cheapestBoughtResources);
+			cheapestCost = stage.coinCost + GetCheapestBoughtResources(stageResourceCost, out cheapestBoughtResources);
 			if (cheapestCost <= bank.Count) {
 				int westPayAmount = 0;
 				int eastPayAmount = 0;
@@ -364,7 +364,7 @@ public abstract class Player : MonoBehaviour {
 	protected int GetCheapestBoughtResources(
 		Multiset<Resource> resourceCost, out Multiset<PlayerResource> cheapestBoughtResources
 	) {
-		int cheapestCost = int.MaxValue;
+		int cheapestCost = Constant.MaxCost;
 		cheapestBoughtResources = new Multiset<PlayerResource>();
 		foreach (Multiset<PlayerResource> boughtResources in GetBoughtResourceSets(0, resourceCost, new Multiset<PlayerResource>())) {
 			int cost = 0;

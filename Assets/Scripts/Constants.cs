@@ -1,3 +1,5 @@
+using System;
+
 public enum Direction { West, East };
 public enum StockType {
 	RawMaterial, ManufacturedGoods, Civilian, Scientific, Commercial, Military, Guild, City, Leader, Wonder,
@@ -20,6 +22,7 @@ public class Constant {
 	public const string GameVersion = "v0.0.1";
 	public const float DistanceEpsilon = 0.01f;
 	public const float AngleEpsilon = 0.1f;
+	public const int MaxCost = Int16.MaxValue;
 
 }
 
