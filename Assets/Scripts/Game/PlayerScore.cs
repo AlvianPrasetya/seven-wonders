@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerScore : MonoBehaviour {
+public class PlayerScore : MonoBehaviour, IComparable<PlayerScore> {
 
-	private const float moveDuration = 1;
+	private const float moveDuration = 0.5f;
 
 	[System.Serializable]
 	public class PointEntry {
@@ -26,10 +26,12 @@ public class PlayerScore : MonoBehaviour {
 
 		private IEnumerator Morph() {
 			int initialDisplayedPoints = displayedPoints;
+			int initialFontSize = pointText.fontSize;
 			float progress = 0;
 			while (progress < 1) {
 				progress = Mathf.Min(progress + Time.deltaTime / morphDuration, 1);
 				DisplayedPoints = (int)Mathf.Lerp(initialDisplayedPoints, Points, progress);
+				pointText.fontSize = (int)Mathf.Lerp(initialFontSize * 1.25f, initialFontSize, progress);
 				
 				yield return null;
 			}
@@ -61,10 +63,12 @@ public class PlayerScore : MonoBehaviour {
 
 		private IEnumerator Morph() {
 			int initialDisplayedTotal = displayedTotal;
+			int initialFontSize = totalText.fontSize;
 			float progress = 0;
 			while (progress < 1) {
 				progress = Mathf.Min(progress + Time.deltaTime / morphDuration, 1);
 				DisplayedTotal = (int)Mathf.Lerp(initialDisplayedTotal, Total, progress);
+				totalText.fontSize = (int)Mathf.Lerp(initialFontSize * 1.25f, initialFontSize, progress);
 				
 				yield return null;
 			}
@@ -93,6 +97,26 @@ public class PlayerScore : MonoBehaviour {
 		foreach (PointEntry pointEntry in pointEntries) {
 			pointEntriesByType[pointEntry.pointType] = pointEntry;
 		}
+	}
+
+	int IComparable<PlayerScore>.CompareTo(PlayerScore other) {
+		if (TotalScore == other.TotalScore) {
+			if (GetInstanceID() == other.GetInstanceID()) {
+				return 0;
+			}
+			
+			if (GetInstanceID() < other.GetInstanceID()) {
+				return 1;
+			}
+
+			return -1;
+		}
+
+		if (TotalScore < other.TotalScore) {
+			return 1;
+		}
+
+		return -1;
 	}
 
 	public string Nickname {

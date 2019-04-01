@@ -8,10 +8,12 @@ public class Scoreboard : MonoBehaviour {
 	public Vector2 initialSpacing = new Vector2(0, -100);
 	public Vector2 spacing = new Vector2(0, -80);
 
-	private Dictionary<Player, PlayerScore> playerScores;
+	private Dictionary<Player, PlayerScore> playerScoresByPlayer;
+	private List<PlayerScore> playerScores;
 
 	void Awake() {
-		playerScores = new Dictionary<Player, PlayerScore>();
+		playerScoresByPlayer = new Dictionary<Player, PlayerScore>();
+		playerScores = new List<PlayerScore>();
 	}
 
 	public bool IsDisplayed {
@@ -27,18 +29,35 @@ public class Scoreboard : MonoBehaviour {
 		playerScore.AnchoredPosition = initialSpacing;
 		
 		playerScore.Nickname = player.Nickname;
-		playerScores.Add(player, playerScore);
+		playerScoresByPlayer.Add(player, playerScore);
+		playerScores.Add(playerScore);
 
-		yield return MoveToPosition(playerScore, playerScores.Count - 1);
+		yield return playerScore.MoveToPosition(GetAnchoredPosition(playerScoresByPlayer.Count - 1));
 	}
 
 	public IEnumerator AddPoints(Player player, PointType pointType, int amount) {
-		yield return playerScores[player].AddPoints(pointType, amount);
+		Coroutine addPoints = StartCoroutine(playerScoresByPlayer[player].AddPoints(pointType, amount));
+
+		// Re-sort player scores
+		playerScores.Sort();
+
+		// Rearrange scoreboard entries
+		Queue<Coroutine> moveToPositions = new Queue<Coroutine>();
+		for (int i = 0; i < playerScores.Count; i++) {
+			moveToPositions.Enqueue(StartCoroutine(
+				playerScores[i].MoveToPosition(GetAnchoredPosition(i))
+			));
+		}
+		while (moveToPositions.Count != 0) {
+			yield return moveToPositions.Dequeue();
+		}
+
+		yield return addPoints;
 	}
 
-	private IEnumerator MoveToPosition(PlayerScore playerScore, int position) {
+	private Vector3 GetAnchoredPosition(int position) {
 		Vector2 anchoredPosition = initialSpacing + spacing * position;
-		yield return playerScore.MoveToPosition(anchoredPosition);
+		return anchoredPosition;
 	}
 
 }
