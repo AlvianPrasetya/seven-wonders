@@ -69,6 +69,8 @@ public class PreGameResolver : IResolvable {
 		Coroutine shuffleAge1 = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.Stocks[StockType.Age1].Shuffle(5, age1RandomSeed)
 		);
+		
+		yield return GameManager.Instance.Stocks[StockType.Guild].Dump();
 
 		yield return shuffleAge3;
 		yield return GameManager.Instance.Stocks[StockType.Age3].Deal(DeckType.Age3);
