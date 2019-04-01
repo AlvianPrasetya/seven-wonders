@@ -8,24 +8,18 @@ public class Logger : MonoBehaviour {
 
 	private StreamWriter writer;
 	
-	void Awake() {
+	void OnEnable() {
 		string logFilePath = Application.persistentDataPath + "/" + logFilename;
 
-		if (!File.Exists(logFilePath)) {
-			try {
-				File.Create(logFilePath);
-			} catch (System.Exception e) {
-				Debug.LogErrorFormat("Failed to create log file: {0}", e);
-				return;
-			}
-		}
-
 		writer = new StreamWriter(logFilePath, true);
+		writer.AutoFlush = true;
 
 		Application.logMessageReceived += OnLoggedCallback;
 	}
 
-	void OnDestroy() {
+	void OnDisable() {
+		Application.logMessageReceived -= OnLoggedCallback;
+
 		try {
 			writer.Close();
 		} catch (System.Exception e) {
