@@ -6,20 +6,20 @@ public class UnloadHandResolver : IResolvable {
 
 	private DeckType deckType;
 	private Direction unloadDirection;
-	private Player player;
+	private Player targetPlayer;
 
-	public UnloadHandResolver(DeckType deckType, Direction unloadDirection, Player player = null) {
+	public UnloadHandResolver(DeckType deckType, Direction unloadDirection, Player targetPlayer = null) {
 		this.deckType = deckType;
 		this.unloadDirection = unloadDirection;
-		this.player = player;
+		this.targetPlayer = targetPlayer;
 	}
 
 	public IEnumerator Resolve() {
-		if (player != null) {
+		if (targetPlayer != null) {
 			// Focus on the only player unloading hand
-			yield return GameManager.Instance.gameCamera.Focus(player);
+			yield return GameManager.Instance.gameCamera.Focus(targetPlayer);
 			// Unload hand to the player's deck
-			yield return player.hand.Unload(player.Decks[deckType], unloadDirection);
+			yield return targetPlayer.hand.Unload(targetPlayer.Decks[deckType], unloadDirection);
 		} else {
 			// Focus on local player when unloading hand
 			yield return GameManager.Instance.gameCamera.Focus(GameManager.Instance.Player);

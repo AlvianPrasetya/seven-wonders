@@ -1,7 +1,5 @@
 public class GainCoinsPerCardOnBuild : OnBuildEffect {
 
-	private const int Priority = 6;
-
 	public int amountPerCard;
 	public CardType cardType;
 	public Target countTarget;
@@ -27,7 +25,7 @@ public class GainCoinsPerCardOnBuild : OnBuildEffect {
 				break;
 		}
 		GameManager.Instance.EnqueueResolver(
-			new GainCoinsPerCountResolver(player, amountPerCard, count), Priority
+			new GainCoinsPerCountResolver(player, amountPerCard, count), Priority.GainCoins
 		);
 	}
 

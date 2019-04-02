@@ -120,7 +120,7 @@ public class GameManager : MonoBehaviourPun {
 
 		resolverQueue.Enqueue(
 			new MatchResolver((int)PhotonNetwork.CurrentRoom.CustomProperties[MatchSeedKey]),
-			1
+			Priority.ResolveMatch
 		);
 		StartCoroutine(Resolve());
 	}

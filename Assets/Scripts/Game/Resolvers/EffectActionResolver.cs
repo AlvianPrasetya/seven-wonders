@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class EffectActionResolver : IResolvable {
 
-	private Player player;
+	private Player targetPlayer;
 
-	public EffectActionResolver(Player player = null) {
-		this.player = player;
+	public EffectActionResolver(Player targetPlayer = null) {
+		this.targetPlayer = targetPlayer;
 	}
 
 	public IEnumerator Resolve() {
-		if (player != null) {
-			player.EffectAction();
+		if (targetPlayer != null) {
+			targetPlayer.EffectAction();
 			yield break;
 		}
 

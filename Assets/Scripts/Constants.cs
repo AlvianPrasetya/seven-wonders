@@ -61,5 +61,21 @@ public class GameOptions {
 	public const int InitialBuyCost = 2;
 	public const int DiscountedBuyCost = 1;
 	public const int DecideTime = 30;
+	public const int TurnsPerAge = 6;
+
+}
+
+public class Priority {
+
+	public const int GainCoins = 9;
+	public const int LoseCoins = 8;
+	public const int PlayHand = 7;
+	public const int PlayLastHand = 6;
+	public const int DiscardLastHand = 5;
+	public const int DigDiscardPile = 4;
+	public const int Turn = 3;
+	public const int ResolvePhase = 2;
+	public const int GainPoints = 2;
+	public const int ResolveMatch = 1;
 
 }

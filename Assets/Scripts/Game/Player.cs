@@ -116,7 +116,7 @@ public abstract class Player : MonoBehaviour {
 
 		public void Effect(Player player) {
 			GameManager.Instance.EnqueueResolver(
-				new GainCoinsResolver(player, GameOptions.DiscardCoinAmount), 6
+				new GainCoinsResolver(player, GameOptions.DiscardCoinAmount), Priority.GainCoins
 			);
 		}
 

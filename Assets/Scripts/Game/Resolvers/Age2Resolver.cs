@@ -5,23 +5,20 @@ using UnityEngine;
 
 public class Age2Resolver : IResolvable {
 
-	private const int TurnCount = 6;
-	private const int Priority = 4;
-
 	public IEnumerator Resolve() {
 		GameManager.Instance.EnqueueResolver(
 			new TurnResolver(DeckType.Age2, DeckType.West, Direction.East),
-			Priority
+			Priority.Turn
 		);
-		for (int i = 0; i < TurnCount - 2; i++) {
+		for (int i = 0; i < GameOptions.TurnsPerAge - 2; i++) {
 			GameManager.Instance.EnqueueResolver(
 				new TurnResolver(DeckType.West, DeckType.West, Direction.East),
-				Priority
+				Priority.Turn
 			);
 		}
 		GameManager.Instance.EnqueueResolver(
 			new TurnResolver(DeckType.West, DeckType.Discard, Direction.East),
-			Priority
+			Priority.Turn
 		);
 
 		yield return null;

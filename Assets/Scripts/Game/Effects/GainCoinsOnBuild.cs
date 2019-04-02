@@ -1,7 +1,5 @@
 public class GainCoinsOnBuild : OnBuildEffect {
 
-	private const int Priority = 6;
-
 	public Target target;
 	public int amount;
 
@@ -10,31 +8,31 @@ public class GainCoinsOnBuild : OnBuildEffect {
 			case Target.Self:
 				GameManager.Instance.EnqueueResolver(
 					new GainCoinsResolver(player, amount),
-					Priority
+					Priority.GainCoins
 				);
 				break;
 			case Target.Neighbours:
 				GameManager.Instance.EnqueueResolver(
 					new GainCoinsResolver(player.Neighbours[Direction.West], amount),
-					Priority
+					Priority.GainCoins
 				);
 				GameManager.Instance.EnqueueResolver(
 					new GainCoinsResolver(player.Neighbours[Direction.East], amount),
-					Priority
+					Priority.GainCoins
 				);
 				break;
 			case Target.Neighbourhood:
 				GameManager.Instance.EnqueueResolver(
 					new GainCoinsResolver(player, amount),
-					Priority
+					Priority.GainCoins
 				);
 				GameManager.Instance.EnqueueResolver(
 					new GainCoinsResolver(player.Neighbours[Direction.West], amount),
-					Priority
+					Priority.GainCoins
 				);
 				GameManager.Instance.EnqueueResolver(
 					new GainCoinsResolver(player.Neighbours[Direction.East], amount),
-					Priority
+					Priority.GainCoins
 				);
 				break;
 			case Target.Others:
@@ -45,7 +43,7 @@ public class GainCoinsOnBuild : OnBuildEffect {
 
 					GameManager.Instance.EnqueueResolver(
 						new GainCoinsResolver(targetPlayer, amount),
-						Priority
+						Priority.GainCoins
 					);
 				}
 				break;
@@ -53,7 +51,7 @@ public class GainCoinsOnBuild : OnBuildEffect {
 				foreach (Player targetPlayer in GameManager.Instance.Players) {
 					GameManager.Instance.EnqueueResolver(
 						new GainCoinsResolver(targetPlayer, amount),
-						Priority
+						Priority.GainCoins
 					);
 				}
 				break;
