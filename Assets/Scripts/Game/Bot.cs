@@ -16,8 +16,26 @@ public class Bot : Player {
 
 				// Build the first buildable card in current hand
 				foreach (Card card in playableCards) {
-					Multiset<Resource> cardResourceCost = new Multiset<Resource>(card.resourceCost);
+					if (BuiltCards.Contains(card.cardName)) {
+						// Card has been built before
+						continue;
+					}
 
+					bool chainable = false;
+					foreach (string chainedCardName in card.chainedFrom) {
+						if (BuiltCards.Contains(chainedCardName)) {
+							chainable = true;
+							break;
+						}
+					}
+
+					if (chainable) {
+						// Card is chainable, build this card with 0 payment
+						DecideBuild(card, new Payment(0, 0, 0));
+						return;
+					}
+					
+					Multiset<Resource> cardResourceCost = new Multiset<Resource>(card.resourceCost);
 					Multiset<PlayerResource> cheapestBoughtResources;
 					int cheapestCost = card.coinCost + GetCheapestBoughtResources(cardResourceCost, out cheapestBoughtResources);
 					if (cheapestCost > bank.Count) {
