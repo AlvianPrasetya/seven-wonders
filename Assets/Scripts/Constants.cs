@@ -73,7 +73,7 @@ public class Priority {
 	public const int PlayLastHand = 6;
 	public const int DiscardLastHand = 5;
 	public const int DigDiscardPile = 4;
-	public const int Turn = 3;
+	public const int ResolveTurn = 3;
 	public const int ResolvePhase = 2;
 	public const int GainPoints = 2;
 	public const int ResolveMatch = 1;
