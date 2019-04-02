@@ -116,7 +116,7 @@ public abstract class Player : MonoBehaviour {
 
 		public void Effect(Player player) {
 			GameManager.Instance.EnqueueResolver(
-				new GainCoinsResolver(player, GameOptions.DiscardCoinAmount), 4
+				new GainCoinsResolver(player, GameOptions.DiscardCoinAmount), 6
 			);
 		}
 
@@ -178,6 +178,7 @@ public abstract class Player : MonoBehaviour {
 		foreach (DeckEntry deckEntry in decks) {
 			Decks.Add(deckEntry.deckType, deckEntry.deck);
 		}
+		Decks.Add(DeckType.Discard, GameManager.Instance.discardPile);
 		Neighbours = new Dictionary<Direction, Player>();
 		BuiltCards = new HashSet<string>();
 		BuiltCardsByType = new Dictionary<CardType, List<Card>>();

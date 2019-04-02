@@ -1,6 +1,6 @@
 public class GainCoinsOnBuild : OnBuildEffect {
 
-	private const int Priority = 4;
+	private const int Priority = 6;
 
 	public Target target;
 	public int amount;
@@ -8,7 +8,10 @@ public class GainCoinsOnBuild : OnBuildEffect {
 	public override void Effect(Player player) {
 		switch (target) {
 			case Target.Self:
-				GameManager.Instance.EnqueueResolver(new GainCoinsResolver(player, amount), 4);
+				GameManager.Instance.EnqueueResolver(
+					new GainCoinsResolver(player, amount),
+					Priority
+				);
 				break;
 			case Target.Neighbours:
 				GameManager.Instance.EnqueueResolver(
@@ -21,7 +24,10 @@ public class GainCoinsOnBuild : OnBuildEffect {
 				);
 				break;
 			case Target.Neighbourhood:
-				GameManager.Instance.EnqueueResolver(new GainCoinsResolver(player, amount), 4);
+				GameManager.Instance.EnqueueResolver(
+					new GainCoinsResolver(player, amount),
+					Priority
+				);
 				GameManager.Instance.EnqueueResolver(
 					new GainCoinsResolver(player.Neighbours[Direction.West], amount),
 					Priority

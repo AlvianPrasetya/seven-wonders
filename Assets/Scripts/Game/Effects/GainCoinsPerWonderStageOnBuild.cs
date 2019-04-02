@@ -1,6 +1,6 @@
 public class GainCoinsPerWonderStageOnBuild : OnBuildEffect {
 
-	private const int Priority = 4;
+	private const int Priority = 6;
 
 	public int amountPerWonderStage;
 	public Target countTarget;

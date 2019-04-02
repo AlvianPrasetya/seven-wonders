@@ -6,7 +6,7 @@ public enum StockType {
 	Age1, Age2, Age3
 }
 public enum DeckType {
-	Wonder, Age1, Age2, Age3, WestDeck, EastDeck, Discard
+	Wonder, Age1, Age2, Age3, West, East, Discard, Swap
 }
 public enum Structure { RawMaterial, ManufacturedGoods, Civilian, Scientific, Commercial, Military, Guild, City, Leader, Wonder };
 public enum Age { Age1, Age2, Age3 };
@@ -60,5 +60,6 @@ public class GameOptions {
 	public const int DiscardCoinAmount = 3;
 	public const int InitialBuyCost = 2;
 	public const int DiscountedBuyCost = 1;
+	public const int DecideTime = 30;
 
 }

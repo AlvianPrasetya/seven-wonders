@@ -1,6 +1,6 @@
 public class GainCoinsPerCardOnBuild : OnBuildEffect {
 
-	private const int Priority = 4;
+	private const int Priority = 6;
 
 	public int amountPerCard;
 	public CardType cardType;
