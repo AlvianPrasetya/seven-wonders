@@ -1,5 +1,7 @@
 public class GainCoinsPerWonderStageOnBuild : OnBuildEffect {
 
+	private const int Priority = 4;
+
 	public int amountPerWonderStage;
 	public Target countTarget;
 
@@ -24,7 +26,7 @@ public class GainCoinsPerWonderStageOnBuild : OnBuildEffect {
 				break;
 		}
 		GameManager.Instance.EnqueueResolver(
-			new GainCoinsPerCountResolver(player, amountPerWonderStage, count), 4
+			new GainCoinsPerCountResolver(player, amountPerWonderStage, count), Priority
 		);
 	}
 
