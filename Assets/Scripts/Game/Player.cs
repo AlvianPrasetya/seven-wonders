@@ -246,61 +246,13 @@ public abstract class Player : MonoBehaviour {
 		resources.Add(resourceOptions);
 	}
 
-	public void EnableBuildAreas(Card card) {
-		bool chainable = false;
-		foreach (string chainedCardName in card.chainedFrom) {
-			if (BuiltCards.Contains(chainedCardName)) {
-				chainable = true;
-				break;
-			}
-		}
-
-		if (chainable) {
-			buildDropArea.payment = new Payment(0, 0, 0);
-			buildDropArea.IsPlayable = true;
-		} else {
-			Multiset<Resource> cardResourceCost = new Multiset<Resource>(card.resourceCost);
-			Multiset<PlayerResource> cheapestBoughtResources;
-			int cheapestCost = card.coinCost + GetCheapestBoughtResources(cardResourceCost, out cheapestBoughtResources);
-			if (cheapestCost <= bank.Count) {
-				int westPayAmount = 0;
-				int eastPayAmount = 0;
-				foreach (PlayerResource boughtResource in cheapestBoughtResources) {
-					if (boughtResource.player == Neighbours[Direction.West]) {
-						westPayAmount += ResourceBuyCosts[boughtResource];
-					} else if (boughtResource.player == Neighbours[Direction.East]) {
-						eastPayAmount += ResourceBuyCosts[boughtResource];
-					}
-				}
-				buildDropArea.payment = new Payment(card.coinCost, westPayAmount, eastPayAmount);
-				buildDropArea.IsPlayable = true;
-			}
-		}
-
-		WonderStage[] buildableStages = Wonder.GetBuildableStages();
-		foreach (WonderStage stage in buildableStages) {
-			Multiset<Resource> stageResourceCost = new Multiset<Resource>(stage.resourceCost);
-			Multiset<PlayerResource> cheapestBoughtResources;
-			int cheapestCost = stage.coinCost + GetCheapestBoughtResources(stageResourceCost, out cheapestBoughtResources);
-			if (cheapestCost <= bank.Count) {
-				int westPayAmount = 0;
-				int eastPayAmount = 0;
-				foreach (PlayerResource boughtResource in cheapestBoughtResources) {
-					if (boughtResource.player == Neighbours[Direction.West]) {
-						westPayAmount += ResourceBuyCosts[boughtResource];
-					} else if (boughtResource.player == Neighbours[Direction.East]) {
-						eastPayAmount += ResourceBuyCosts[boughtResource];
-					}
-				}
-				stage.buryDropArea.payment = new Payment(stage.coinCost, westPayAmount, eastPayAmount);
-				stage.buryDropArea.IsPlayable = true;
-			}
-		}
-
-		discardDropArea.IsPlayable = true;
+	public void EnableDropAreas(Card card) {
+		EnableBuildAreas(card);
+		EnableBuryAreas();
+		EnableDiscardArea();
 	}
 
-	public void DisableBuildAreas() {
+	public void DisableDropAreas() {
 		buildDropArea.IsPlayable = false;
 		foreach (WonderStage wonderStage in Wonder.wonderStages) {
 			wonderStage.IsPlayable = false;
@@ -394,6 +346,71 @@ public abstract class Player : MonoBehaviour {
 		}
 		
 		return cheapestCost;
+	}
+
+	private void EnableBuildAreas(Card card) {
+		if (BuiltCards.Contains(card.cardName)) {
+			// Card has been built before, do not enable build area
+			return;
+		}
+
+		bool chainable = false;
+		foreach (string chainedCardName in card.chainedFrom) {
+			if (BuiltCards.Contains(chainedCardName)) {
+				chainable = true;
+				break;
+			}
+		}
+
+		if (chainable) {
+			// Card is chainable, enable build area with 0 payment
+			buildDropArea.payment = new Payment(0, 0, 0);
+			buildDropArea.IsPlayable = true;
+			return;
+		}
+
+		Multiset<Resource> cardResourceCost = new Multiset<Resource>(card.resourceCost);
+		Multiset<PlayerResource> cheapestBoughtResources;
+		int cheapestCost = card.coinCost + GetCheapestBoughtResources(cardResourceCost, out cheapestBoughtResources);
+		if (cheapestCost <= bank.Count) {
+			int westPayAmount = 0;
+			int eastPayAmount = 0;
+			foreach (PlayerResource boughtResource in cheapestBoughtResources) {
+				if (boughtResource.player == Neighbours[Direction.West]) {
+					westPayAmount += ResourceBuyCosts[boughtResource];
+				} else if (boughtResource.player == Neighbours[Direction.East]) {
+					eastPayAmount += ResourceBuyCosts[boughtResource];
+				}
+			}
+			buildDropArea.payment = new Payment(card.coinCost, westPayAmount, eastPayAmount);
+			buildDropArea.IsPlayable = true;
+		}
+	}
+
+	private void EnableBuryAreas() {
+		WonderStage[] buildableStages = Wonder.GetBuildableStages();
+		foreach (WonderStage stage in buildableStages) {
+			Multiset<Resource> stageResourceCost = new Multiset<Resource>(stage.resourceCost);
+			Multiset<PlayerResource> cheapestBoughtResources;
+			int cheapestCost = stage.coinCost + GetCheapestBoughtResources(stageResourceCost, out cheapestBoughtResources);
+			if (cheapestCost <= bank.Count) {
+				int westPayAmount = 0;
+				int eastPayAmount = 0;
+				foreach (PlayerResource boughtResource in cheapestBoughtResources) {
+					if (boughtResource.player == Neighbours[Direction.West]) {
+						westPayAmount += ResourceBuyCosts[boughtResource];
+					} else if (boughtResource.player == Neighbours[Direction.East]) {
+						eastPayAmount += ResourceBuyCosts[boughtResource];
+					}
+				}
+				stage.buryDropArea.payment = new Payment(stage.coinCost, westPayAmount, eastPayAmount);
+				stage.buryDropArea.IsPlayable = true;
+			}
+		}
+	}
+
+	private void EnableDiscardArea() {
+		discardDropArea.IsPlayable = true;
 	}
 
 }

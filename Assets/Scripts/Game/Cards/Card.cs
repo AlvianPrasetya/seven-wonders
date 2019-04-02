@@ -40,7 +40,7 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	public void OnBeginDrag(PointerEventData eventData) {
 		dragged = true;
 		dragStartPosition = transform.position;
-		GameManager.Instance.Player.EnableBuildAreas(this);
+		GameManager.Instance.Player.EnableDropAreas(this);
 	}
 
 	public void OnDrag(PointerEventData eventData) {
@@ -74,7 +74,7 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 		}
 
 		dragged = false;
-		GameManager.Instance.Player.DisableBuildAreas();
+		GameManager.Instance.Player.DisableDropAreas();
 	}
 
 	public bool IsPlayable {
