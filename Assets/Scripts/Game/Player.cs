@@ -238,6 +238,7 @@ public abstract class Player : MonoBehaviour {
 	
 	public void EffectAction() {
 		Action.Effect(this);
+		Action = null;
 	}
 
 	public IEnumerator GainCoins(int amount) {

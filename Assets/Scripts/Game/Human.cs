@@ -17,8 +17,6 @@ public class Human : Player {
 				foreach (Card card in playableCards) {
 					card.IsPlayable = true;
 				}
-
-				Action = null;
 			} else {
 				foreach (Card card in playableCards) {
 					card.IsPlayable = false;

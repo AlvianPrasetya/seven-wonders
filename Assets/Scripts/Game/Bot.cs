@@ -5,8 +5,6 @@ public class Bot : Player {
 	public override bool IsPlayable {
 		set {
 			if (value) {
-				Action = null;
-
 				List<Card> playableCards = new List<Card>();
 				foreach (CardPile displayPile in hand.cardPiles) {
 					if (displayPile.Count != 0) {
