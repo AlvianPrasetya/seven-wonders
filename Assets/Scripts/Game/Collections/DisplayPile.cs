@@ -5,10 +5,19 @@ using UnityEngine;
 public class DisplayPile : CardPile {
 
 	public override IEnumerator Push(Card newCard) {
+		bool pushedNewCard = false;
 		Stack<Card> tempStack = new Stack<Card>();
-		tempStack.Push(newCard);
 		while (Elements.Count != 0) {
-			tempStack.Push(Pop());
+			Card card = Pop();
+			if (!pushedNewCard && newCard.displayPriority >= card.displayPriority) {
+				tempStack.Push(newCard);
+				pushedNewCard = true;
+			}
+			tempStack.Push(card);
+		}
+		if (!pushedNewCard) {
+			tempStack.Push(newCard);
+			pushedNewCard = true;
 		}
 
 		Queue<Coroutine> dropCards = new Queue<Coroutine>();

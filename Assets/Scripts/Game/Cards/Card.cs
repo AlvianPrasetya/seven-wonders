@@ -7,6 +7,7 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	public string cardName;
 	public CardType cardType;
 	public DisplayType displayType;
+	public int displayPriority;
 	public float dragHeight = 2;
 	public string[] chainedFrom;
 	public int coinCost;
