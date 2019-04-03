@@ -136,10 +136,6 @@ public class GameManager : MonoBehaviourPun {
 	}
 
 	public void DecideBuild(int positionInHand, Payment payment) {
-		Debug.LogFormat(
-			"Paying bank: {0}, west: {1}, east: {2}",
-			payment.PayBankAmount, payment.PayWestAmount, payment.PayEastAmount
-		);
 		photonView.RPC(
 			"DecideBuild", RpcTarget.All, positionInHand,
 			payment.PayBankAmount, payment.PayWestAmount, payment.PayEastAmount
@@ -147,10 +143,6 @@ public class GameManager : MonoBehaviourPun {
 	}
 
 	public void DecideBury(int positionInHand, int wonderStage, Payment payment) {
-		Debug.LogFormat(
-			"Paying bank: {0}, west: {1}, east: {2}",
-			payment.PayBankAmount, payment.PayWestAmount, payment.PayEastAmount
-		);
 		photonView.RPC(
 			"DecideBury", RpcTarget.All, positionInHand, wonderStage,
 			payment.PayBankAmount, payment.PayWestAmount, payment.PayEastAmount
