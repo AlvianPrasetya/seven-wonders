@@ -7,17 +7,17 @@ public class Age3Resolver : IResolvable {
 
 	public IEnumerator Resolve() {
 		GameManager.Instance.EnqueueResolver(
-			new TurnResolver(DeckType.Age3, DeckType.East, Direction.West),
+			TurnResolverFactory.Instance.Create(DeckType.Age3, DeckType.East, Direction.West),
 			Priority.ResolveTurn
 		);
 		for (int i = 0; i < GameOptions.TurnsPerAge - 2; i++) {
 			GameManager.Instance.EnqueueResolver(
-				new TurnResolver(DeckType.East, DeckType.East, Direction.West),
+				TurnResolverFactory.Instance.Create(DeckType.East, DeckType.East, Direction.West),
 				Priority.ResolveTurn
 			);
 		}
 		GameManager.Instance.EnqueueResolver(
-			new TurnResolver(DeckType.East, DeckType.Discard, Direction.West),
+			TurnResolverFactory.Instance.Create(DeckType.East, DeckType.Discard, Direction.West),
 			Priority.ResolveTurn
 		);
 

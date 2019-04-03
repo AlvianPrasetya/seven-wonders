@@ -67,10 +67,9 @@ public class GameOptions {
 
 public class Priority {
 
-	public const int GainCoins = 9;
-	public const int LoseCoins = 8;
-	public const int PlayHand = 7;
-	public const int PlayLastHand = 6;
+	public const int GainCoins = 8;
+	public const int LoseCoins = 7;
+	public const int PlayHand = 6;
 	public const int DiscardLastHand = 5;
 	public const int DigDiscardPile = 4;
 	public const int ResolveTurn = 3;

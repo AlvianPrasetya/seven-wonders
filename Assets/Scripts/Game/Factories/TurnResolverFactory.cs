@@ -2,7 +2,17 @@ using System;
 
 public class TurnResolverFactory : Factory {
 
+	public static TurnResolverFactory Instance {
+		get {
+			if (instance == null) {
+				instance = new TurnResolverFactory();
+			}
+			return instance;
+		}
+	}
 	public Player DoubleTurnPlayer { private get; set; }
+
+	private static TurnResolverFactory instance;
 
 	public override IResolvable[] Create(Player player) {
 		throw new NotImplementedException();

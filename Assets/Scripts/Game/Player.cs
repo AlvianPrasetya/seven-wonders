@@ -210,23 +210,28 @@ public abstract class Player : MonoBehaviour {
 
 	public IEnumerator PrepareBuild(int positionInHand, Payment payment) {
 		Card card = hand.PopAt(positionInHand);
-		Action = new BuildAction(card, payment);
 		yield return preparedCardSlot.Push(card);
+		Action = new BuildAction(card, payment);
 	}
 
 	public IEnumerator PrepareBury(int positionInHand, int wonderStage, Payment payment) {
 		Card card = hand.PopAt(positionInHand);
-		Action = new BuryAction(card, wonderStage, payment);
 		yield return preparedCardSlot.Push(card);
+		Action = new BuryAction(card, wonderStage, payment);
 	}
 
 	public IEnumerator PrepareDiscard(int positionInHand) {
 		Card card = hand.PopAt(positionInHand);
-		Action = new DiscardAction(card);
 		yield return preparedCardSlot.Push(card);
+		Action = new DiscardAction(card);
 	}
 
 	public IEnumerator PerformAction() {
+		while (Action == null) {
+			// Wait until action is set
+			yield return null;
+		}
+
 		Card card = preparedCardSlot.Pop();
 		yield return Action.Perform(this);
 	}

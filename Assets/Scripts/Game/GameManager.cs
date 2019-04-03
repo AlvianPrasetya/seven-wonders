@@ -129,6 +129,12 @@ public class GameManager : MonoBehaviourPun {
 		resolverQueue.Enqueue(resolver, priority);
 	}
 
+	public void EnqueueResolver(IResolvable[] resolvers, int priority) {
+		foreach (IResolvable resolver in resolvers) {
+			resolverQueue.Enqueue(resolver, priority);
+		}
+	}
+
 	public void DecideBuild(int positionInHand, Payment payment) {
 		Debug.LogFormat(
 			"Paying bank: {0}, west: {1}, east: {2}",
