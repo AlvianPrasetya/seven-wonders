@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public abstract class Player : MonoBehaviour {
@@ -115,9 +116,7 @@ public abstract class Player : MonoBehaviour {
 		}
 
 		public void Effect(Player player) {
-			GameManager.Instance.EnqueueResolver(
-				new GainCoinsResolver(player, GameOptions.DiscardCoinAmount), Priority.GainCoins
-			);
+			new GainCoinsOnBuild(Target.Self, GameOptions.DiscardCoinAmount).Effect(player);
 		}
 
 	}
@@ -172,6 +171,7 @@ public abstract class Player : MonoBehaviour {
 	public Dictionary<PlayerResource, int> ResourceBuyCosts { get; private set; }
 
 	private List<ResourceOptions> resources;
+	private List<ScienceOptions> sciences;
 
 	void Awake() {
 		Decks = new Dictionary<DeckType, Deck>();
@@ -187,6 +187,7 @@ public abstract class Player : MonoBehaviour {
 		}
 		ResourceBuyCosts = new Dictionary<PlayerResource, int>();
 		resources = new List<ResourceOptions>();
+		sciences = new List<ScienceOptions>();
 	}
 
 	public abstract void DecideBuild(Card card, Payment payment);
@@ -251,6 +252,17 @@ public abstract class Player : MonoBehaviour {
 
 	public void AddResource(ResourceOptions resourceOptions) {
 		resources.Add(resourceOptions);
+	}
+
+	/// <summary>
+	/// Adds a science entry for this player and returns the points gained by playing  this science.
+	/// </summary>
+	public int AddScience(ScienceOptions scienceOptions) {
+		int pointsBefore = CalculateSciencePoints();
+		sciences.Add(scienceOptions);
+		int pointsAfter = CalculateSciencePoints();
+
+		return pointsAfter - pointsBefore;
 	}
 
 	public void EnableDropAreas(Card card) {
@@ -436,6 +448,38 @@ public abstract class Player : MonoBehaviour {
 
 	private void EnableDiscardArea() {
 		discardDropArea.IsPlayable = true;
+	}
+
+	private int CalculateSciencePoints(int pos = 0, int[] counts = null) {
+		if (pos == sciences.Count) {
+			return 0;
+		}
+
+		if (counts == null) {
+			counts = new int[Enum.GetNames(typeof(Science)).Length];
+		}
+
+		int maxPoints = 0;
+		foreach (Science science in sciences[pos].Sciences) {
+			int prevSymbolCount = counts[(int)science];
+			int prevSetCount = counts.Min();
+
+			counts[(int)science]++;
+
+			int symbolCount = counts[(int)science];
+			int setCount = counts.Min();
+
+			maxPoints = Mathf.Max(
+				maxPoints,
+				CalculateSciencePoints(pos + 1, counts) +
+					symbolCount * symbolCount - prevSymbolCount * prevSymbolCount +
+					GameOptions.PointsPerScienceSet * (setCount - prevSetCount)
+			);
+
+			counts[(int)science]--;
+		}
+
+		return maxPoints;
 	}
 
 }

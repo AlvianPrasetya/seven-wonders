@@ -5,7 +5,7 @@ public class GainPointsOnBuild : OnBuildEffect {
 
 	public override void Effect(Player player) {
 		GameManager.Instance.EnqueueResolver(
-			new GainPointsResolver(player, pointType, amount),
+			new GainPointsResolver(player, pointType, () => { return amount; }),
 			Priority.GainPoints
 		);
 	}

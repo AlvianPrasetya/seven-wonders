@@ -5,19 +5,29 @@ public class GainPointsPerWonderStageOnBuild : OnBuildEffect {
 	public Target countTarget;
 
 	public override void Effect(Player player) {
-		GainPointsPerCountResolver.Count count = null;
+		GainPointsResolver.Count count = null;
 		switch (countTarget) {
 			case Target.Self:
-				count += () => player.Wonder.BuiltStagesCount;
+				count = () => {
+					return amountPerWonderStage * player.Wonder.BuiltStagesCount;
+				};
 				break;
 			case Target.Neighbours:
-				count += () => player.Neighbours[Direction.West].Wonder.BuiltStagesCount;
-				count += () => player.Neighbours[Direction.East].Wonder.BuiltStagesCount;
+				count = () => {
+					return amountPerWonderStage * (
+						player.Neighbours[Direction.West].Wonder.BuiltStagesCount +
+						player.Neighbours[Direction.East].Wonder.BuiltStagesCount
+					);
+				};
 				break;
 			case Target.Neighbourhood:
-				count += () => player.Wonder.BuiltStagesCount;
-				count += () => player.Neighbours[Direction.West].Wonder.BuiltStagesCount;
-				count += () => player.Neighbours[Direction.East].Wonder.BuiltStagesCount;
+				count = () => {
+					return amountPerWonderStage * (
+						player.Wonder.BuiltStagesCount +
+						player.Neighbours[Direction.West].Wonder.BuiltStagesCount +
+						player.Neighbours[Direction.East].Wonder.BuiltStagesCount
+					);
+				};
 				break;
 			case Target.Others:
 				break;
@@ -25,7 +35,7 @@ public class GainPointsPerWonderStageOnBuild : OnBuildEffect {
 				break;
 		}
 		GameManager.Instance.EnqueueResolver(
-			new GainPointsPerCountResolver(player, pointType, amountPerWonderStage, count),
+			new GainPointsResolver(player, pointType, count),
 			Priority.GainPoints
 		);
 	}

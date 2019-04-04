@@ -3,35 +3,41 @@ public class GainCoinsOnBuild : OnBuildEffect {
 	public Target target;
 	public int amount;
 
+	public GainCoinsOnBuild(Target target, int amount) {
+		this.target = target;
+		this.amount = amount;
+	}
+
 	public override void Effect(Player player) {
+		GainCoinsResolver.Count count = () => { return amount; };
 		switch (target) {
 			case Target.Self:
 				GameManager.Instance.EnqueueResolver(
-					new GainCoinsResolver(player, amount),
+					new GainCoinsResolver(player, count),
 					Priority.GainCoins
 				);
 				break;
 			case Target.Neighbours:
 				GameManager.Instance.EnqueueResolver(
-					new GainCoinsResolver(player.Neighbours[Direction.West], amount),
+					new GainCoinsResolver(player.Neighbours[Direction.West], count),
 					Priority.GainCoins
 				);
 				GameManager.Instance.EnqueueResolver(
-					new GainCoinsResolver(player.Neighbours[Direction.East], amount),
+					new GainCoinsResolver(player.Neighbours[Direction.East], count),
 					Priority.GainCoins
 				);
 				break;
 			case Target.Neighbourhood:
 				GameManager.Instance.EnqueueResolver(
-					new GainCoinsResolver(player, amount),
+					new GainCoinsResolver(player, count),
 					Priority.GainCoins
 				);
 				GameManager.Instance.EnqueueResolver(
-					new GainCoinsResolver(player.Neighbours[Direction.West], amount),
+					new GainCoinsResolver(player.Neighbours[Direction.West], count),
 					Priority.GainCoins
 				);
 				GameManager.Instance.EnqueueResolver(
-					new GainCoinsResolver(player.Neighbours[Direction.East], amount),
+					new GainCoinsResolver(player.Neighbours[Direction.East], count),
 					Priority.GainCoins
 				);
 				break;
@@ -42,7 +48,7 @@ public class GainCoinsOnBuild : OnBuildEffect {
 					}
 
 					GameManager.Instance.EnqueueResolver(
-						new GainCoinsResolver(targetPlayer, amount),
+						new GainCoinsResolver(targetPlayer, count),
 						Priority.GainCoins
 					);
 				}
@@ -50,7 +56,7 @@ public class GainCoinsOnBuild : OnBuildEffect {
 			case Target.Everyone:
 				foreach (Player targetPlayer in GameManager.Instance.Players) {
 					GameManager.Instance.EnqueueResolver(
-						new GainCoinsResolver(targetPlayer, amount),
+						new GainCoinsResolver(targetPlayer, count),
 						Priority.GainCoins
 					);
 				}

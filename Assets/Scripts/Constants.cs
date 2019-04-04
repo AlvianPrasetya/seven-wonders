@@ -16,6 +16,7 @@ public enum CardType { RawMaterial, ManufacturedGoods, Civilian, Scientific, Com
 public enum Target { Self, Neighbours, Neighbourhood, Others, Everyone };
 public enum Resource { Lumber, Ore, Clay, Stone, Loom, Glassworks, Press };
 public enum PointType { Military, Treasury, Wonders, Civilian, Scientific, Commercial, Guilds, Leaders };
+public enum Science { Compass, Tablet, Gear }
 
 public class Constant {
 	
@@ -62,6 +63,7 @@ public class GameOptions {
 	public const int DiscountedBuyCost = 1;
 	public const int DecideTime = 30;
 	public const int TurnsPerAge = 6;
+	public const int PointsPerScienceSet = 7;
 
 }
 
