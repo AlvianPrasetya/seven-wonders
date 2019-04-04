@@ -1,20 +1,27 @@
+using System.Collections.Generic;
+
 public class Human : Player {
+
+	private List<Card> playableCards;
 
 	public override bool IsPlayable {
 		set {
-			foreach (CardPile displayPile in hand.cardPiles) {
-				if (displayPile.Count != 0) {
-					displayPile.Peek().IsPlayable = value;
-				}
-			}
-
-			buildDropArea.IsPlayable = value;
-			discardDropArea.IsPlayable = value;
-			Wonder.IsPlayable = value;
-
 			if (value) {
-				Action = null;
+				playableCards = new List<Card>();
+				foreach (CardPile displayPile in hand.cardPiles) {
+					if (displayPile.Count != 0) {
+						playableCards.Add(displayPile.Peek());
+					}
+				}
+
+				foreach (Card card in playableCards) {
+					card.IsPlayable = true;
+				}
 			} else {
+				foreach (Card card in playableCards) {
+					card.IsPlayable = false;
+				}
+
 				if (Action == null) {
 					// Player has yet to decide on an action, discard a random card
 					DecideDiscard(hand.GetRandom());
@@ -23,14 +30,14 @@ public class Human : Player {
 		}
 	}
 
-	public override void DecideBuild(Card card) {
+	public override void DecideBuild(Card card, Payment payment) {
 		int positionInHand = hand.GetPosition(card);
-		GameManager.Instance.DecideBuild(positionInHand);
+		GameManager.Instance.DecideBuild(positionInHand, payment);
 	}
 
-	public override void DecideBury(Card card, int wonderStage) {
+	public override void DecideBury(Card card, int wonderStage, Payment payment) {
 		int positionInHand = hand.GetPosition(card);
-		GameManager.Instance.DecideBury(positionInHand, wonderStage);
+		GameManager.Instance.DecideBury(positionInHand, wonderStage, payment);
 	}
 
 	public override void DecideDiscard(Card card) {

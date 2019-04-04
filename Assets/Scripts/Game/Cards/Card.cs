@@ -7,11 +7,14 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	public string cardName;
 	public CardType cardType;
 	public DisplayType displayType;
+	public int displayPriority;
 	public float dragHeight = 2;
+	public string[] chainedFrom;
 	public int coinCost;
 	public Resource[] resourceCost;
 	public OnBuildEffect[] onBuildEffects;
 	
+	private bool dragged;
 	private Vector3 dragStartPosition;
 	private new Collider collider;
 	private DropArea<Card> lastDropArea;
@@ -36,12 +39,16 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	}
 
 	public void OnBeginDrag(PointerEventData eventData) {
+		dragged = true;
 		dragStartPosition = transform.position;
-
-		GameManager.Instance.Player.EvaluatePlayability(this);
+		GameManager.Instance.Player.EnableDropAreas(this);
 	}
 
 	public void OnDrag(PointerEventData eventData) {
+		if (!dragged) {
+			return;
+		}
+
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hitInfo;
 		if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask(LayerName.Table))) {
@@ -63,16 +70,23 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 			lastDropArea.Drop(this);
 			lastDropArea.IsHighlighted = false;
 			lastDropArea = null;
-
-			IsPlayable = false;
 		} else {
 			transform.position = dragStartPosition;
 		}
+
+		dragged = false;
+		GameManager.Instance.Player.DisableDropAreas();
 	}
 
 	public bool IsPlayable {
 		set {
 			collider.enabled = value;
+
+			if (!value && dragged) {
+				// Forcefully return card to hand
+				lastDropArea = null;
+				OnEndDrag(null);
+			}
 		}
 	}
 

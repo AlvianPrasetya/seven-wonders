@@ -2,6 +2,8 @@ using System.Collections.Generic;
 
 public class GainResourcesOnBuild : OnBuildEffect {
 
+	public bool produced;
+
 	public bool lumber;
 	public bool ore;
 	public bool clay;
@@ -34,7 +36,7 @@ public class GainResourcesOnBuild : OnBuildEffect {
 			resources.Add(Resource.Press);
 		}
 
-		player.AddResource(new ResourceOptions(resources.ToArray()));
+		player.AddResource(new ResourceOptions(produced, resources.ToArray()));
 	}
 
 }

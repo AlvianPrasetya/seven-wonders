@@ -68,8 +68,10 @@ public class ResolverQueue {
 		BubbleUp(index);
 
 		Debug.Log(string.Format(
-			"Enqueued resolver with priority {0} and enqueue index {1}",
-			priority, index
+			"Enqueued {0} with priority {1} and enqueue index {2}",
+			resolverNode.resolver,
+			resolverNode.priority,
+			resolverNode.enqueueIndex
 		));
 	}
 

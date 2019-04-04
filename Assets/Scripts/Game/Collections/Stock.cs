@@ -5,18 +5,25 @@ using UnityEngine;
 // Stock represents a pile of cards to be dealt.
 public class Stock : CardPile, ILoadable, IShuffleable, IDealable {
 
-	public Card[] initialCardPrefabs;
+	[System.Serializable]
+	public class CardEntry {
+
+		public Card cardPrefab;
+		public int minPlayers;
+
+	}
+
+	public CardEntry[] initialCardEntries;
 	public CardPile[] shuffleCardPiles;
 
 	public virtual IEnumerator Load() {
-		foreach (Card initialCardPrefab in initialCardPrefabs) {
-			if (initialCardPrefab is StructureCard &&
-				((StructureCard)initialCardPrefab).minPlayers > GameManager.Instance.Players.Count
-			) {
+		foreach (CardEntry cardEntry in initialCardEntries) {
+			if (cardEntry.minPlayers > GameManager.Instance.Players.Count) {
+				// Not enough players to put this card into play
 				continue;
 			}
 
-			Card card = Instantiate(initialCardPrefab, transform.position, transform.rotation);
+			Card card = Instantiate(cardEntry.cardPrefab, transform.position, transform.rotation);
 			yield return Push(card);
 		}
 	}
@@ -44,9 +51,22 @@ public class Stock : CardPile, ILoadable, IShuffleable, IDealable {
 
 	public IEnumerator Deal(DeckType deckType) {
 		int playerIndex = 0;
+		Queue<Coroutine> dealCoins = new Queue<Coroutine>();
 		while (Elements.Count != 0) {
-			yield return GameManager.Instance.Players[playerIndex].Decks[deckType].Push(Pop());
+			dealCoins.Enqueue(StartCoroutine(
+				GameManager.Instance.Players[playerIndex].Decks[deckType].Push(Pop())
+			));
 			playerIndex = (playerIndex + 1) % GameManager.Instance.Players.Count;
+
+			if (dealCoins.Count == GameManager.Instance.Players.Count) {
+				// Deal to all players at a time
+				while (dealCoins.Count != 0) {
+					yield return dealCoins.Dequeue();
+				}
+			}
+		}
+		while (dealCoins.Count != 0) {
+			yield return dealCoins.Dequeue();
 		}
 	}
 

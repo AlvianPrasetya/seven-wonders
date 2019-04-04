@@ -10,11 +10,11 @@ public class MatchResolver : IResolvable {
 	}
 	
 	public IEnumerator Resolve() {
-		GameManager.Instance.EnqueueResolver(new PreGameResolver(matchSeed), 2);
-		GameManager.Instance.EnqueueResolver(new Age1Resolver(), 2);
-		GameManager.Instance.EnqueueResolver(new Age2Resolver(), 2);
-		GameManager.Instance.EnqueueResolver(new Age3Resolver(), 2);
-		GameManager.Instance.EnqueueResolver(new PostGameResolver(), 2);
+		GameManager.Instance.EnqueueResolver(new PreGameResolver(matchSeed), Priority.ResolvePhase);
+		GameManager.Instance.EnqueueResolver(new Age1Resolver(), Priority.ResolvePhase);
+		GameManager.Instance.EnqueueResolver(new Age2Resolver(), Priority.ResolvePhase);
+		GameManager.Instance.EnqueueResolver(new Age3Resolver(), Priority.ResolvePhase);
+		GameManager.Instance.EnqueueResolver(new PostGameResolver(), Priority.ResolvePhase);
 
 		yield return null;
 	}

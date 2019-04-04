@@ -35,6 +35,12 @@ public class Multiset<T> : IEnumerable<T> {
 		dict[element]++;
 	}
 
+	public void Add(T element, int amount) {
+		for (int i = 0; i < amount; i++) {
+			Add(element);
+		}
+	}
+
 	public void Add(IEnumerable<T> elements) {
 		foreach (T element in elements) {
 			Add(element);

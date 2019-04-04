@@ -7,6 +7,7 @@ public class UIManager : MonoBehaviour {
 	public static UIManager Instance { get; private set; }
 	public PlayerNav[] playerNavs;
 	public Text timerText;
+	public Scoreboard scoreboard;
 
 	private Coroutine countdown;
 

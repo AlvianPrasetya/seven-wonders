@@ -6,6 +6,7 @@ public class Wonder : MonoBehaviour, IMoveable {
 	public Bank bank;
 	public CardSlot preparedCardSlot;
 	public WonderStage[] wonderStages;
+	public OnBuildEffect[] onBuildEffects;
 
 	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation, float duration) {
 		Vector3 initialPosition = transform.position;
@@ -22,14 +23,26 @@ public class Wonder : MonoBehaviour, IMoveable {
 		}
 	}
 
-	public virtual bool IsPlayable {
-		set {
+	public virtual WonderStage[] GetBuildableStages() {
+		foreach (WonderStage wonderStage in wonderStages) {
+			if (!wonderStage.IsBuilt) {
+				return new WonderStage[]{ wonderStage };
+			}
+		}
+
+		return new WonderStage[0];
+	}
+
+	public int BuiltStagesCount {
+		get {
+			int count = 0;
 			foreach (WonderStage wonderStage in wonderStages) {
-				wonderStage.IsPlayable = !wonderStage.IsBuilt && value;
-				if (!wonderStage.IsBuilt && value) {
-					break;
+				if (wonderStage.IsBuilt) {
+					count++;
 				}
 			}
+
+			return count;
 		}
 	}
 

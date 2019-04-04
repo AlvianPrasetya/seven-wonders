@@ -95,7 +95,9 @@ public class RoomManager : MonoBehaviourPunCallbacks {
 		PhotonNetwork.CurrentRoom.IsVisible = false;
 
 		// Set match seed
-		SetMatchSeed(new System.Random().Next());
+		int matchSeed = new System.Random().Next();
+		SetMatchSeed(matchSeed);
+		Debug.LogFormat("Match seed: {0}", matchSeed);
 
 		PhotonNetwork.LoadLevel(LevelName.Game);
 	}
