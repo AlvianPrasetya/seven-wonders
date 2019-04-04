@@ -246,6 +246,10 @@ public abstract class Player : MonoBehaviour {
 		yield return bank.PushMany(GameManager.Instance.bank.PopMany(amount));
 	}
 
+	public IEnumerator LoseCoins(int amount) {
+		yield return GameManager.Instance.bank.PushMany(bank.PopMany(amount));
+	}
+
 	public IEnumerator GainPoints(PointType pointType, int amount) {
 		yield return UIManager.Instance.scoreboard.AddPoints(this, pointType, amount);
 	}
