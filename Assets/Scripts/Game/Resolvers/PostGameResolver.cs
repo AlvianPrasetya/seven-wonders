@@ -11,6 +11,16 @@ public class PostGameResolver : IResolvable {
 			yield return UIManager.Instance.scoreboard.AddPlayer(player);
 		}
 
+		// Tally points from treasury
+		foreach (Player player in GameManager.Instance.Players) {
+			GameManager.Instance.EnqueueResolver(
+				new GainPointsResolver(player, PointType.Treasury, () => {
+					return player.bank.Count / GameOptions.CoinsPerTreasuryPoint;
+				}),
+				Priority.GainPoints
+			);
+		}
+
 		yield return null;
 	}
 

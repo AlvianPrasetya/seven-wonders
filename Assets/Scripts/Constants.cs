@@ -64,6 +64,7 @@ public class GameOptions {
 	public const int DecideTime = 30;
 	public const int TurnsPerAge = 6;
 	public const int PointsPerScienceSet = 7;
+	public const int CoinsPerTreasuryPoint = 3;
 
 }
 
