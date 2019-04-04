@@ -51,7 +51,12 @@ public class TurnResolver : IResolvable {
 
 	private IEnumerator CheckDoubleTurn() {
 		if (targetDeck == DeckType.Discard && DoubleTurnPlayer != null) {
-			if (DoubleTurnPlayer == GameManager.Instance.Player) {
+			if (PhotonNetwork.IsMasterClient && DoubleTurnPlayer.GetType() == typeof(Bot)) {
+				GameManager.Instance.EnqueueResolver(
+					new DecideBotActionResolver((Bot)DoubleTurnPlayer),
+					Priority.PlayHand
+				);
+			} else if (DoubleTurnPlayer == GameManager.Instance.Player) {
 				// This is the player with double turn, enqueue DecideActionResolver
 				GameManager.Instance.EnqueueResolver(
 					new DecideActionResolver(GameOptions.DecideTime),
