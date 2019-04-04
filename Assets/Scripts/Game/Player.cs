@@ -267,6 +267,24 @@ public abstract class Player : MonoBehaviour {
 		discardDropArea.IsPlayable = false;
 	}
 
+	public int CountResource(Resource countedResource) {
+		int count = 0;
+		foreach (ResourceOptions resourceOptions in resources) {
+			if (!resourceOptions.IsProduced) {
+				// Only count produced resources
+				continue;
+			}
+
+			foreach (Resource resource in resourceOptions.Resources) {
+				if (resource == countedResource) {
+					count++;
+				}
+			}
+		}
+
+		return count;
+	}
+
 	// TODO: Refactor
 	protected IEnumerable<Multiset<PlayerResource>> GetBoughtResourceSets(
 		int pos, Multiset<Resource> resourceCost, Multiset<PlayerResource> toBuy
