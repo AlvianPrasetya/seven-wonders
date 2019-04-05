@@ -113,6 +113,9 @@ public abstract class Player : MonoBehaviour {
 
 		public IEnumerator Perform(Player player) {
 			yield return GameManager.Instance.discardPile.Push(card);
+			// Set discarded cards as virtually free
+			card.coinCost = 0;
+			card.resourceCost = new Resource[0];
 		}
 
 		public void Effect(Player player) {
