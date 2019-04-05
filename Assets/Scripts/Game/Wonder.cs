@@ -5,6 +5,7 @@ public class Wonder : MonoBehaviour, IMoveable {
 	
 	public Bank bank;
 	public CardSlot preparedCardSlot;
+	public MilitaryTokenDisplay militaryTokenDisplay;
 	public WonderStage[] wonderStages;
 	public OnBuildEffect[] onBuildEffects;
 

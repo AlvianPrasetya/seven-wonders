@@ -1,7 +1,9 @@
 using System.Collections;
 using UnityEngine;
 
-public class Coin : MonoBehaviour, IMoveable {
+public class MilitaryToken : MonoBehaviour, IMoveable {
+	
+	public int points;
 
 	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation, float duration) {
 		Vector3 initialPosition = transform.position;

@@ -116,7 +116,12 @@ public abstract class Player : MonoBehaviour {
 		}
 
 		public void Effect(Player player) {
-			new GainCoinsOnBuild(Target.Self, GameOptions.DiscardCoinAmount).Effect(player);
+			GameManager.Instance.EnqueueResolver(
+				new GainCoinsResolver(player, () => {
+					return GameOptions.DiscardCoinAmount;
+				}),
+				Priority.GainCoins
+			);
 		}
 
 	}
@@ -138,6 +143,7 @@ public abstract class Player : MonoBehaviour {
 	public Hand hand;
 	public CardSlot preparedCardSlot;
 	public BuildDisplay buildDisplay;
+	public MilitaryTokenDisplay militaryTokenDisplay;
 	public BuildDropArea buildDropArea;
 	public DiscardDropArea discardDropArea;
 	public WonderSlot wonderSlot;
@@ -169,6 +175,7 @@ public abstract class Player : MonoBehaviour {
 		}
 	}
 	public Dictionary<PlayerResource, int> ResourceBuyCosts { get; private set; }
+	public int ShieldCount { get; private set; }
 
 	private List<ResourceOptions> resources;
 	private List<ScienceOptions> sciences;
@@ -200,6 +207,7 @@ public abstract class Player : MonoBehaviour {
 		yield return wonderSlot.Push(wonder);
 		bank = wonder.bank;
 		preparedCardSlot = wonder.preparedCardSlot;
+		militaryTokenDisplay = wonder.militaryTokenDisplay;
 		foreach (WonderStage wonderStage in wonder.wonderStages) {
 			wonderStage.buryDropArea.onDropEvent.AddListener(DecideBury);
 		}
@@ -254,6 +262,16 @@ public abstract class Player : MonoBehaviour {
 		yield return UIManager.Instance.scoreboard.AddPoints(this, pointType, amount);
 	}
 
+	public IEnumerator GainMilitaryToken(MilitaryToken militaryToken) {
+		GameManager.Instance.EnqueueResolver(
+			new GainPointsResolver(this, PointType.Military, () => {
+				return militaryToken.points;
+			}),
+			Priority.GainPoints
+		);
+		yield return militaryTokenDisplay.Push(militaryToken);
+	}
+
 	public void AddResource(ResourceOptions resourceOptions) {
 		resources.Add(resourceOptions);
 	}
@@ -267,6 +285,10 @@ public abstract class Player : MonoBehaviour {
 		int pointsAfter = CalculateSciencePoints();
 
 		return pointsAfter - pointsBefore;
+	}
+
+	public void AddShield(int shieldsToAdd) {
+		ShieldCount += shieldsToAdd;
 	}
 
 	public void EnableDropAreas(Card card) {

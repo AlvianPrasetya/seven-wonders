@@ -21,6 +21,15 @@ public class Age2Resolver : IResolvable {
 			Priority.ResolveTurn
 		);
 
+		GameManager.Instance.EnqueueResolver(
+			new MilitaryConflictResolver(
+				GameManager.Instance.victoryTokenAge2Prefab,
+				GameManager.Instance.drawTokenPrefab,
+				GameManager.Instance.defeatTokenPrefab
+			),
+			Priority.ResolveTurn
+		);
+
 		yield return null;
 	}
 

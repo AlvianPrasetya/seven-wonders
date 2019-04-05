@@ -23,6 +23,11 @@ public class GameManager : MonoBehaviourPun {
 	public StockEntry[] stocks;
 	public Human humanPrefab;
 	public Bot botPrefab;
+	public MilitaryToken victoryTokenAge1Prefab;
+	public MilitaryToken victoryTokenAge2Prefab;
+	public MilitaryToken victoryTokenAge3Prefab;
+	public MilitaryToken drawTokenPrefab;
+	public MilitaryToken defeatTokenPrefab;
 	public static GameManager Instance { get; private set; }
 	public Dictionary<StockType, Stock> Stocks { get; private set; }
 	public List<Player> Players { get; private set; }
