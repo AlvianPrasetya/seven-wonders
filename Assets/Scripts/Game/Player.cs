@@ -176,6 +176,7 @@ public abstract class Player : MonoBehaviour {
 	}
 	public Dictionary<PlayerResource, int> ResourceBuyCosts { get; private set; }
 	public int ShieldCount { get; private set; }
+	public bool IsPeaceful { get; set; }
 
 	private List<ResourceOptions> resources;
 	private List<ScienceOptions> sciences;
