@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 
 	public CardPile[] cardPiles;
+	public Button cycleWest;
+	public Button cycleEast;
+
 	public Facing Facing {
 		set {
 			foreach (CardPile displayPile in cardPiles) {
@@ -140,6 +144,55 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 		}
 
 		return cards[Random.Range(0, cards.Count)];
+	}
+
+	public void DecideCycleWest() {
+		GameManager.Instance.DecideCycle(Direction.West);
+	}
+
+	public void DecideCycleEast() {
+		GameManager.Instance.DecideCycle(Direction.East);
+	}
+
+	public IEnumerator Cycle(Direction direction) {
+		cycleWest.interactable = false;
+		cycleEast.interactable = false;
+
+		CardPile westernmostPile = cardPiles[0];
+		CardPile easternmostPile = cardPiles[cardPiles.Length - 1];
+		Queue<Coroutine> cycles = new Queue<Coroutine>();
+		switch (direction) {
+			case Direction.West:
+				/*if (easternmostPile.Count <= 1) {
+					// Easternmost pile is not cycleable
+					yield break;
+				}*/
+
+				for (int i = 0; i < cardPiles.Length - 1; i++) {
+					cycles.Enqueue(StartCoroutine(cardPiles[i].Push(cardPiles[i + 1].Pop())));
+				}
+				break;
+			case Direction.East:
+				/*if (westernmostPile.Count <= 1) {
+					// Westernmost pile is not cycleable
+					yield break;
+				}*/
+
+				for (int i = cardPiles.Length - 1; i > 0; i--) {
+					cycles.Enqueue(StartCoroutine(cardPiles[i].Push(cardPiles[i - 1].Pop())));
+				}
+				break;
+		}
+		while (cycles.Count != 0) {
+			yield return cycles.Dequeue();
+		}
+
+		if (easternmostPile.Count > 1) {
+			cycleWest.interactable = true;
+		}
+		if (westernmostPile.Count > 1) {
+			cycleEast.interactable = true;
+		}
 	}
 
 }

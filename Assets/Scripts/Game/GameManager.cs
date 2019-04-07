@@ -201,6 +201,10 @@ public class GameManager : MonoBehaviourPun {
 		photonView.RPC("Sync", RpcTarget.All);
 	}
 
+	public void DecideCycle(Direction direction) {
+		photonView.RPC("DecideCycle", RpcTarget.All, direction);
+	}
+
 	[PunRPC]
 	private void DecideBuild(
 		int positionInHand,
@@ -258,6 +262,12 @@ public class GameManager : MonoBehaviourPun {
 	[PunRPC]
 	private void Sync(PhotonMessageInfo info) {
 		SyncQueue.Enqueue(info.Sender.ActorNumber);
+	}
+
+	[PunRPC]
+	private void DecideCycle(Direction direction, PhotonMessageInfo info) {
+		Player player = HumansByActorID[info.Sender.ActorNumber];
+		StartCoroutine(player.hand.Cycle(direction));
 	}
 
 	private IEnumerator Resolve() {
