@@ -21,4 +21,19 @@ public class MilitaryTokenDisplay : MonoBehaviour, IPushable<MilitaryToken> {
 		}
 	}
 
+	public int Count(MilitaryTokenType type) {
+		int count = 0;
+		foreach (MilitaryTokenSlot slot in militaryTokenSlots) {
+			if (slot.Element == null) {
+				continue;
+			}
+
+			if (slot.Element.type == type) {
+				count++;
+			}
+		}
+		
+		return count;
+	}
+
 }

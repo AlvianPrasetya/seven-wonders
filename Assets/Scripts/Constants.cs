@@ -17,6 +17,7 @@ public enum Target { Self, Neighbours, Neighbourhood, Others, Everyone };
 public enum Resource { Lumber, Ore, Clay, Stone, Loom, Glassworks, Press };
 public enum PointType { Military, Treasury, Wonders, Civilian, Scientific, Commercial, Guilds, Leaders };
 public enum Science { Compass, Tablet, Gear }
+public enum MilitaryTokenType { Victory, Draw, Defeat }
 
 public class Constant {
 	

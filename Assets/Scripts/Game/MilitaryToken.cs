@@ -4,6 +4,7 @@ using UnityEngine;
 public class MilitaryToken : MonoBehaviour, IMoveable {
 	
 	public int points;
+	public MilitaryTokenType type;
 
 	public IEnumerator MoveTowards(Vector3 targetPosition, Quaternion targetRotation, float duration) {
 		Vector3 initialPosition = transform.position;
