@@ -31,7 +31,7 @@ public class PlayerScore : MonoBehaviour, IComparable<PlayerScore> {
 			while (progress < 1) {
 				progress = Mathf.Min(progress + Time.deltaTime / morphDuration, 1);
 				DisplayedPoints = (int)Mathf.Lerp(initialDisplayedPoints, Points, progress);
-				pointText.fontSize = (int)Mathf.Lerp(initialFontSize * 1.25f, initialFontSize, progress);
+				pointText.fontSize = (int)Mathf.Lerp(initialFontSize * 1.5f, initialFontSize, progress);
 				
 				yield return null;
 			}
