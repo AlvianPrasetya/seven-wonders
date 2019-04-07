@@ -196,30 +196,21 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 	}
 
 	public IEnumerator Cycle(Direction direction) {
-		cycleWestButton.interactable = false;
-		cycleEastButton.interactable = false;
-
 		Queue<Coroutine> cycles = new Queue<Coroutine>();
 		switch (direction) {
 			case Direction.West:
-				/*if (easternmostPile.Count <= 1) {
-					// Easternmost pile is not cycleable
-					yield break;
-				}*/
-
+				westernmostPile.Peek().IsPlayable = false;
 				for (int i = 0; i < cardPiles.Length - 1; i++) {
 					cycles.Enqueue(StartCoroutine(cardPiles[i].Push(cardPiles[i + 1].Pop())));
 				}
+				easternmostPile.Peek().IsPlayable = true;
 				break;
 			case Direction.East:
-				/*if (westernmostPile.Count <= 1) {
-					// Westernmost pile is not cycleable
-					yield break;
-				}*/
-
+				easternmostPile.Peek().IsPlayable = false;
 				for (int i = cardPiles.Length - 1; i > 0; i--) {
 					cycles.Enqueue(StartCoroutine(cardPiles[i].Push(cardPiles[i - 1].Pop())));
 				}
+				westernmostPile.Peek().IsPlayable = true;
 				break;
 		}
 		while (cycles.Count != 0) {
