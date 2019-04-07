@@ -6,8 +6,12 @@ using UnityEngine.UI;
 public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 
 	public CardPile[] cardPiles;
-	public Button cycleWest;
-	public Button cycleEast;
+	public Button cycleWestButton;
+	public Button cycleEastButton;
+
+	private List<Card> playableCards = new List<Card>();
+	private CardPile westernmostPile;
+	private CardPile easternmostPile;
 
 	public Facing Facing {
 		set {
@@ -26,6 +30,43 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 			
 			return count;
 		}
+	}
+
+	public bool IsPlayable {
+		set {
+			if (value) {
+				foreach (CardPile cardPile in cardPiles) {
+					if (cardPile.Count != 0) {
+						playableCards.Add(cardPile.Peek());
+					}
+				}
+
+				foreach (Card card in playableCards) {
+					card.IsPlayable = true;
+				}
+
+				EnableCycleButtons();
+			} else {
+				foreach (Card card in playableCards) {
+					card.IsPlayable = false;
+				}
+
+				playableCards.Clear();
+				
+				DisableCycleButtons();
+			}
+		}
+	}
+
+	public List<Card> PlayableCards {
+		get {
+			return playableCards;
+		}
+	}
+
+	void Awake() {
+		westernmostPile = cardPiles[0];
+		easternmostPile = cardPiles[cardPiles.Length - 1];
 	}
 
 	public IEnumerator Push(Card card) {
@@ -155,11 +196,9 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 	}
 
 	public IEnumerator Cycle(Direction direction) {
-		cycleWest.interactable = false;
-		cycleEast.interactable = false;
+		cycleWestButton.interactable = false;
+		cycleEastButton.interactable = false;
 
-		CardPile westernmostPile = cardPiles[0];
-		CardPile easternmostPile = cardPiles[cardPiles.Length - 1];
 		Queue<Coroutine> cycles = new Queue<Coroutine>();
 		switch (direction) {
 			case Direction.West:
@@ -186,12 +225,25 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 		while (cycles.Count != 0) {
 			yield return cycles.Dequeue();
 		}
+		
+		EnableCycleButtons();
+	}
 
-		if (easternmostPile.Count > 1) {
-			cycleWest.interactable = true;
+	private void EnableCycleButtons() {
+		if (cycleWestButton != null) {
+			cycleWestButton.gameObject.SetActive(easternmostPile.Count > 1);
 		}
-		if (westernmostPile.Count > 1) {
-			cycleEast.interactable = true;
+		if (cycleEastButton != null) {
+			cycleEastButton.gameObject.SetActive(westernmostPile.Count > 1);
+		}
+	}
+
+	private void DisableCycleButtons() {
+		if (cycleWestButton != null) {
+			cycleWestButton.gameObject.SetActive(false);
+		}
+		if (cycleEastButton != null) {
+			cycleEastButton.gameObject.SetActive(false);
 		}
 	}
 

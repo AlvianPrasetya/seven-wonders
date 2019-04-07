@@ -2,25 +2,12 @@ using System.Collections.Generic;
 
 public class Human : Player {
 
-	private List<Card> playableCards;
-
 	public override bool IsPlayable {
 		set {
 			if (value) {
-				playableCards = new List<Card>();
-				foreach (CardPile displayPile in hand.cardPiles) {
-					if (displayPile.Count != 0) {
-						playableCards.Add(displayPile.Peek());
-					}
-				}
-
-				foreach (Card card in playableCards) {
-					card.IsPlayable = true;
-				}
+				hand.IsPlayable = true;
 			} else {
-				foreach (Card card in playableCards) {
-					card.IsPlayable = false;
-				}
+				hand.IsPlayable = false;
 
 				if (Action == null) {
 					// Player has yet to decide on an action, discard a random card

@@ -5,15 +5,10 @@ public class Bot : Player {
 	public override bool IsPlayable {
 		set {
 			if (value) {
-				List<Card> playableCards = new List<Card>();
-				foreach (CardPile displayPile in hand.cardPiles) {
-					if (displayPile.Count != 0) {
-						playableCards.Add(displayPile.Peek());
-					}
-				}
+				hand.IsPlayable = true;
 
 				// Build the first buildable card in current hand
-				foreach (Card card in playableCards) {
+				foreach (Card card in hand.PlayableCards) {
 					if (BuiltCards.Contains(card.cardName)) {
 						// Card has been built before
 						continue;
@@ -57,6 +52,8 @@ public class Bot : Player {
 
 				// Discard any card if unable to build any
 				DecideDiscard(hand.GetRandom());
+			} else {
+				hand.IsPlayable = false;
 			}
 		}
 	}
