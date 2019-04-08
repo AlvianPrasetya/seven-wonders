@@ -33,6 +33,9 @@ public class GameManager : MonoBehaviourPun {
 	public Dictionary<StockType, Stock> Stocks { get; private set; }
 	public List<Player> Players { get; private set; }
 	public Dictionary<int, Player> HumansByActorID { get; private set; }
+	/// <summary>
+	/// Player represents the local (controlled) player.
+	/// </summary>
 	public Player Player { get; private set; }
 	public List<Human> Humans { get; private set; }
 	public List<Bot> Bots { get; private set; }
@@ -103,11 +106,6 @@ public class GameManager : MonoBehaviourPun {
 				Players.Add(playersByPos[i]);
 				// Set hand facing down for other players
 				playersByPos[i].hand.Facing = (playersByPos[i] == Player) ? Facing.Up : Facing.Down;
-				// Disable buttons for other players
-				playersByPos[i].hand.cycleWestButton =
-					(playersByPos[i] == Player) ? playersByPos[i].hand.cycleWestButton : null;
-				playersByPos[i].hand.cycleEastButton =
-					(playersByPos[i] == Player) ? playersByPos[i].hand.cycleEastButton : null;
 			}
 		}
 
@@ -245,7 +243,7 @@ public class GameManager : MonoBehaviourPun {
 	[PunRPC]
 	private void DecideCycle(Direction direction, PhotonMessageInfo info) {
 		Player player = HumansByActorID[info.Sender.ActorNumber];
-		StartCoroutine(player.hand.Cycle(direction));
+		StartCoroutine(player.hand.Cycle(direction, player == Player));
 	}
 
 	private IEnumerator Resolve() {

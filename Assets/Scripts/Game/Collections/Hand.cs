@@ -195,31 +195,31 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 		GameManager.Instance.DecideCycle(Direction.East);
 	}
 
-	public IEnumerator Cycle(Direction direction) {
-		DisableCycleButtons();
+	public IEnumerator Cycle(Direction direction, bool local = false) {
+		if (local) DisableCycleButtons();
 
 		Queue<Coroutine> cycles = new Queue<Coroutine>();
 		switch (direction) {
 			case Direction.West:
-				westernmostPile.Peek().IsPlayable = false;
+				if (local) westernmostPile.Peek().IsPlayable = false;
 				for (int i = 0; i < cardPiles.Length - 1; i++) {
 					cycles.Enqueue(StartCoroutine(cardPiles[i].Push(cardPiles[i + 1].Pop())));
 				}
-				easternmostPile.Peek().IsPlayable = true;
+				if (local) easternmostPile.Peek().IsPlayable = true;
 				break;
 			case Direction.East:
-				easternmostPile.Peek().IsPlayable = false;
+				if (local) easternmostPile.Peek().IsPlayable = false;
 				for (int i = cardPiles.Length - 1; i > 0; i--) {
 					cycles.Enqueue(StartCoroutine(cardPiles[i].Push(cardPiles[i - 1].Pop())));
 				}
-				westernmostPile.Peek().IsPlayable = true;
+				if (local) westernmostPile.Peek().IsPlayable = true;
 				break;
 		}
 		while (cycles.Count != 0) {
 			yield return cycles.Dequeue();
 		}
 		
-		EnableCycleButtons();
+		if (local) EnableCycleButtons();
 	}
 
 	private void EnableCycleButtons() {
