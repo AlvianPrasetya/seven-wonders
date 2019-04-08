@@ -196,6 +196,8 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 	}
 
 	public IEnumerator Cycle(Direction direction) {
+		DisableCycleButtons();
+
 		Queue<Coroutine> cycles = new Queue<Coroutine>();
 		switch (direction) {
 			case Direction.West:
