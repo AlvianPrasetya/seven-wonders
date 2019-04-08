@@ -103,6 +103,11 @@ public class GameManager : MonoBehaviourPun {
 				Players.Add(playersByPos[i]);
 				// Set hand facing down for other players
 				playersByPos[i].hand.Facing = (playersByPos[i] == Player) ? Facing.Up : Facing.Down;
+				// Disable buttons for other players
+				playersByPos[i].hand.cycleWestButton =
+					(playersByPos[i] == Player) ? playersByPos[i].hand.cycleWestButton : null;
+				playersByPos[i].hand.cycleEastButton =
+					(playersByPos[i] == Player) ? playersByPos[i].hand.cycleEastButton : null;
 			}
 		}
 
