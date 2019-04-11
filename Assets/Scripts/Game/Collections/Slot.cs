@@ -15,10 +15,8 @@ public abstract class Slot<T> : MonoBehaviour, IPushable<T>, IPoppable<T> where 
 			transform.up * spacing.y + 
 			transform.forward * spacing.z;
 		Vector3 dropEulerAngles = transform.rotation.eulerAngles;
-		if (facing == Facing.Up) {
-			dropEulerAngles.z = 0.0f;
-		} else {
-			dropEulerAngles.z = 180.0f;
+		if (facing == Facing.Down) {
+			dropEulerAngles.z += 180;
 		}
 		Quaternion dropRotation = Quaternion.Euler(dropEulerAngles);
 

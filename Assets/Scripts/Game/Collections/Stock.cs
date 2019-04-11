@@ -14,7 +14,7 @@ public class Stock : CardPile, ILoadable, IShuffleable, IDealable {
 	}
 
 	public CardEntry[] initialCardEntries;
-	public CardPile[] shuffleCardPiles;
+	public CardPile[] rifflePiles;
 
 	public virtual IEnumerator Load() {
 		foreach (CardEntry cardEntry in initialCardEntries) {
@@ -35,16 +35,29 @@ public class Stock : CardPile, ILoadable, IShuffleable, IDealable {
 		}
 
 		System.Random random = new System.Random(randomSeed);
-
+		int numElements = Elements.Count;
+		Queue<Coroutine> loadRifflePiles = new Queue<Coroutine>();
 		for (int i = 0; i < numIterations; i++) {
-			// Move each card to a random shuffle stock
+			// Move half of the stock to the left riffle pile
+			while (Elements.Count != numElements / 2) {
+				loadRifflePiles.Enqueue(StartCoroutine(rifflePiles[0].Push(Pop())));
+			}
+			// Move the other half to the right riffle pile
 			while (Elements.Count != 0) {
-				yield return shuffleCardPiles[random.Next(0, shuffleCardPiles.Length)].Push(Pop());
+				loadRifflePiles.Enqueue(StartCoroutine(rifflePiles[1].Push(Pop())));
+			}
+			while (loadRifflePiles.Count != 0) {
+				yield return loadRifflePiles.Dequeue();
 			}
 
-			// Merge all shuffle stocks
-			foreach (CardPile shuffleCardPile in shuffleCardPiles) {
-				yield return PushMany(shuffleCardPile.PopMany(shuffleCardPile.Count));
+			while (rifflePiles[0].Count != 0 && rifflePiles[1].Count != 0) {
+				yield return Push(rifflePiles[random.Next(0, rifflePiles.Length)].Pop());
+			}
+			while (rifflePiles[0].Count != 0) {
+				yield return Push(rifflePiles[0].Pop());
+			}
+			while (rifflePiles[1].Count != 0) {
+				yield return Push(rifflePiles[1].Pop());
 			}
 		}
 	}

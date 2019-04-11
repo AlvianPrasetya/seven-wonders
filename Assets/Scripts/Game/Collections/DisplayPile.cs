@@ -28,10 +28,8 @@ public class DisplayPile : CardPile {
 				transform.up * (initialSpacing.y + spacing.y * (tempStack.Count)) + 
 				transform.forward * (initialSpacing.z + spacing.z * (Elements.Count));
 			Vector3 dropEulerAngles = transform.rotation.eulerAngles;
-			if (facing == Facing.Up) {
-				dropEulerAngles.z = 0.0f;
-			} else {
-				dropEulerAngles.z = 180.0f;
+			if (facing == Facing.Down) {
+				dropEulerAngles.z += 180;
 			}
 			Quaternion dropRotation = Quaternion.Euler(dropEulerAngles);
 

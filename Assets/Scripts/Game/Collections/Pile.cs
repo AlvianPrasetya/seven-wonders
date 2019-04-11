@@ -26,10 +26,8 @@ public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T>, IPeek
 			transform.up * (initialSpacing.y + spacing.y * (Elements.Count)) + 
 			transform.forward * (initialSpacing.z + spacing.z * (Elements.Count));
 		Vector3 dropEulerAngles = transform.rotation.eulerAngles;
-		if (facing == Facing.Up) {
-			dropEulerAngles.z = 0.0f;
-		} else {
-			dropEulerAngles.z = 180.0f;
+		if (facing == Facing.Down) {
+			dropEulerAngles.z += 180;
 		}
 		Quaternion dropRotation = Quaternion.Euler(dropEulerAngles);
 
