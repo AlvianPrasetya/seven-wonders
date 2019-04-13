@@ -14,131 +14,6 @@ public abstract class Player : MonoBehaviour {
 
 	}
 
-	public interface IActionable {
-
-		IEnumerator Perform(Player player);
-		void Effect(Player player);
-
-	}
-
-	public class BuildAction : IActionable {
-
-		private Card card;
-		private Payment payment;
-
-		public BuildAction(Card card, Payment payment) {
-			this.card = card;
-			this.payment = payment;
-		}
-
-		public IEnumerator Perform(Player player) {
-			yield return card.Flip();
-
-			int maxCardCount = 0;
-			foreach (KeyValuePair<DisplayType, DisplayPile> kv in player.buildDisplay.DisplayPiles) {
-				DisplayPile displayPile = kv.Value;
-				if (displayPile.Count > maxCardCount) {
-					maxCardCount = displayPile.Count;
-				}
-			}
-			player.wonderSlot.spacing = new Vector3(0, 0.2f + (maxCardCount + 1) * 0.05f, 0);
-			yield return player.wonderSlot.Push(player.wonderSlot.Pop());
-
-			yield return player.buildDisplay.Push(card);
-			player.BuiltCards.Add(card.cardName);
-			player.BuiltCardsByType[card.cardType].Add(card);
-
-			// Pay bank and neighbours
-			yield return GameManager.Instance.bank.PushMany(
-				player.bank.PopMany(payment.PayBankAmount)
-			);
-			yield return player.Neighbours[Direction.West].bank.PushMany(
-				player.bank.PopMany(payment.PayWestAmount)
-			);
-			yield return player.Neighbours[Direction.East].bank.PushMany(
-				player.bank.PopMany(payment.PayEastAmount)
-			);
-		}
-
-		public void Effect(Player player) {
-			foreach (OnBuildEffect onBuildEffect in card.onBuildEffects) {
-				onBuildEffect.Effect(player);
-			}
-		}
-
-	}
-
-	public class BuryAction : IActionable {
-
-		private Card card;
-		private int wonderStage;
-		private Payment payment;
-
-		public BuryAction(Card card, int wonderStage, Payment payment) {
-			this.card = card;
-			this.wonderStage = wonderStage;
-			this.payment = payment;
-		}
-
-		public IEnumerator Perform(Player player) {
-			yield return player.Wonder.wonderStages[wonderStage].buildCardSlot.Push(card);
-
-			// Pay bank and neighbours
-			yield return GameManager.Instance.bank.PushMany(
-				player.bank.PopMany(payment.PayBankAmount)
-			);
-			yield return player.Neighbours[Direction.West].bank.PushMany(
-				player.bank.PopMany(payment.PayWestAmount)
-			);
-			yield return player.Neighbours[Direction.East].bank.PushMany(
-				player.bank.PopMany(payment.PayEastAmount)
-			);
-		}
-
-		public void Effect(Player player) {
-			foreach (OnBuildEffect onBuildEffect in player.Wonder.wonderStages[wonderStage].onBuildEffects) {
-				onBuildEffect.Effect(player);
-			}
-		}
-
-	}
-
-	public class DiscardAction : IActionable {
-
-		private Card card;
-
-		public DiscardAction(Card card) {
-			this.card = card;
-		}
-
-		public IEnumerator Perform(Player player) {
-			yield return GameManager.Instance.discardPile.Push(card);
-		}
-
-		public void Effect(Player player) {
-			GameManager.Instance.EnqueueResolver(
-				new GainCoinsResolver(player, () => {
-					return GameOptions.DiscardCoinAmount;
-				}),
-				Priority.GainCoins
-			);
-		}
-
-	}
-
-	public delegate IEnumerator TurnAction(
-		Card card, params object[] args
-	);
-
-	public struct PlayerResource {
-		public Player player;
-		public Resource resource;
-		public PlayerResource(Player player, Resource resource) {
-			this.player = player;
-			this.resource = resource;
-		}
-	}
-
 	public DeckEntry[] decks;
 	public Hand hand;
 	public CardSlot preparedCardSlot;
@@ -162,6 +37,8 @@ public abstract class Player : MonoBehaviour {
 	public HashSet<string> BuiltCards { get; private set; }
 	public Dictionary<CardType, List<Card>> BuiltCardsByType { get; private set; }
 	public string Nickname { get; set; }
+
+	public List<ResourceOptions> resources;
 	public List<ResourceOptions> ProducedResources {
 		get {
 			List<ResourceOptions> producedResources = new List<ResourceOptions>();
@@ -174,11 +51,9 @@ public abstract class Player : MonoBehaviour {
 			return producedResources;
 		}
 	}
-	public Dictionary<PlayerResource, int> ResourceBuyCosts { get; private set; }
+	public Dictionary<KeyValuePair<Direction, Resource>, int> ResourceBuyCosts { get; private set; }
 	public int ShieldCount { get; private set; }
 	public bool IsPeaceful { get; set; }
-
-	private List<ResourceOptions> resources;
 	private List<ScienceOptions> sciences;
 
 	void Awake() {
@@ -193,7 +68,13 @@ public abstract class Player : MonoBehaviour {
 		foreach (CardType cardType in Enum.GetValues(typeof(CardType))) {
 			BuiltCardsByType[cardType] = new List<Card>();
 		}
-		ResourceBuyCosts = new Dictionary<PlayerResource, int>();
+		ResourceBuyCosts = new Dictionary<KeyValuePair<Direction, Resource>, int>();
+		foreach (Direction direction in Enum.GetValues(typeof(Direction))) {
+			foreach (Resource resource in Enum.GetValues(typeof(Resource))) {
+				ResourceBuyCosts[new KeyValuePair<Direction, Resource>(direction, resource)] =
+					GameOptions.InitialBuyCost;
+			}
+		}
 		resources = new List<ResourceOptions>();
 		sciences = new List<ScienceOptions>();
 	}
@@ -294,7 +175,7 @@ public abstract class Player : MonoBehaviour {
 
 	public void EnableDropAreas(Card card) {
 		EnableBuildAreas(card);
-		EnableBuryAreas();
+		EnableBuryAreas(card);
 		EnableDiscardArea();
 	}
 
@@ -324,150 +205,53 @@ public abstract class Player : MonoBehaviour {
 		return count;
 	}
 
-	// TODO: Refactor
-	protected IEnumerable<Multiset<PlayerResource>> GetBoughtResourceSets(
-		int pos, Multiset<Resource> resourceCost, Multiset<PlayerResource> toBuy
-	) {
-		if (resourceCost.Count == 0) {
-			yield return toBuy;
-			yield break;
+	private void EnableBuildAreas(Card card) {
+		if (BuiltCards.Contains(card.cardName)) {
+			// Can't build duplicate cards
+			return;
 		}
 
-		if (pos < resources.Count) {
-			// Use own resources first
-			bool usable = false;
-			foreach (Resource resource in resources[pos].Resources) {
-				if (resourceCost.Contains(resource)) {
-					usable = true;
-					resourceCost.Remove(resource);
-					foreach (Multiset<PlayerResource> set in GetBoughtResourceSets(pos + 1, resourceCost, toBuy)) {
-						yield return set;
-					}
-					resourceCost.Add(resource);
-				}
+		List<Payment> possiblePayments = new List<Payment>(
+			PaymentResolver.Instance.Resolve(this, card)
+		);
+		if (possiblePayments.Count == 0) {
+			// No payment combinations possible for this card
+			return;
+		}
+
+		Payment cheapestPayment = possiblePayments[0];
+		foreach (Payment payment in possiblePayments) {
+			if (payment < cheapestPayment) {
+				cheapestPayment = payment;
 			}
-			if (!usable) {
-				foreach (Multiset<PlayerResource> set in GetBoughtResourceSets(pos + 1, resourceCost, toBuy)) {
-					yield return set;
-				}
-			}
-
-			yield break;
 		}
 
-		Dictionary<Direction, List<ResourceOptions>> neighbourResources =
-			new Dictionary<Direction, List<ResourceOptions>>();
-		neighbourResources[Direction.West] = Neighbours[Direction.West].ProducedResources;
-		neighbourResources[Direction.East] = Neighbours[Direction.East].ProducedResources;
-
-		Direction buyDirection = Direction.West;
-		int resourcePos = 0;
-		if (pos < resources.Count + neighbourResources[Direction.West].Count) {
-			buyDirection = Direction.West;
-			resourcePos = pos - resources.Count;
-		} else if (pos < resources.Count + neighbourResources[Direction.West].Count + neighbourResources[Direction.East].Count) {
-			buyDirection = Direction.East;
-			resourcePos = pos - resources.Count - neighbourResources[Direction.West].Count;
-		} else {
-			yield break;
+		if (cheapestPayment.TotalAmount <= bank.Count) {
+			buildDropArea.payment = cheapestPayment;
+			buildDropArea.IsPlayable = true;
 		}
+	}
 
-		ResourceOptions resourceOptions = neighbourResources[buyDirection][resourcePos];
-		foreach (Resource resource in resourceOptions.Resources) {
-			if (!resourceCost.Contains(resource)) {
+	private void EnableBuryAreas(Card card) {
+		WonderStage[] buildableStages = Wonder.GetBuildableStages();
+		foreach (WonderStage stage in buildableStages) {
+			List<Payment> possiblePayments = new List<Payment>(
+				PaymentResolver.Instance.Resolve(this, stage, card)
+			);
+			if (possiblePayments.Count == 0) {
+				// No payment combinations possible for this wonder stage
 				continue;
 			}
 
-			PlayerResource playerResource = new PlayerResource(Neighbours[buyDirection], resource);
-			resourceCost.Remove(resource);
-			toBuy.Add(playerResource);
-			foreach (Multiset<PlayerResource> set in GetBoughtResourceSets(pos + 1, resourceCost, toBuy)) {
-				yield return set;
-			}
-			resourceCost.Add(resource);
-			toBuy.Remove(playerResource);
-		}
-
-		foreach (Multiset<PlayerResource> set in GetBoughtResourceSets(pos + 1, resourceCost, toBuy)) {
-			yield return set;
-		}
-	}
-
-	protected int GetCheapestBoughtResources(
-		Multiset<Resource> resourceCost, out Multiset<PlayerResource> cheapestBoughtResources
-	) {
-		int cheapestCost = Constant.MaxCost;
-		cheapestBoughtResources = new Multiset<PlayerResource>();
-		foreach (Multiset<PlayerResource> boughtResources in GetBoughtResourceSets(0, resourceCost, new Multiset<PlayerResource>())) {
-			int cost = 0;
-			foreach (PlayerResource playerResource in boughtResources) {
-				cost += ResourceBuyCosts[playerResource];
-			}
-			if (cost < cheapestCost) {
-				cheapestCost = cost;
-				cheapestBoughtResources = new Multiset<PlayerResource>(boughtResources);
-			}
-		}
-		
-		return cheapestCost;
-	}
-
-	private void EnableBuildAreas(Card card) {
-		if (BuiltCards.Contains(card.cardName)) {
-			// Card has been built before, do not enable build area
-			return;
-		}
-
-		bool chainable = false;
-		foreach (string chainedCardName in card.chainedFrom) {
-			if (BuiltCards.Contains(chainedCardName)) {
-				chainable = true;
-				break;
-			}
-		}
-
-		if (chainable) {
-			// Card is chainable, enable build area with 0 payment
-			buildDropArea.payment = new Payment(0, 0, 0);
-			buildDropArea.IsPlayable = true;
-			return;
-		}
-
-		Multiset<Resource> cardResourceCost = new Multiset<Resource>(card.resourceCost);
-		Multiset<PlayerResource> cheapestBoughtResources;
-		int cheapestCost = card.coinCost + GetCheapestBoughtResources(cardResourceCost, out cheapestBoughtResources);
-		if (cheapestCost <= bank.Count) {
-			int westPayAmount = 0;
-			int eastPayAmount = 0;
-			foreach (PlayerResource boughtResource in cheapestBoughtResources) {
-				if (boughtResource.player == Neighbours[Direction.West]) {
-					westPayAmount += ResourceBuyCosts[boughtResource];
-				} else if (boughtResource.player == Neighbours[Direction.East]) {
-					eastPayAmount += ResourceBuyCosts[boughtResource];
+			Payment cheapestPayment = possiblePayments[0];
+			foreach (Payment payment in possiblePayments) {
+				if (payment < cheapestPayment) {
+					cheapestPayment = payment;
 				}
 			}
-			buildDropArea.payment = new Payment(card.coinCost, westPayAmount, eastPayAmount);
-			buildDropArea.IsPlayable = true;
-		}
-	}
 
-	private void EnableBuryAreas() {
-		WonderStage[] buildableStages = Wonder.GetBuildableStages();
-		foreach (WonderStage stage in buildableStages) {
-			Multiset<Resource> stageResourceCost = new Multiset<Resource>(stage.resourceCost);
-			Multiset<PlayerResource> cheapestBoughtResources;
-			int cheapestCost = stage.coinCost + GetCheapestBoughtResources(stageResourceCost, out cheapestBoughtResources);
-			if (cheapestCost <= bank.Count) {
-				int westPayAmount = 0;
-				int eastPayAmount = 0;
-				foreach (PlayerResource boughtResource in cheapestBoughtResources) {
-					if (boughtResource.player == Neighbours[Direction.West]) {
-						westPayAmount += ResourceBuyCosts[boughtResource];
-					} else if (boughtResource.player == Neighbours[Direction.East]) {
-						eastPayAmount += ResourceBuyCosts[boughtResource];
-					}
-				}
-				stage.buryDropArea.payment = new Payment(stage.coinCost, westPayAmount, eastPayAmount);
+			if (cheapestPayment.TotalAmount <= bank.Count) {
+				stage.buryDropArea.payment = cheapestPayment;
 				stage.buryDropArea.IsPlayable = true;
 			}
 		}

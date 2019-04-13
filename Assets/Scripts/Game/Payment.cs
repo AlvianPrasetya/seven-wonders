@@ -1,16 +1,29 @@
 using System;
 using System.Runtime.InteropServices;
 
+[System.Serializable]
 public struct Payment {
 
+	public PaymentType PaymentType { get; private set; }
 	public int PayBankAmount { get; private set; }
 	public int PayWestAmount { get; private set; }
 	public int PayEastAmount { get; private set; }
+	public int TotalAmount {
+		get {
+			return PayBankAmount + PayWestAmount + PayEastAmount;
+		}
+	}
 
-	public Payment(int payBankAmount, int payWestAmount, int payEastAmount) {
+	public Payment(PaymentType paymentType, int payBankAmount, int payWestAmount, int payEastAmount) {
+		PaymentType = paymentType;
 		PayBankAmount = payBankAmount;
 		PayWestAmount = payWestAmount;
 		PayEastAmount = payEastAmount;
+	}
+
+	public override int GetHashCode() {
+		return PaymentType.GetHashCode() ^ PayBankAmount.GetHashCode() ^
+			PayWestAmount.GetHashCode() ^ PayEastAmount.GetHashCode();
 	}
 
 	public static byte[] Serialize(object paymentObject) {
@@ -36,6 +49,32 @@ public struct Payment {
 		Marshal.FreeHGlobal(ptr);
 		
 		return payment;
+	}
+
+	public static Payment operator +(Payment p1, Payment p2) {
+		Payment payment = new Payment();
+		payment.PaymentType = PaymentType.Normal;
+		payment.PayBankAmount = p1.PayBankAmount + p2.PayBankAmount;
+		payment.PayWestAmount = p1.PayWestAmount + p2.PayWestAmount;
+		payment.PayEastAmount = p1.PayEastAmount + p2.PayEastAmount;
+		return payment;
+	}
+
+	public static Payment operator -(Payment p1, Payment p2) {
+		Payment payment = new Payment();
+		payment.PaymentType = PaymentType.Normal;
+		payment.PayBankAmount = Math.Max(p1.PayBankAmount - p2.PayBankAmount, 0);
+		payment.PayWestAmount = Math.Max(p1.PayWestAmount - p2.PayWestAmount, 0);
+		payment.PayEastAmount = Math.Max(p1.PayEastAmount - p2.PayEastAmount, 0);
+		return payment;
+	}
+
+	public static bool operator <(Payment p1, Payment p2) {
+		return p1.TotalAmount < p2.TotalAmount;
+	}
+
+	public static bool operator >(Payment p1, Payment p2) {
+		return p1.TotalAmount > p2.TotalAmount;
 	}
 
 }

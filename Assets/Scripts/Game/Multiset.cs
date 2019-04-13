@@ -55,6 +55,20 @@ public class Multiset<T> : IEnumerable<T> {
 		}
 	}
 
+	public T Pop() {
+		if (dict.Count == 0) {
+			return default(T);
+		}
+
+		T poppedElement = default(T);
+		foreach (KeyValuePair<T, int> kv in dict) {
+			poppedElement = kv.Key;
+		}
+		Remove(poppedElement);
+
+		return poppedElement;
+	}
+
 	public Multiset<T> ExceptWith(IEnumerable<T> other) {
 		Multiset<T> resultSet = new Multiset<T>(this);
 		foreach (T element in other) {

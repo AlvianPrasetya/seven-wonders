@@ -1,5 +1,4 @@
-[System.Serializable]
-public class ResourceOptions {
+public struct ResourceOptions {
 
 	public bool IsProduced {
 		get; private set;
@@ -9,8 +8,8 @@ public class ResourceOptions {
 	}
 
 	public ResourceOptions(bool produced, Resource[] resources) {
-		this.IsProduced = produced;
-		this.Resources = resources;
+		IsProduced = produced;
+		Resources = resources;
 	}
 
 }

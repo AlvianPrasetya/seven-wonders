@@ -15,37 +15,38 @@ public class CheaperResourcesOnBuild : OnBuildEffect {
 	public override void Effect(Player player) {
 		Player neighbour = player.Neighbours[direction];
 
-		List<Player.PlayerResource> playerResources = new List<Player.PlayerResource>();
+		List<KeyValuePair<Direction, Resource>> discountedPurchases =
+			new List<KeyValuePair<Direction, Resource>>();
 		if (lumber) {
-			playerResources.Add(new Player.PlayerResource(neighbour, Resource.Lumber));
+			discountedPurchases.Add(new KeyValuePair<Direction, Resource>(direction, Resource.Lumber));
 		}
 
 		if (ore) {
-			playerResources.Add(new Player.PlayerResource(neighbour, Resource.Ore));
+			discountedPurchases.Add(new KeyValuePair<Direction, Resource>(direction, Resource.Ore));
 		}
 
 		if (clay) {
-			playerResources.Add(new Player.PlayerResource(neighbour, Resource.Clay));
+			discountedPurchases.Add(new KeyValuePair<Direction, Resource>(direction, Resource.Clay));
 		}
 
 		if (stone) {
-			playerResources.Add(new Player.PlayerResource(neighbour, Resource.Stone));
+			discountedPurchases.Add(new KeyValuePair<Direction, Resource>(direction, Resource.Stone));
 		}
 
 		if (loom) {
-			playerResources.Add(new Player.PlayerResource(neighbour, Resource.Loom));
+			discountedPurchases.Add(new KeyValuePair<Direction, Resource>(direction, Resource.Loom));
 		}
 
 		if (glassworks) {
-			playerResources.Add(new Player.PlayerResource(neighbour, Resource.Glassworks));
+			discountedPurchases.Add(new KeyValuePair<Direction, Resource>(direction, Resource.Glassworks));
 		}
 
 		if (press) {
-			playerResources.Add(new Player.PlayerResource(neighbour, Resource.Press));
+			discountedPurchases.Add(new KeyValuePair<Direction, Resource>(direction, Resource.Press));
 		}
 
-		foreach (Player.PlayerResource playerResource in playerResources) {
-			player.ResourceBuyCosts[playerResource] = GameOptions.DiscountedBuyCost;
+		foreach (KeyValuePair<Direction, Resource> discountedPurchase in discountedPurchases) {
+			player.ResourceBuyCosts[discountedPurchase] = GameOptions.DiscountedBuyCost;
 		}
 	}
 

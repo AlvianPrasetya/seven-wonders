@@ -3,6 +3,11 @@ using Photon.Pun;
 public class DigDiscardPileOnBuild : OnBuildEffect {
 
 	public override void Effect(Player player) {
+		if (GameManager.Instance.discardPile.Count == 0) {
+			// Discard pile is empty, this effect is nullified
+			return;
+		}
+
 		GameManager.Instance.EnqueueResolver(
 			new UnloadHandResolver(DeckType.Swap, Direction.East, player),
 			Priority.DigDiscardPile

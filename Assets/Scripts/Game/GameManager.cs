@@ -130,12 +130,6 @@ public class GameManager : MonoBehaviourPun {
 			Player eastPlayer = Players[(i + 1) % Players.Count];
 			Players[i].Neighbours[Direction.West] = westPlayer;
 			Players[i].Neighbours[Direction.East] = eastPlayer;
-
-			// Set initial buying costs
-			foreach (Resource resource in Enum.GetValues(typeof(Resource))) {
-				Players[i].ResourceBuyCosts[new Player.PlayerResource(westPlayer, resource)] = GameOptions.InitialBuyCost;
-				Players[i].ResourceBuyCosts[new Player.PlayerResource(eastPlayer, resource)] = GameOptions.InitialBuyCost;
-			}
 		}
 
 		int playerPos = (int)PhotonNetwork.LocalPlayer.CustomProperties[PlayerProperty.Pos];
