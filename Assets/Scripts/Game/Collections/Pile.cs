@@ -16,7 +16,7 @@ public abstract class Pile<T> : MonoBehaviour, IPushable<T>, IPoppable<T>, IPeek
 		}
 	}
 
-	void Awake() {
+	protected virtual void Awake() {
 		Elements = new Stack<T>();
 	}
 

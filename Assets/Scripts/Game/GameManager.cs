@@ -10,10 +10,18 @@ public class GameManager : MonoBehaviourPun {
 	private const string MatchSeedKey = "match_seed";
 
 	[System.Serializable]
-	public class StockEntry {
+	public class CardStockEntry {
 
 		public StockType stockType;
-		public Stock stock;
+		public CardStock cardStock;
+
+	}
+
+	[System.Serializable]
+	public class AgeStockEntry {
+
+		public StockType stockType;
+		public AgeStock ageStock;
 
 	}
 
@@ -21,7 +29,8 @@ public class GameManager : MonoBehaviourPun {
 	public Bank bank;
 	public Deck discardPile;
 	public WonderStock wonderStock;
-	public StockEntry[] stocks;
+	public CardStockEntry[] cardStocks;
+	public AgeStockEntry[] ageStocks;
 	public Human humanPrefab;
 	public Bot botPrefab;
 	public MilitaryToken victoryTokenAge1Prefab;
@@ -30,7 +39,8 @@ public class GameManager : MonoBehaviourPun {
 	public MilitaryToken drawTokenPrefab;
 	public MilitaryToken defeatTokenPrefab;
 	public static GameManager Instance { get; private set; }
-	public Dictionary<StockType, Stock> Stocks { get; private set; }
+	public Dictionary<StockType, CardStock> CardStocks { get; private set; }
+	public Dictionary<StockType, AgeStock> AgeStocks { get; private set; }
 	public List<Player> Players { get; private set; }
 	public Dictionary<int, Player> HumansByActorID { get; private set; }
 	/// <summary>
@@ -47,16 +57,21 @@ public class GameManager : MonoBehaviourPun {
 		PhotonPeer.RegisterType(typeof(Payment), 0, Payment.Serialize, Payment.Deserialize);
 
 		Instance = this;
-		Stocks = new Dictionary<StockType, Stock>();
+		CardStocks = new Dictionary<StockType, CardStock>();
+		AgeStocks = new Dictionary<StockType, AgeStock>();
 		Players = new List<Player>();
 		HumansByActorID = new Dictionary<int, Player>();
-		foreach (StockEntry stockEntry in stocks) {
-			Stocks.Add(stockEntry.stockType, stockEntry.stock);
-		}
 		Humans = new List<Human>();
 		Bots = new List<Bot>();
 		SyncQueue = new Queue<int>();
 		resolverQueue = new ResolverQueue();
+
+		foreach (CardStockEntry cardStock in cardStocks) {
+			CardStocks.Add(cardStock.stockType, cardStock.cardStock);
+		}
+		foreach (AgeStockEntry ageStock in ageStocks) {
+			AgeStocks.Add(ageStock.stockType, ageStock.ageStock);
+		}
 	}
 
 	void Start() {

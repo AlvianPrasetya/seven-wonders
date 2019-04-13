@@ -1,17 +1,26 @@
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-public class AgeStock : Stock {
+public class AgeStock : Stock<Card>, IDealable {
 
 	public Age age;
+	public DeckType dealDeckType;
+	public CardPile[] cardRifflePiles;
+
+	protected override void Awake() {
+		base.Awake();
+		rifflePiles = cardRifflePiles;
+	}
 
 	public override IEnumerator Load() {
-		Stock rawMaterialStock = GameManager.Instance.Stocks[StockType.RawMaterial];
-		Stock manufacturedGoodsStock = GameManager.Instance.Stocks[StockType.ManufacturedGoods];
-		Stock civilianStock = GameManager.Instance.Stocks[StockType.Civilian];
-		Stock scientificStock = GameManager.Instance.Stocks[StockType.Scientific];
-		Stock commercialStock = GameManager.Instance.Stocks[StockType.Commercial];
-		Stock militaryStock = GameManager.Instance.Stocks[StockType.Military];
-		Stock guildStock = GameManager.Instance.Stocks[StockType.Guild];
+		CardStock rawMaterialStock = GameManager.Instance.CardStocks[StockType.RawMaterial];
+		CardStock manufacturedGoodsStock = GameManager.Instance.CardStocks[StockType.ManufacturedGoods];
+		CardStock civilianStock = GameManager.Instance.CardStocks[StockType.Civilian];
+		CardStock scientificStock = GameManager.Instance.CardStocks[StockType.Scientific];
+		CardStock commercialStock = GameManager.Instance.CardStocks[StockType.Commercial];
+		CardStock militaryStock = GameManager.Instance.CardStocks[StockType.Military];
+		CardStock guildStock = GameManager.Instance.CardStocks[StockType.Guild];
 
 		while (rawMaterialStock.Count != 0) {
 			Card card = rawMaterialStock.Pop();
@@ -83,6 +92,27 @@ public class AgeStock : Stock {
 				yield return guildStock.Push(card);
 				break;
 			}
+		}
+	}
+
+	public IEnumerator Deal() {
+		int playerIndex = 0;
+		Queue<Coroutine> dealCards = new Queue<Coroutine>();
+		while (Elements.Count != 0) {
+			dealCards.Enqueue(StartCoroutine(
+				GameManager.Instance.Players[playerIndex].Decks[dealDeckType].Push(Pop())
+			));
+			playerIndex = (playerIndex + 1) % GameManager.Instance.Players.Count;
+
+			if (dealCards.Count == GameManager.Instance.Players.Count) {
+				// Deal to all players at a time
+				while (dealCards.Count != 0) {
+					yield return dealCards.Dequeue();
+				}
+			}
+		}
+		while (dealCards.Count != 0) {
+			yield return dealCards.Dequeue();
 		}
 	}
 
