@@ -5,15 +5,20 @@ using UnityEngine.UI;
 
 public class LobbyManager : MonoBehaviourPunCallbacks {
 
+	public static ServerSettings photonServerSettings;
+
 	public Image backgroundImageFrontBuffer;
 	public Image backgroundImageBackBuffer;
 	public InputField nicknameInputField;
 	public Text statusText;
+	public Text versionText;
 	public Sprite[] backgroundSprites;
 	public float backgroundStayDuration = 5;
 	public float backgroundTransitionDuration = 2;
 
 	void Start() {
+		photonServerSettings = (ServerSettings)Resources.Load("PhotonServerSettings", typeof(ServerSettings));
+		versionText.text = photonServerSettings.AppSettings.AppVersion;
 		backgroundImageFrontBuffer.sprite = backgroundSprites[0];
 		StartCoroutine(TransitionBackground());
 	}
@@ -63,7 +68,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks {
 		Debug.Log(statusText);
 		this.statusText.text = statusText;
 
-		PhotonNetwork.GameVersion = Constant.GameVersion;
 		PhotonNetwork.ConnectUsingSettings();
 	}
 
