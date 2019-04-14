@@ -8,11 +8,13 @@ public class TurnResolver : IResolvable {
 	private DeckType sourceDeck;
 	private DeckType targetDeck;
 	private Direction direction;
+	private bool targetSelf;
 
-	public TurnResolver(DeckType sourceDeck, DeckType targetDeck, Direction direction) {
+	public TurnResolver(DeckType sourceDeck, DeckType targetDeck, Direction direction, bool targetSelf = false) {
 		this.sourceDeck = sourceDeck;
 		this.targetDeck = targetDeck;
 		this.direction = direction;
+		this.targetSelf = targetSelf;
 	}
 
 	public IEnumerator Resolve() {
@@ -42,7 +44,7 @@ public class TurnResolver : IResolvable {
 		yield return CheckDoubleTurn();
 		
 		GameManager.Instance.EnqueueResolver(
-			new UnloadHandResolver(targetDeck, direction),
+			new UnloadHandResolver(targetDeck, direction, targetSelf),
 			(targetDeck == DeckType.Discard) ? Priority.DiscardLastHand : Priority.PlayHand
 		);
 		

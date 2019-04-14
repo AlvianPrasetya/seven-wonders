@@ -9,7 +9,7 @@ public class DigDiscardPileOnBuild : OnBuildEffect {
 		}
 
 		GameManager.Instance.EnqueueResolver(
-			new UnloadHandResolver(DeckType.Swap, Direction.East, player),
+			new UnloadHandResolver(DeckType.Swap, Direction.East, true, player),
 			Priority.DigDiscardPile
 		);
 		GameManager.Instance.EnqueueResolver(
@@ -35,7 +35,7 @@ public class DigDiscardPileOnBuild : OnBuildEffect {
 		GameManager.Instance.EnqueueResolver(new PerformActionResolver(player), Priority.DigDiscardPile);
 		GameManager.Instance.EnqueueResolver(new EffectActionResolver(player), Priority.DigDiscardPile);
 		GameManager.Instance.EnqueueResolver(
-			new UnloadHandResolver(DeckType.Discard, Direction.East, player),
+			new UnloadHandResolver(DeckType.Discard, Direction.East, true, player),
 			Priority.DigDiscardPile
 		);
 		GameManager.Instance.EnqueueResolver(

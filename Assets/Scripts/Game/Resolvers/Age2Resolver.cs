@@ -1,11 +1,12 @@
-using Photon.Pun;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class Age2Resolver : IResolvable {
 
 	public IEnumerator Resolve() {
+		GameManager.Instance.EnqueueResolver(
+			new TurnResolver(DeckType.Leader, DeckType.Leader, Direction.East, true),
+			Priority.ResolveTurn
+		);
 		GameManager.Instance.EnqueueResolver(
 			new TurnResolver(DeckType.Age2, DeckType.West, Direction.East),
 			Priority.ResolveTurn

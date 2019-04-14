@@ -5,22 +5,19 @@ using System.Linq;
 
 public class PaymentResolver : IResolvable {
 
-	private static PaymentResolver instance;
+	private Player player;
 	// Statically allocated processing variables to optimize memory usage
-	private List<Resource> resourceCost = new List<Resource>();
-	private List<ResourceOptions> ownedResources = new List<ResourceOptions>();
-	private List<BuyableResourceOptions> buyableResources = new List<BuyableResourceOptions>();
-	private Dictionary<KeyValuePair<int, int>, HashSet<Payment>> memo =
-		new Dictionary<KeyValuePair<int, int>, HashSet<Payment>>();
+	private List<Resource> resourceCost;
+	private List<ResourceOptions> ownedResources;
+	private List<BuyableResourceOptions> buyableResources;
+	private Dictionary<KeyValuePair<int, int>, HashSet<Payment>> memo;
 
-	public static PaymentResolver Instance {
-		get {
-			if (instance == null) {
-				instance = new PaymentResolver();
-			}
-
-			return instance;
-		}
+	public PaymentResolver(Player player) {
+		this.player = player;
+		resourceCost = new List<Resource>();
+		ownedResources = new List<ResourceOptions>();
+		buyableResources = new List<BuyableResourceOptions>();
+		memo = new Dictionary<KeyValuePair<int, int>, HashSet<Payment>>();
 	}
 
 	public IEnumerator Resolve() {
@@ -37,7 +34,7 @@ public class PaymentResolver : IResolvable {
 		}
 
 		EvaluateResourceCost(cardToBuild);
-		EvaluateOwnedResources(player);
+		EvaluateOwnedResources(player, cardToBuild);
 		EvaluateBuyableResources(player);
 		memo.Clear();
 
@@ -49,7 +46,7 @@ public class PaymentResolver : IResolvable {
 
 	public IEnumerable<Payment> Resolve(Player player, WonderStage stageToBuild, Card cardToBury) {
 		EvaluateResourceCost(stageToBuild);
-		EvaluateOwnedResources(player);
+		EvaluateOwnedResources(player, stageToBuild);
 		EvaluateBuyableResources(player);
 		memo.Clear();
 
@@ -75,11 +72,35 @@ public class PaymentResolver : IResolvable {
 		}
 	}
 	
-	private void EvaluateOwnedResources(Player player) {
+	private void EvaluateOwnedResources(Player player, Card cardToBuild) {
 		ownedResources.Clear();
 
-		foreach (ResourceOptions resource in player.resources) {
+		foreach (ResourceOptions resource in player.Resources) {
 			ownedResources.Add(resource);
+		}
+
+		foreach (ConditionalResourceOptions conditionalResource in player.ConditionalResources) {
+			foreach (ResourceOptions resource in conditionalResource.EvaluateForBuild(
+				player, cardToBuild
+			)) {
+				ownedResources.Add(resource);
+			}
+		}
+	}
+
+	private void EvaluateOwnedResources(Player player, WonderStage stageToBuild) {
+		ownedResources.Clear();
+
+		foreach (ResourceOptions resource in player.Resources) {
+			ownedResources.Add(resource);
+		}
+
+		foreach (ConditionalResourceOptions conditionalResource in player.ConditionalResources) {
+			foreach (ResourceOptions resource in conditionalResource.EvaluateForBury(
+				player, stageToBuild
+			)) {
+				ownedResources.Add(resource);
+			}
 		}
 	}
 

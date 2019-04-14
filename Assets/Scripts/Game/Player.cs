@@ -19,6 +19,7 @@ public abstract class Player : MonoBehaviour {
 	public CardSlot preparedCardSlot;
 	public BuildDisplay buildDisplay;
 	public MilitaryTokenDisplay militaryTokenDisplay;
+	public DraftDropArea draftDropArea;
 	public BuildDropArea buildDropArea;
 	public DiscardDropArea discardDropArea;
 	public WonderSlot wonderSlot;
@@ -30,19 +31,26 @@ public abstract class Player : MonoBehaviour {
 			return wonderSlot.Element;
 		}
 	}
-	public abstract bool IsPlayable {
-		set;
+	public bool IsPlayable {
+		set {
+			if (value) {
+				hand.IsPlayable = true;
+			} else {
+				hand.IsPlayable = false;
+			}
+		}
 	}
 	public IActionable Action { get; protected set; }
 	public HashSet<string> BuiltCards { get; private set; }
 	public Dictionary<CardType, List<Card>> BuiltCardsByType { get; private set; }
 	public string Nickname { get; set; }
 
-	public List<ResourceOptions> resources;
+	public List<ResourceOptions> Resources { get; private set; }
+	public List<ConditionalResourceOptions> ConditionalResources { get; private set; }
 	public List<ResourceOptions> ProducedResources {
 		get {
 			List<ResourceOptions> producedResources = new List<ResourceOptions>();
-			foreach (ResourceOptions resource in resources) {
+			foreach (ResourceOptions resource in Resources) {
 				if (resource.IsProduced) {
 					producedResources.Add(resource);
 				}
@@ -54,7 +62,15 @@ public abstract class Player : MonoBehaviour {
 	public Dictionary<KeyValuePair<Direction, Resource>, int> ResourceBuyCosts { get; private set; }
 	public int ShieldCount { get; private set; }
 	public bool IsPeaceful { get; set; }
-	private List<ScienceOptions> sciences;
+	public List<ScienceOptions> Sciences { get; private set; }
+
+	// Resolvers
+	public PaymentResolver PaymentResolver {
+		get; private set;
+	}
+	public SciencePointsResolver SciencePointsResolver {
+		get; private set;
+	}
 
 	void Awake() {
 		Decks = new Dictionary<DeckType, Deck>();
@@ -75,9 +91,15 @@ public abstract class Player : MonoBehaviour {
 					GameOptions.InitialBuyCost;
 			}
 		}
-		resources = new List<ResourceOptions>();
-		sciences = new List<ScienceOptions>();
+		Resources = new List<ResourceOptions>();
+		ConditionalResources = new List<ConditionalResourceOptions>();
+		Sciences = new List<ScienceOptions>();
+
+		PaymentResolver = new PaymentResolver(this);
+		SciencePointsResolver = new SciencePointsResolver(this);
 	}
+
+	public abstract void DecideDraft(Card card);
 
 	public abstract void DecideBuild(Card card, Payment payment);
 
@@ -97,6 +119,12 @@ public abstract class Player : MonoBehaviour {
 		foreach (OnBuildEffect onBuildEffect in wonder.onBuildEffects) {
 			onBuildEffect.Effect(this);
 		}
+	}
+
+	public IEnumerator PrepareDraft(int positionInHand) {
+		Card card = hand.PopAt(positionInHand);
+		yield return preparedCardSlot.Push(card);
+		Action = new DraftAction(card);
 	}
 
 	public IEnumerator PrepareBuild(int positionInHand, Payment payment) {
@@ -154,17 +182,29 @@ public abstract class Player : MonoBehaviour {
 		yield return militaryTokenDisplay.Push(militaryToken);
 	}
 
-	public void AddResource(ResourceOptions resourceOptions) {
-		resources.Add(resourceOptions);
+	public void AddResource(ResourceOptions resource) {
+		Resources.Add(resource);
+	}
+
+	public void AddConditionalResource(ConditionalResourceOptions conditionalResource) {
+		ConditionalResources.Add(conditionalResource);
 	}
 
 	/// <summary>
 	/// Adds a science entry for this player and returns the points gained by playing  this science.
 	/// </summary>
 	public int AddScience(ScienceOptions scienceOptions) {
-		int pointsBefore = CalculateSciencePoints();
-		sciences.Add(scienceOptions);
-		int pointsAfter = CalculateSciencePoints();
+		int pointsBefore = SciencePointsResolver.ResolvePoints();
+		Sciences.Add(scienceOptions);
+		int pointsAfter = SciencePointsResolver.ResolvePoints();
+
+		return pointsAfter - pointsBefore;
+	}
+
+	public int AddPointsPerScienceSet(int extraPointsPerScienceSet) {
+		int pointsBefore = SciencePointsResolver.ResolvePoints();
+		SciencePointsResolver.AddPointsPerScienceSet(extraPointsPerScienceSet);
+		int pointsAfter = SciencePointsResolver.ResolvePoints();
 
 		return pointsAfter - pointsBefore;
 	}
@@ -173,46 +213,18 @@ public abstract class Player : MonoBehaviour {
 		ShieldCount += shieldsToAdd;
 	}
 
-	public void EnableDropAreas(Card card) {
-		EnableBuildAreas(card);
-		EnableBuryAreas(card);
-		EnableDiscardArea();
+	public void EnableDraftArea() {
+		draftDropArea.IsPlayable = true;
 	}
 
-	public void DisableDropAreas() {
-		buildDropArea.IsPlayable = false;
-		foreach (WonderStage wonderStage in Wonder.wonderStages) {
-			wonderStage.IsPlayable = false;
-		}
-		discardDropArea.IsPlayable = false;
-	}
-
-	public int CountResource(Resource countedResource) {
-		int count = 0;
-		foreach (ResourceOptions resourceOptions in resources) {
-			if (!resourceOptions.IsProduced) {
-				// Only count produced resources
-				continue;
-			}
-
-			foreach (Resource resource in resourceOptions.Resources) {
-				if (resource == countedResource) {
-					count++;
-				}
-			}
-		}
-
-		return count;
-	}
-
-	private void EnableBuildAreas(Card card) {
+	public void EnableBuildArea(Card card) {
 		if (BuiltCards.Contains(card.cardName)) {
 			// Can't build duplicate cards
 			return;
 		}
 
 		List<Payment> possiblePayments = new List<Payment>(
-			PaymentResolver.Instance.Resolve(this, card)
+			PaymentResolver.Resolve(this, card)
 		);
 		if (possiblePayments.Count == 0) {
 			// No payment combinations possible for this card
@@ -232,11 +244,11 @@ public abstract class Player : MonoBehaviour {
 		}
 	}
 
-	private void EnableBuryAreas(Card card) {
+	public void EnableBuryAreas(Card card) {
 		WonderStage[] buildableStages = Wonder.GetBuildableStages();
 		foreach (WonderStage stage in buildableStages) {
 			List<Payment> possiblePayments = new List<Payment>(
-				PaymentResolver.Instance.Resolve(this, stage, card)
+				PaymentResolver.Resolve(this, stage, card)
 			);
 			if (possiblePayments.Count == 0) {
 				// No payment combinations possible for this wonder stage
@@ -257,40 +269,44 @@ public abstract class Player : MonoBehaviour {
 		}
 	}
 
-	private void EnableDiscardArea() {
+	public void EnableDiscardArea() {
 		discardDropArea.IsPlayable = true;
 	}
 
-	private int CalculateSciencePoints(int pos = 0, int[] counts = null) {
-		if (pos == sciences.Count) {
-			return 0;
+	public void DisableDraftArea() {
+		draftDropArea.IsPlayable = false;
+	}
+
+	public void DisableBuildArea() {
+		buildDropArea.IsPlayable = false;
+	}
+
+	public void DisableBuryAreas() {
+		foreach (WonderStage wonderStage in Wonder.wonderStages) {
+			wonderStage.IsPlayable = false;
+		}
+	}
+
+	public void DisableDiscardArea() {
+		discardDropArea.IsPlayable = false;
+	}
+
+	public int CountResource(Resource countedResource) {
+		int count = 0;
+		foreach (ResourceOptions resourceOptions in Resources) {
+			if (!resourceOptions.IsProduced) {
+				// Only count produced resources
+				continue;
+			}
+
+			foreach (Resource resource in resourceOptions.Resources) {
+				if (resource == countedResource) {
+					count++;
+				}
+			}
 		}
 
-		if (counts == null) {
-			counts = new int[Enum.GetNames(typeof(Science)).Length];
-		}
-
-		int maxPoints = 0;
-		foreach (Science science in sciences[pos].Sciences) {
-			int prevSymbolCount = counts[(int)science];
-			int prevSetCount = counts.Min();
-
-			counts[(int)science]++;
-
-			int symbolCount = counts[(int)science];
-			int setCount = counts.Min();
-
-			maxPoints = Mathf.Max(
-				maxPoints,
-				CalculateSciencePoints(pos + 1, counts) +
-					symbolCount * symbolCount - prevSymbolCount * prevSymbolCount +
-					GameOptions.PointsPerScienceSet * (setCount - prevSetCount)
-			);
-
-			counts[(int)science]--;
-		}
-
-		return maxPoints;
+		return count;
 	}
 
 }

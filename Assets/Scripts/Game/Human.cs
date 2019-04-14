@@ -2,19 +2,9 @@ using System.Collections.Generic;
 
 public class Human : Player {
 
-	public override bool IsPlayable {
-		set {
-			if (value) {
-				hand.IsPlayable = true;
-			} else {
-				hand.IsPlayable = false;
-
-				if (Action == null) {
-					// Player has yet to decide on an action, discard a random card
-					DecideDiscard(hand.GetRandom());
-				}
-			}
-		}
+	public override void DecideDraft(Card card) {
+		int positionInHand = hand.GetPosition(card);
+		GameManager.Instance.DecideDraft(positionInHand);
 	}
 
 	public override void DecideBuild(Card card, Payment payment) {

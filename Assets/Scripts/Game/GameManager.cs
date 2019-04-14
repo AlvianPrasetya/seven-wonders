@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviourPun {
 	public WonderStock wonderStock;
 	public CardStockEntry[] cardStocks;
 	public AgeStockEntry[] ageStocks;
+	public LeaderStock leaderStock;
 	public Human humanPrefab;
 	public Bot botPrefab;
 	public MilitaryToken victoryTokenAge1Prefab;
@@ -155,6 +156,10 @@ public class GameManager : MonoBehaviourPun {
 		}
 	}
 
+	public void DecideDraft(int positionInHand) {
+		photonView.RPC("DecideDraft", RpcTarget.All, positionInHand);
+	}
+
 	public void DecideBuild(int positionInHand, Payment payment) {
 		photonView.RPC("DecideBuild", RpcTarget.All, positionInHand, payment);
 	}
@@ -165,6 +170,17 @@ public class GameManager : MonoBehaviourPun {
 
 	public void DecideDiscard(int positionInHand) {
 		photonView.RPC("DecideDiscard", RpcTarget.All, positionInHand);
+	}
+
+	public void DecideBotDraft(Bot bot, int positionInHand) {
+		int botIndex = 0;
+		for (int i = 0; i < Bots.Count; i++) {
+			if (bot == Bots[i]) {
+				botIndex = i;
+				break;
+			}
+		}
+		photonView.RPC("DecideBotDraft", RpcTarget.All, botIndex, positionInHand);
 	}
 
 	public void DecideBotBuild(Bot bot, int positionInHand, Payment payment) {
@@ -209,6 +225,12 @@ public class GameManager : MonoBehaviourPun {
 	}
 
 	[PunRPC]
+	private void DecideDraft(int positionInHand, PhotonMessageInfo info) {
+		Player player = HumansByActorID[info.Sender.ActorNumber];
+		StartCoroutine(player.PrepareDraft(positionInHand));
+	}
+
+	[PunRPC]
 	private void DecideBuild(int positionInHand, Payment payment, PhotonMessageInfo info) {
 		Player player = HumansByActorID[info.Sender.ActorNumber];
 		StartCoroutine(player.PrepareBuild(positionInHand, payment));
@@ -224,6 +246,12 @@ public class GameManager : MonoBehaviourPun {
 	private void DecideDiscard(int positionInHand, PhotonMessageInfo info) {
 		Player player = HumansByActorID[info.Sender.ActorNumber];
 		StartCoroutine(player.PrepareDiscard(positionInHand));
+	}
+
+	[PunRPC]
+	private void DecideBotDraft(int botIndex, int positionInHand) {
+		Player player = Bots[botIndex];
+		StartCoroutine(player.PrepareDraft(positionInHand));
 	}
 
 	[PunRPC]

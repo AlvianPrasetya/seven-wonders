@@ -15,6 +15,7 @@ public class PreGameResolver : IResolvable {
 		System.Random random = new System.Random(randomSeed);
 		int wonderRandomSeed = random.Next();
 		int guildRandomSeed = random.Next();
+		int leaderRandomSeed = random.Next();
 		int age3RandomSeed = random.Next();
 		int age2RandomSeed = random.Next();
 		int age1RandomSeed = random.Next();
@@ -46,7 +47,10 @@ public class PreGameResolver : IResolvable {
 			GameManager.Instance.CardStocks[StockType.Military].Load()
 		);
 		Coroutine loadAndShuffleGuildStock = GameManager.Instance.StartCoroutine(
-			LoadAndShuffle(StockType.Guild, 5, guildRandomSeed)
+			LoadAndShuffle(StockType.Guild, 4, guildRandomSeed)
+		);
+		Coroutine loadAndShuffleLeaderStock = GameManager.Instance.StartCoroutine(
+			LoadAndShuffle(StockType.Leader, 4, leaderRandomSeed)
 		);
 
 		yield return loadRawMaterialStock;
@@ -56,7 +60,12 @@ public class PreGameResolver : IResolvable {
 		yield return loadCommercialStock;
 		yield return loadMilitaryStock;
 		yield return loadAndShuffleGuildStock;
+		yield return loadAndShuffleLeaderStock;
 		
+		yield return GameManager.Instance.leaderStock.Load();
+		Coroutine shuffleLeaderStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.leaderStock.Shuffle(4, leaderRandomSeed)
+		);
 		yield return GameManager.Instance.AgeStocks[StockType.Age3].Load();
 		Coroutine shuffleAge3 = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.AgeStocks[StockType.Age3].Shuffle(5, age3RandomSeed)
@@ -70,8 +79,11 @@ public class PreGameResolver : IResolvable {
 			GameManager.Instance.AgeStocks[StockType.Age1].Shuffle(5, age1RandomSeed)
 		);
 		
+		yield return GameManager.Instance.CardStocks[StockType.Leader].Dump();
 		yield return GameManager.Instance.CardStocks[StockType.Guild].Dump();
 
+		yield return shuffleLeaderStock;
+		yield return GameManager.Instance.leaderStock.Deal();
 		yield return shuffleAge3;
 		yield return GameManager.Instance.AgeStocks[StockType.Age3].Deal();
 		yield return shuffleAge2;
@@ -89,6 +101,8 @@ public class PreGameResolver : IResolvable {
 		while (gainCoins.Count != 0) {
 			yield return gainCoins.Dequeue();
 		}
+
+		yield return GameManager.Instance.gameCamera.Focus(GameManager.Instance.Player);
 	}
 
 	private IEnumerator LoadAndShuffle(StockType stockType, int numIterations, int randomSeed) {

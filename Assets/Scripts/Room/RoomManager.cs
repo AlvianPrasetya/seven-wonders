@@ -96,7 +96,7 @@ public class RoomManager : MonoBehaviourPunCallbacks {
 
 		// Set match seed
 		int matchSeed = new System.Random().Next();
-		SetMatchSeed(matchSeed);
+		SetMatchSeed(1752667832);
 		Debug.LogFormat("Match seed: {0}", matchSeed);
 
 		PhotonNetwork.LoadLevel(LevelName.Game);

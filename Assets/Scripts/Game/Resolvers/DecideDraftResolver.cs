@@ -2,11 +2,11 @@ using Photon.Pun;
 using System.Collections;
 using UnityEngine;
 
-public class DecideActionResolver : IResolvable {
+public class DecideDraftResolver : IResolvable {
 
 	private float decideTime;
 
-	public DecideActionResolver(float decideTime) {
+	public DecideDraftResolver(float decideTime) {
 		this.decideTime = decideTime;
 	}
 
@@ -24,8 +24,8 @@ public class DecideActionResolver : IResolvable {
 		GameManager.Instance.Player.IsPlayable = false;
 
 		if (GameManager.Instance.Player.Action == null) {
-			// Player has yet to decide on an action, discard a random card
-			GameManager.Instance.Player.DecideDiscard(GameManager.Instance.Player.hand.GetRandom());
+			// Player has yet to decide on an action, draft a random card
+			GameManager.Instance.Player.DecideDraft(GameManager.Instance.Player.hand.GetRandom());
 		}
 	}
 

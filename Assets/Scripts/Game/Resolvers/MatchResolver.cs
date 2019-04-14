@@ -11,6 +11,7 @@ public class MatchResolver : IResolvable {
 	
 	public IEnumerator Resolve() {
 		GameManager.Instance.EnqueueResolver(new PreGameResolver(matchSeed), Priority.ResolvePhase);
+		GameManager.Instance.EnqueueResolver(new DraftingPhaseResolver(), Priority.ResolvePhase);
 		GameManager.Instance.EnqueueResolver(new Age1Resolver(), Priority.ResolvePhase);
 		GameManager.Instance.EnqueueResolver(new Age2Resolver(), Priority.ResolvePhase);
 		GameManager.Instance.EnqueueResolver(new Age3Resolver(), Priority.ResolvePhase);
