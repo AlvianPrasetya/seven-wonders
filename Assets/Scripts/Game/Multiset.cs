@@ -63,6 +63,7 @@ public class Multiset<T> : IEnumerable<T> {
 		T poppedElement = default(T);
 		foreach (KeyValuePair<T, int> kv in dict) {
 			poppedElement = kv.Key;
+			break;
 		}
 		Remove(poppedElement);
 

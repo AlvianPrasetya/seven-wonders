@@ -21,9 +21,19 @@ public struct Payment {
 		PayEastAmount = payEastAmount;
 	}
 
+	public override bool Equals(object obj) {
+		Payment other = (Payment)obj;
+		return PaymentType.Equals(other.PaymentType) && PayBankAmount.Equals(other.PayBankAmount) &&
+			PayWestAmount.Equals(other.PayWestAmount) && PayEastAmount.Equals(other.PayEastAmount);
+	}
+
 	public override int GetHashCode() {
-		return PaymentType.GetHashCode() ^ PayBankAmount.GetHashCode() ^
-			PayWestAmount.GetHashCode() ^ PayEastAmount.GetHashCode();
+		int hash = 0;
+		hash = hash * 23 + PaymentType.GetHashCode();
+		hash = hash * 23 + PayBankAmount.GetHashCode();
+		hash = hash * 23 + PayWestAmount.GetHashCode();
+		hash = hash * 23 + PayEastAmount.GetHashCode();
+		return hash;
 	}
 
 	public static byte[] Serialize(object paymentObject) {

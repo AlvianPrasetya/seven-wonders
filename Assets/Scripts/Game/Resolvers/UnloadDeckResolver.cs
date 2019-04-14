@@ -17,13 +17,9 @@ public class UnloadDeckResolver : IResolvable {
 
 	public IEnumerator Resolve() {
 		if (targetPlayer != null) {
-			// Focus on the only player unloading deck
-			yield return GameManager.Instance.gameCamera.Focus(targetPlayer);
 			// Unload deck to the player's hand
 			yield return targetPlayer.Decks[deckType].Unload(targetPlayer.hand, pushDirection);
 		} else {
-			// Focus on local player when unloading deck
-			yield return GameManager.Instance.gameCamera.Focus(GameManager.Instance.Player);
 			// Unload each player's deck to the player's hand
 			Queue<Coroutine> unloadDecks = new Queue<Coroutine>();
 			foreach (Player player in GameManager.Instance.Players) {

@@ -1,10 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class PaymentResolver : IResolvable {
 
 	private static PaymentResolver instance;
+	// Statically allocated processing variables to optimize memory usage
+	private List<Resource> resourceCost = new List<Resource>();
+	private List<ResourceOptions> ownedResources = new List<ResourceOptions>();
+	private List<BuyableResourceOptions> buyableResources = new List<BuyableResourceOptions>();
+	private Dictionary<KeyValuePair<int, int>, HashSet<Payment>> memo =
+		new Dictionary<KeyValuePair<int, int>, HashSet<Payment>>();
 
 	public static PaymentResolver Instance {
 		get {
@@ -24,43 +31,60 @@ public class PaymentResolver : IResolvable {
 		foreach (string chainedCardName in cardToBuild.chainedFrom) {
 			if (player.BuiltCards.Contains(chainedCardName)) {
 				// Card is chainable for 0 cost
-				return new Payment[]{
-					new Payment(PaymentType.Chained, 0, 0, 0)
-				};
+				yield return new Payment(PaymentType.Chained, 0, 0, 0);
+				yield break;
 			}
 		}
 
-		HashSet<Payment> possiblePayments = new HashSet<Payment>(GetPaymentCombinations(
-			GetOwnedResources(player),
-			GetBuyableResources(player),
-			new Multiset<Resource>(cardToBuild.resourceCost),
-			new Payment(PaymentType.Normal, cardToBuild.coinCost, 0, 0)
-		));
+		EvaluateResourceCost(cardToBuild);
+		EvaluateOwnedResources(player);
+		EvaluateBuyableResources(player);
+		memo.Clear();
 
-		return possiblePayments;
+		IEnumerable payments = GetPaymentCombinations((1 << resourceCost.Count) - 1);
+		foreach (Payment payment in payments) {
+			yield return payment + new Payment(PaymentType.Normal, cardToBuild.coinCost, 0, 0);
+		}
 	}
 
 	public IEnumerable<Payment> Resolve(Player player, WonderStage stageToBuild, Card cardToBury) {
-		HashSet<Payment> possiblePayments = new HashSet<Payment>(GetPaymentCombinations(
-			GetOwnedResources(player),
-			GetBuyableResources(player),
-			new Multiset<Resource>(stageToBuild.resourceCost),
-			new Payment(PaymentType.Normal, stageToBuild.coinCost, 0, 0)
-		));
+		EvaluateResourceCost(stageToBuild);
+		EvaluateOwnedResources(player);
+		EvaluateBuyableResources(player);
+		memo.Clear();
 
-		return possiblePayments;
+		IEnumerable payments = GetPaymentCombinations((1 << resourceCost.Count) - 1);
+		foreach (Payment payment in payments) {
+			yield return payment + new Payment(PaymentType.Normal, stageToBuild.coinCost, 0, 0);
+		}
+	}
+
+	private void EvaluateResourceCost(Card cardToBuild) {
+		resourceCost.Clear();
+
+		foreach (Resource resource in cardToBuild.resourceCost) {
+			resourceCost.Add(resource);
+		}
+	}
+
+	private void EvaluateResourceCost(WonderStage stageToBuild) {
+		resourceCost.Clear();
+
+		foreach (Resource resource in stageToBuild.resourceCost) {
+			resourceCost.Add(resource);
+		}
 	}
 	
-	private Multiset<ResourceOptions> GetOwnedResources(Player player) {
-		Multiset<ResourceOptions> ownedResources = new Multiset<ResourceOptions>();
+	private void EvaluateOwnedResources(Player player) {
+		ownedResources.Clear();
 
-		ownedResources.Add(player.resources);
-
-		return ownedResources;
+		foreach (ResourceOptions resource in player.resources) {
+			ownedResources.Add(resource);
+		}
 	}
 
-	private Multiset<BuyableResourceOptions> GetBuyableResources(Player player) {
-		Multiset<BuyableResourceOptions> buyableResources = new Multiset<BuyableResourceOptions>();
+	private void EvaluateBuyableResources(Player player) {
+		buyableResources.Clear();
 
 		// Evaluate buyable resources from west neighbour
 		List<ResourceOptions> westResources = player.Neighbours[Direction.West].ProducedResources;
@@ -85,95 +109,109 @@ public class PaymentResolver : IResolvable {
 				new BuyableResourceOptions(resource, new Payment(PaymentType.Normal, 0, 0, buyCost))
 			);
 		}
-
-		return buyableResources;
 	}
 
 	private IEnumerable<Payment> GetPaymentCombinations(
-		Multiset<ResourceOptions> ownedResources,
-		Multiset<BuyableResourceOptions> buyableResources,
-		Multiset<Resource> resourceCost,
-		Payment currentPayment
+		int costBitmask,
+		int pos = 0
 	) {
-		if (resourceCost.Count == 0) {
-			yield return currentPayment;
+		// Base case #1: All resource costs are fulfilled
+		if (costBitmask == 0) {
+			yield return new Payment();
 			yield break;
 		}
 
-		// Use owned resources first
-		if (ownedResources.Count != 0) {
-			ResourceOptions resourceOptions = ownedResources.Pop();
-			bool usable = false;
-			foreach (Resource resource in resourceOptions.Resources) {
-				if (!resourceCost.Contains(resource)) {
-					// Choosing this resource does not contribute towards fulfilling the cost
-					continue;
-				}
-				
-				usable = true;
-				resourceCost.Remove(resource);
-				foreach (Payment payment in GetPaymentCombinations(
-					ownedResources,
-					buyableResources,
-					resourceCost,
-					currentPayment
-				)) {
-					yield return payment;
-				}
-				resourceCost.Add(resource);
+		// Base case #2: This combination has been evaluated and memoized
+		HashSet<Payment> memoizedPayments;
+		if (memo.TryGetValue(new KeyValuePair<int, int>(costBitmask, pos), out memoizedPayments)) {
+			foreach (Payment payment in memoizedPayments) {
+				yield return payment;
 			}
-			if (!usable) {
-				// Any resource choices do not contribute towards fulfilling the cost
-				foreach (Payment payment in GetPaymentCombinations(
-					ownedResources,
-					buyableResources,
-					resourceCost,
-					currentPayment
-				)) {
-					yield return payment;
-				}
-			}
-			ownedResources.Add(resourceOptions);
+			yield break;
 		}
 
-		// Resort to buyable resources if self-fulfilment is not possible
-		if (buyableResources.Count != 0) {
-			BuyableResourceOptions buyableResourceOptions = buyableResources.Pop();
+		if (pos < ownedResources.Count) {
+			// Use owned resources first
+			int actualPos = pos;
 			bool usable = false;
-			foreach (Resource resource in buyableResourceOptions.ResourceOptions.Resources) {
-				if (!resourceCost.Contains(resource)) {
-					// Buying this resource does not contribute towards fulfilling the cost
-					continue;
-				}
+			foreach (Resource resource in ownedResources[actualPos].Resources) {
+				for (int i = 0; i < resourceCost.Count; i++) {
+					if ((costBitmask & (1 << i)) == 0 || resource != resourceCost[i]) {
+						// This resource is no longer required or resources do not match
+						continue;
+					}
 
-				usable = true;
-				resourceCost.Remove(resource);
-				foreach (Payment payment in GetPaymentCombinations(
-					ownedResources,
-					buyableResources,
-					resourceCost,
-					currentPayment + buyableResourceOptions.Cost
-				)) {
-					yield return payment;
+					// Matching a required resource, further evaluate this combination
+					usable = true;
+					Memoize(costBitmask, pos, GetPaymentCombinations(
+						costBitmask ^ (1 << i), // Remove this resource from cost
+						pos + 1
+					));
 				}
-				resourceCost.Add(resource);
 			}
 			if (!usable) {
-				// Any resource choices do not contribute towards fulfilling the cost
-				foreach (Payment payment in GetPaymentCombinations(
-					ownedResources,
-					buyableResources,
-					resourceCost,
-					currentPayment
-				)) {
-					yield return payment;
+				// Any resource choices do not contribute towards fulfilling the cost,
+				// further evaluate without using the current owned resource
+				Memoize(costBitmask, pos, GetPaymentCombinations(
+					costBitmask,
+					pos + 1
+				));
+			}
+
+			foreach (Payment payment in Recall(costBitmask, pos)) {
+				yield return payment;
+			}
+		} else if (pos < ownedResources.Count + buyableResources.Count) {
+			// Resort to buyable resources if self-fulfilment is not possible
+			int actualPos = pos - ownedResources.Count;
+			BuyableResourceOptions buyableResource = buyableResources[actualPos];
+			foreach (Resource resource in buyableResource.ResourceOptions.Resources) {
+				for (int i = 0; i < resourceCost.Count; i++) {
+					if ((costBitmask & (1 << i)) == 0 || resource != resourceCost[i]) {
+						// This resource is no longer required or resources do not match
+						continue;
+					}
+
+					// Matching a required resource, further evaluate this combination
+					Memoize(costBitmask, pos, GetPaymentCombinations(
+						costBitmask ^ (1 << i), // Remove this resource from cost
+						pos + 1
+					), buyableResource.Cost);
 				}
 			}
-			buyableResources.Add(buyableResourceOptions);
+			Memoize(costBitmask, pos, GetPaymentCombinations(
+				costBitmask,
+				pos + 1
+			));
+
+			foreach (Payment payment in Recall(costBitmask, pos)) {
+				yield return payment;
+			}
+		} else {
+			// This combination of owned and buyable resources does not fulfill the cost
+			yield break;
+		}
+	}
+
+	private void Memoize(int costBitmask, int pos, IEnumerable<Payment> payments, Payment addedCost = new Payment()) {
+		KeyValuePair<int, int> key = new KeyValuePair<int, int>(costBitmask, pos);
+		if (!memo.ContainsKey(key)) {
+			memo[key] = new HashSet<Payment>();
 		}
 
-		// This combination of resources does not fulfill the cost
-		yield break;
+		foreach (Payment payment in payments) {
+			memo[key].Add(payment + addedCost);
+		}
+	}
+
+	private IEnumerable<Payment> Recall(int costBitmask, int pos) {
+		KeyValuePair<int, int> key = new KeyValuePair<int, int>(costBitmask, pos);
+		HashSet<Payment> payments;
+		if (memo.TryGetValue(key, out payments)) {
+			return payments;
+		}
+
+		return Enumerable.Empty<Payment>();
 	}
 
 }
