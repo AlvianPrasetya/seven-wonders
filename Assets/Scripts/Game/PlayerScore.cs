@@ -6,12 +6,12 @@ using UnityEngine.UI;
 
 public class PlayerScore : MonoBehaviour, IComparable<PlayerScore> {
 
-	private const float moveDuration = 0.5f;
+	private const float moveDuration = 0.25f;
 
 	[System.Serializable]
 	public class PointEntry {
 
-		private const float morphDuration = 0.5f;
+		private const float morphDuration = 0.25f;
 
 		public PointType pointType;
 		public Text pointText;
@@ -49,7 +49,7 @@ public class PlayerScore : MonoBehaviour, IComparable<PlayerScore> {
 	[System.Serializable]
 	public class TotalEntry {
 
-		private const float morphDuration = 0.5f;
+		private const float morphDuration = 0.25f;
 
 		public Text totalText;
 		public int Total { get; private set; }
