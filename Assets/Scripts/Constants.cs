@@ -22,7 +22,6 @@ public enum PaymentType { Normal, Chained }
 
 public class Constant {
 	
-	public const string GameVersion = "v0.0.3";
 	public const float DistanceEpsilon = 0.01f;
 	public const float AngleEpsilon = 0.1f;
 	public const int MaxCost = Int16.MaxValue;
