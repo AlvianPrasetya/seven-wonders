@@ -10,7 +10,7 @@ public class GameCamera : MonoBehaviour {
 	[System.Serializable]
 	public class OnFocusedEvent : UnityEvent {}
 
-	public Vector3 selfFocusOffset = new Vector3(0, 25, -7);
+	public Vector3 selfFocusOffset = new Vector3(0, 25, -6);
 	public float selfFocusAngle = 75;
 	public Vector3 othersFocusOffset = new Vector3(0, 25, 0);
 	public float othersFocusAngle = 75;
