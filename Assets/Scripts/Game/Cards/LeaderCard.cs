@@ -18,6 +18,8 @@ public class LeaderCard : Card {
 			GameManager.Instance.Player.EnableDraftArea();
 		} else {
 			GameManager.Instance.Player.EnableBuildArea(this);
+			GameManager.Instance.Player.EnableBuryAreas(this);
+			GameManager.Instance.Player.EnableDiscardArea();
 		}
 	}
 
@@ -28,6 +30,8 @@ public class LeaderCard : Card {
 			GameManager.Instance.Player.DisableDraftArea();
 		} else {
 			GameManager.Instance.Player.DisableBuildArea();
+			GameManager.Instance.Player.DisableBuryAreas();
+			GameManager.Instance.Player.DisableDiscardArea();
 		}
 	}
 
