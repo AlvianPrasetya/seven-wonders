@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MilitaryConflictResolver : IResolvable {
@@ -16,11 +17,16 @@ public class MilitaryConflictResolver : IResolvable {
 	}
 
 	public IEnumerator Resolve() {
+		Queue<Coroutine> gainTokens = new Queue<Coroutine>();
 		foreach (Player player in GameManager.Instance.Players) {
 			if (player.IsPeaceful) {
 				// Peace is treated as draws to both sides
-				yield return player.GainMilitaryToken(drawTokenPrefab);
-				yield return player.GainMilitaryToken(drawTokenPrefab);
+				gainTokens.Enqueue(GameManager.Instance.StartCoroutine(
+					player.GainMilitaryToken(drawTokenPrefab)
+				));
+				gainTokens.Enqueue(GameManager.Instance.StartCoroutine(
+					player.GainMilitaryToken(drawTokenPrefab)
+				));
 				continue;
 			}
 
@@ -47,7 +53,9 @@ public class MilitaryConflictResolver : IResolvable {
 			} else {
 				westMilitaryToken = GameObject.Instantiate(defeatTokenPrefab, Vector3.zero, Quaternion.identity);
 			}
-			yield return player.GainMilitaryToken(westMilitaryToken);
+			gainTokens.Enqueue(GameManager.Instance.StartCoroutine(
+				player.GainMilitaryToken(westMilitaryToken)
+			));
 
 			MilitaryToken eastMilitaryToken;
 			if (shields > eastShields) {
@@ -57,7 +65,12 @@ public class MilitaryConflictResolver : IResolvable {
 			} else {
 				eastMilitaryToken = GameObject.Instantiate(defeatTokenPrefab, Vector3.zero, Quaternion.identity);
 			}
-			yield return player.GainMilitaryToken(eastMilitaryToken);
+			gainTokens.Enqueue(GameManager.Instance.StartCoroutine(
+				player.GainMilitaryToken(eastMilitaryToken)
+			));
+		}
+		while (gainTokens.Count != 0) {
+			yield return gainTokens.Dequeue();
 		}
 
 		// Reset peaceful status for all players
