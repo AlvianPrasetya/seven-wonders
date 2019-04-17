@@ -35,8 +35,13 @@ public class Bank : MonoBehaviour, IPushable<Coin>, IPoppable<Coin>, ILoadable {
 	}
 
 	public IEnumerator PushMany(Coin[] coins) {
+		Queue<Coroutine> pushCoins = new Queue<Coroutine>();
 		foreach (Coin coin in coins) {
-			yield return Push(coin);
+			pushCoins.Enqueue(StartCoroutine(Push(coin)));
+			yield return new WaitForSeconds(0.1f);
+		}
+		while (pushCoins.Count != 0) {
+			yield return pushCoins.Dequeue();
 		}
 	}
 
