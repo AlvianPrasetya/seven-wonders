@@ -7,6 +7,8 @@ public class DigDiscardPileOnBuild : OnBuildEffect {
 			// Discard pile is empty, this effect is nullified
 			return;
 		}
+		
+		GameManager.Instance.EnqueueResolver(new SyncResolver(), Priority.DigDiscardPile);
 
 		GameManager.Instance.EnqueueResolver(
 			new UnloadHandResolver(DeckType.Swap, Direction.East, true, player),
@@ -16,7 +18,6 @@ public class DigDiscardPileOnBuild : OnBuildEffect {
 			new UnloadDeckResolver(DeckType.Discard, Direction.East, player),
 			Priority.DigDiscardPile
 		);
-		GameManager.Instance.EnqueueResolver(new SyncResolver(), Priority.DigDiscardPile);
 
 		if (player.GetType() == typeof(Bot) && PhotonNetwork.IsMasterClient) {
 			// This player is a bot, enqueue decide bot action resolver on master client
