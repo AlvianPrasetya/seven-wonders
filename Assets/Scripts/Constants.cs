@@ -14,9 +14,9 @@ public enum Facing { Up, Down };
 public enum DisplayType { Resource, Point, OneOff, Military, Scientific, Leader };
 public enum CardType { RawMaterial, ManufacturedGoods, Civilian, Scientific, Commercial, Military, Guild, City, Leader };
 public enum Target { Self, Neighbours, Neighbourhood, Others, Everyone };
-public enum Resource { Lumber, Ore, Clay, Stone, Loom, Glassworks, Press };
+public enum ResourceType { Lumber, Ore, Clay, Stone, Loom, Glassworks, Press };
 public enum PointType { Military, Treasury, Wonders, Civilian, Scientific, Commercial, Guilds, Leaders };
-public enum Science { Compass, Tablet, Gear }
+public enum ScienceType { Compass, Tablet, Gear }
 public enum MilitaryTokenType { Victory, Draw, Defeat }
 public enum PaymentType { Normal, Chained }
 

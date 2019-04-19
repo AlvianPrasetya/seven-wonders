@@ -1,25 +1,25 @@
-public struct BuyableResourceOptions {
+public struct BuyableResource {
 
-	public ResourceOptions ResourceOptions {
+	public Resource Resource {
 		get; private set;
 	}
 	public Payment Cost {
 		get; private set;
 	}
 
-	public BuyableResourceOptions(ResourceOptions resourceOptions, Payment cost) {
-		ResourceOptions = resourceOptions;
+	public BuyableResource(Resource resource, Payment cost) {
+		Resource = resource;
 		Cost = cost;
 	}
 
 	public override bool Equals(object obj) {
-		BuyableResourceOptions other = (BuyableResourceOptions)obj;
-		return ResourceOptions.Equals(other.ResourceOptions) && Cost.Equals(other.Cost);
+		BuyableResource other = (BuyableResource)obj;
+		return Resource.Equals(other.Resource) && Cost.Equals(other.Cost);
 	}
 
 	public override int GetHashCode() {
 		int hash = 0;
-		hash = hash * 23 + ResourceOptions.GetHashCode();
+		hash = hash * 23 + Resource.GetHashCode();
 		hash = hash * 23 + Cost.GetHashCode();
 		return hash;
 	}

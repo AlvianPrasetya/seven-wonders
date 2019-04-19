@@ -18,7 +18,7 @@ public class DiscardPile : Deck {
 
 		// Set discarded cards as virtually free
 		card.coinCost = 0;
-		card.resourceCost = new Resource[0];
+		card.resourceCost = new ResourceType[0];
 	}
 
 }

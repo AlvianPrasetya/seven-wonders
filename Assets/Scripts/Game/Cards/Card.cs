@@ -11,7 +11,7 @@ public abstract class Card : MonoBehaviour, IMoveable, IBeginDragHandler, IDragH
 	public float dragHeight = 2;
 	public string[] chainedFrom;
 	public int coinCost;
-	public Resource[] resourceCost;
+	public ResourceType[] resourceCost;
 	public OnBuildEffect[] onBuildEffects;
 	
 	private bool dragged;

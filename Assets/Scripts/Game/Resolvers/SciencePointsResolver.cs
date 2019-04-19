@@ -19,24 +19,24 @@ public class SciencePointsResolver : IResolvable {
 	}
 
 	public int ResolvePoints(int pos = 0, int[] counts = null) {
-		List<ScienceOptions> sciences = player.Sciences;
+		List<Science> sciences = player.Sciences;
 
 		if (pos == sciences.Count) {
 			return 0;
 		}
 
 		if (counts == null) {
-			counts = new int[Enum.GetNames(typeof(Science)).Length];
+			counts = new int[Enum.GetNames(typeof(ScienceType)).Length];
 		}
 
 		int maxPoints = 0;
-		foreach (Science science in sciences[pos].Sciences) {
-			int prevSymbolCount = counts[(int)science];
+		foreach (ScienceType scienceType in sciences[pos].ScienceTypes) {
+			int prevSymbolCount = counts[(int)scienceType];
 			int prevSetCount = counts.Min();
 
-			counts[(int)science]++;
+			counts[(int)scienceType]++;
 
-			int symbolCount = counts[(int)science];
+			int symbolCount = counts[(int)scienceType];
 			int setCount = counts.Min();
 
 			maxPoints = Mathf.Max(
@@ -46,7 +46,7 @@ public class SciencePointsResolver : IResolvable {
 					pointsPerScienceSet * (setCount - prevSetCount)
 			);
 
-			counts[(int)science]--;
+			counts[(int)scienceType]--;
 		}
 
 		return maxPoints;

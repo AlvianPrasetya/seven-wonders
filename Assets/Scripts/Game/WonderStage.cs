@@ -6,7 +6,7 @@ public class WonderStage : MonoBehaviour {
 	public BuryDropArea buryDropArea;
 	public CardSlot buildCardSlot;
 	public int coinCost;
-	public Resource[] resourceCost;
+	public ResourceType[] resourceCost;
 	public OnBuildEffect[] onBuildEffects;
 	public bool IsBuilt {
 		get {
