@@ -40,7 +40,8 @@ public class PaymentResolver : IResolvable {
 
 		IEnumerable payments = GetPaymentCombinations((1 << resourceCost.Count) - 1);
 		foreach (Payment payment in payments) {
-			yield return payment + new Payment(PaymentType.Normal, cardToBuild.coinCost, 0, 0);
+			int coinCost = cardToBuild.coinCost == -1 ? (int)GameManager.Instance.currentAge : cardToBuild.coinCost;
+			yield return payment + new Payment(PaymentType.Normal, coinCost, 0, 0);
 		}
 	}
 
