@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviourPun {
 	public List<Human> Humans { get; private set; }
 	public List<Bot> Bots { get; private set; }
 	public Queue<int> SyncQueue { get; private set; }
-
+	public Age currentAge { get; private set; }
 	private ResolverQueue resolverQueue;
 
 	void Awake() {
@@ -76,6 +76,8 @@ public class GameManager : MonoBehaviourPun {
 	}
 
 	void Start() {
+		currentAge = Age.Age1;
+
 		// Create player at location determined by player pos
 		Player[] playersByPos = new Player[7];
 		for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++) {
@@ -144,6 +146,21 @@ public class GameManager : MonoBehaviourPun {
 			Priority.ResolveMatch
 		);
 		StartCoroutine(Resolve());
+	}
+
+	// Update is called once per frame
+	void Update() {
+		if (currentAge == Age.Age1) {
+			if (Player.Decks[DeckType.Age1].Count < 1) {
+				currentAge = Age.Age2;
+			}
+		}
+
+		if (currentAge == Age.Age2) {
+			if (Player.Decks[DeckType.Age2].Count < 1) {
+				currentAge = Age.Age3;
+			}
+		}
 	}
 
 	public void EnqueueResolver(IResolvable resolver, int priority) {
