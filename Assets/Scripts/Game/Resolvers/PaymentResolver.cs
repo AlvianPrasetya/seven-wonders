@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class PaymentResolver : IResolvable {
+	
+	public delegate void ModifyPayments(ref List<Payment> payments);
 
 	private Player player;
 	// Statically allocated processing variables to optimize memory usage
@@ -11,6 +13,7 @@ public class PaymentResolver : IResolvable {
 	private List<Resource> ownedResources;
 	private List<BuyableResource> buyableResources;
 	private Dictionary<KeyValuePair<int, int>, HashSet<Payment>> memo;
+	private List<ModifyPayments> paymentModifiers;
 
 	public PaymentResolver(Player player) {
 		this.player = player;
@@ -28,8 +31,9 @@ public class PaymentResolver : IResolvable {
 		foreach (string chainedCardName in cardToBuild.chainedFrom) {
 			if (player.BuiltCards.Contains(chainedCardName)) {
 				// Card is chainable for 0 cost
-				yield return new Payment(PaymentType.Chained, 0, 0, 0);
-				yield break;
+				return new Payment[]{
+					new Payment(PaymentType.Chained, 0, 0, 0)
+				};
 			}
 		}
 
@@ -38,10 +42,19 @@ public class PaymentResolver : IResolvable {
 		EvaluateBuyableResources(player);
 		memo.Clear();
 
-		IEnumerable payments = GetPaymentCombinations((1 << resourceCost.Count) - 1);
-		foreach (Payment payment in payments) {
-			yield return payment + new Payment(PaymentType.Normal, cardToBuild.coinCost, 0, 0);
+		List<Payment> payments = new List<Payment>(
+			GetPaymentCombinations((1 << resourceCost.Count) - 1)
+		);
+		// Add in card base coin cost
+		for (int i = 0; i < payments.Count; i++) {
+			payments[i] += new Payment(PaymentType.Normal, cardToBuild.coinCost, 0, 0);
 		}
+		// Apply payment modifiers
+		foreach (ModifyPayments paymentModifier in paymentModifiers) {
+			paymentModifier.Invoke(ref payments);
+		}
+
+		return payments;
 	}
 
 	public IEnumerable<Payment> Resolve(Player player, WonderStage stageToBuild, Card cardToBury) {
@@ -50,10 +63,23 @@ public class PaymentResolver : IResolvable {
 		EvaluateBuyableResources(player);
 		memo.Clear();
 
-		IEnumerable payments = GetPaymentCombinations((1 << resourceCost.Count) - 1);
-		foreach (Payment payment in payments) {
-			yield return payment + new Payment(PaymentType.Normal, stageToBuild.coinCost, 0, 0);
+		List<Payment> payments = new List<Payment>(
+			GetPaymentCombinations((1 << resourceCost.Count) - 1)
+		);
+		// Add in wonder stage base coin cost
+		for (int i = 0; i < payments.Count; i++) {
+			payments[i] += new Payment(PaymentType.Normal, stageToBuild.coinCost, 0, 0);
 		}
+		// Apply payment modifiers
+		foreach (ModifyPayments paymentModifier in paymentModifiers) {
+			paymentModifier.Invoke(ref payments);
+		}
+
+		return payments;
+	}
+
+	public void AddPaymentModifier(ModifyPayments paymentModifier) {
+		paymentModifiers.Add(paymentModifier);
 	}
 
 	private void EvaluateResourceCost(Card cardToBuild) {

@@ -21,6 +21,17 @@ public struct Payment {
 		PayEastAmount = payEastAmount;
 	}
 
+	public void ApplyRebate(Direction direction, int amount) {
+		switch (direction) {
+			case Direction.West:
+				PayWestAmount = Math.Max(PayWestAmount - amount, 0);
+				break;
+			case Direction.East:
+				PayEastAmount = Math.Max(PayEastAmount - amount, 0);
+				break;
+		}
+	}
+
 	public override bool Equals(object obj) {
 		Payment other = (Payment)obj;
 		return PaymentType.Equals(other.PaymentType) && PayBankAmount.Equals(other.PayBankAmount) &&
