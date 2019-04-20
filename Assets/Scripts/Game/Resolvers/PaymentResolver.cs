@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class PaymentResolver : IResolvable {
-	
-	public delegate void ModifyPayments(ref List<Payment> payments);
 
 	private Player player;
 	// Statically allocated processing variables to optimize memory usage
@@ -13,7 +11,7 @@ public class PaymentResolver : IResolvable {
 	private List<Resource> ownedResources;
 	private List<BuyableResource> buyableResources;
 	private Dictionary<KeyValuePair<int, int>, HashSet<Payment>> memo;
-	private List<ModifyPayments> paymentModifiers;
+	private List<PaymentModifier> paymentModifiers;
 
 	public PaymentResolver(Player player) {
 		this.player = player;
@@ -21,6 +19,7 @@ public class PaymentResolver : IResolvable {
 		ownedResources = new List<Resource>();
 		buyableResources = new List<BuyableResource>();
 		memo = new Dictionary<KeyValuePair<int, int>, HashSet<Payment>>();
+		paymentModifiers = new List<PaymentModifier>();
 	}
 
 	public IEnumerator Resolve() {
@@ -49,12 +48,14 @@ public class PaymentResolver : IResolvable {
 		for (int i = 0; i < payments.Count; i++) {
 			payments[i] += new Payment(PaymentType.Normal, cardToBuild.coinCost, 0, 0);
 		}
+
 		// Apply payment modifiers
-		foreach (ModifyPayments paymentModifier in paymentModifiers) {
-			paymentModifier.Invoke(ref payments);
+		IEnumerable<Payment> modifiedPayments = payments;
+		foreach (PaymentModifier paymentModifier in paymentModifiers) {
+			modifiedPayments = paymentModifier.ModifyForBuild(cardToBuild, modifiedPayments);
 		}
 
-		return payments;
+		return modifiedPayments;
 	}
 
 	public IEnumerable<Payment> Resolve(Player player, WonderStage stageToBuild, Card cardToBury) {
@@ -70,15 +71,17 @@ public class PaymentResolver : IResolvable {
 		for (int i = 0; i < payments.Count; i++) {
 			payments[i] += new Payment(PaymentType.Normal, stageToBuild.coinCost, 0, 0);
 		}
+
 		// Apply payment modifiers
-		foreach (ModifyPayments paymentModifier in paymentModifiers) {
-			paymentModifier.Invoke(ref payments);
+		IEnumerable<Payment> modifiedPayments = payments;
+		foreach (PaymentModifier paymentModifier in paymentModifiers) {
+			modifiedPayments = paymentModifier.ModifyForBury(stageToBuild, modifiedPayments);
 		}
 
-		return payments;
+		return modifiedPayments;
 	}
 
-	public void AddPaymentModifier(ModifyPayments paymentModifier) {
+	public void AddPaymentModifier(PaymentModifier paymentModifier) {
 		paymentModifiers.Add(paymentModifier);
 	}
 

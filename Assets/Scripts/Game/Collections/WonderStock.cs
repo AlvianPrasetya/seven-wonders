@@ -22,7 +22,7 @@ public class WonderStock : Stock<Wonder>, IDealable {
 		yield return new System.NotImplementedException();
 	}
 
-	public IEnumerator Load(int randomSeed) {
+	public override IEnumerator RandomLoad(int randomSeed) {
 		System.Random random = new System.Random(randomSeed);
 		foreach (WonderEntry wonderEntry in wonderEntries) {
 			Wonder wonder = Instantiate(
@@ -34,7 +34,7 @@ public class WonderStock : Stock<Wonder>, IDealable {
 		}
 	}
 
-	public IEnumerator Deal() {
+	public override IEnumerator Deal() {
 		foreach (Player player in GameManager.Instance.Players) {
 			Wonder wonder = Pop();
 			yield return player.SetWonder(wonder);

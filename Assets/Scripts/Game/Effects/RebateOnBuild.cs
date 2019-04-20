@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 public class RebateOnBuild : OnBuildEffect {
@@ -11,13 +12,70 @@ public class RebateOnBuild : OnBuildEffect {
 	}
 
 	public override void Effect(Player player) {
-		PaymentResolver.ModifyPayments rebate = (ref List<Payment> payments) => {
-			for (int i = 0; i < payments.Count; i++) {
-				payments[i].ApplyRebate(direction, amount);
-			}
-		};
+		player.PaymentResolver.AddPaymentModifier(
+			new PaymentModifier(
+				delegate(Card cardToBuild, IEnumerable<Payment> payments) {
+					List<Payment> rebatedPayments = new List<Payment>();
 
-		player.PaymentResolver.AddPaymentModifier(rebate);
+					foreach (Payment payment in payments) {
+						int payWestAmount = payment.PayWestAmount;
+						int payEastAmount = payment.PayEastAmount;
+						switch (direction) {
+							case Direction.West:
+								payWestAmount = Math.Max(
+									payWestAmount - amount,
+									0
+								);
+								break;
+							case Direction.East:
+								payEastAmount = Math.Max(
+									payEastAmount - amount,
+									0
+								);
+								break;
+						}
+						rebatedPayments.Add(new Payment(
+							payment.PaymentType,
+							payment.PayBankAmount,
+							payWestAmount,
+							payEastAmount
+						));
+					}
+
+					return rebatedPayments;
+				},
+				delegate(WonderStage stageToBuild, IEnumerable<Payment> payments) {
+					List<Payment> rebatedPayments = new List<Payment>();
+					
+					foreach (Payment payment in payments) {
+						int payWestAmount = payment.PayWestAmount;
+						int payEastAmount = payment.PayEastAmount;
+						switch (direction) {
+							case Direction.West:
+								payWestAmount = Math.Max(
+									payWestAmount - amount,
+									0
+								);
+								break;
+							case Direction.East:
+								payEastAmount = Math.Max(
+									payEastAmount - amount,
+									0
+								);
+								break;
+						}
+						rebatedPayments.Add(new Payment(
+							payment.PaymentType,
+							payment.PayBankAmount,
+							payWestAmount,
+							payEastAmount
+						));
+					}
+
+					return rebatedPayments;
+				}
+			)
+		);
 	}
 
 }

@@ -15,12 +15,13 @@ public class PreGameResolver : IResolvable {
 		System.Random random = new System.Random(randomSeed);
 		int wonderRandomSeed = random.Next();
 		int guildRandomSeed = random.Next();
+		int cityRandomSeed = random.Next();
 		int leaderRandomSeed = random.Next();
 		int age3RandomSeed = random.Next();
 		int age2RandomSeed = random.Next();
 		int age1RandomSeed = random.Next();
 
-		yield return GameManager.Instance.wonderStock.Load(wonderRandomSeed);
+		yield return GameManager.Instance.wonderStock.RandomLoad(wonderRandomSeed);
 		yield return GameManager.Instance.wonderStock.Shuffle(5, wonderRandomSeed);
 		yield return GameManager.Instance.wonderStock.Deal();
 		yield return GameManager.Instance.wonderStock.Dump();
@@ -46,11 +47,14 @@ public class PreGameResolver : IResolvable {
 		Coroutine loadMilitaryStock = GameManager.Instance.StartCoroutine(
 			GameManager.Instance.CardStocks[StockType.Military].Load()
 		);
+		Coroutine loadCityStock = GameManager.Instance.StartCoroutine(
+			GameManager.Instance.CardStocks[StockType.City].RandomLoad(cityRandomSeed)
+		);
 		Coroutine loadAndShuffleGuildStock = GameManager.Instance.StartCoroutine(
 			LoadAndShuffle(StockType.Guild, 4, guildRandomSeed)
 		);
-		Coroutine loadAndShuffleLeaderStock = GameManager.Instance.StartCoroutine(
-			LoadAndShuffle(StockType.Leader, 4, leaderRandomSeed)
+		Coroutine loadShuffleDealLeaderStock = GameManager.Instance.StartCoroutine(
+			LoadShuffleDeal(StockType.Leader, 5, leaderRandomSeed)
 		);
 
 		yield return loadRawMaterialStock;
@@ -59,37 +63,31 @@ public class PreGameResolver : IResolvable {
 		yield return loadScientificStock;
 		yield return loadCommercialStock;
 		yield return loadMilitaryStock;
+		yield return loadCityStock;
 		yield return loadAndShuffleGuildStock;
-		yield return loadAndShuffleLeaderStock;
 		
-		yield return GameManager.Instance.leaderStock.Load();
-		Coroutine shuffleLeaderStock = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.leaderStock.Shuffle(4, leaderRandomSeed)
-		);
-		yield return GameManager.Instance.AgeStocks[StockType.Age3].Load();
+		yield return GameManager.Instance.CardStocks[StockType.Age3].Load();
 		Coroutine shuffleAge3 = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.AgeStocks[StockType.Age3].Shuffle(5, age3RandomSeed)
+			GameManager.Instance.CardStocks[StockType.Age3].Shuffle(5, age3RandomSeed)
 		);
-		yield return GameManager.Instance.AgeStocks[StockType.Age2].Load();
+		yield return GameManager.Instance.CardStocks[StockType.Age2].Load();
 		Coroutine shuffleAge2 = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.AgeStocks[StockType.Age2].Shuffle(5, age2RandomSeed)
+			GameManager.Instance.CardStocks[StockType.Age2].Shuffle(5, age2RandomSeed)
 		);
-		yield return GameManager.Instance.AgeStocks[StockType.Age1].Load();
+		yield return GameManager.Instance.CardStocks[StockType.Age1].Load();
 		Coroutine shuffleAge1 = GameManager.Instance.StartCoroutine(
-			GameManager.Instance.AgeStocks[StockType.Age1].Shuffle(5, age1RandomSeed)
+			GameManager.Instance.CardStocks[StockType.Age1].Shuffle(5, age1RandomSeed)
 		);
 		
-		yield return GameManager.Instance.CardStocks[StockType.Leader].Dump();
 		yield return GameManager.Instance.CardStocks[StockType.Guild].Dump();
 
-		yield return shuffleLeaderStock;
-		yield return GameManager.Instance.leaderStock.Deal();
+		yield return loadShuffleDealLeaderStock;
 		yield return shuffleAge3;
-		yield return GameManager.Instance.AgeStocks[StockType.Age3].Deal();
+		yield return GameManager.Instance.CardStocks[StockType.Age3].Deal();
 		yield return shuffleAge2;
-		yield return GameManager.Instance.AgeStocks[StockType.Age2].Deal();
+		yield return GameManager.Instance.CardStocks[StockType.Age2].Deal();
 		yield return shuffleAge1;
-		yield return GameManager.Instance.AgeStocks[StockType.Age1].Deal();
+		yield return GameManager.Instance.CardStocks[StockType.Age1].Deal();
 		
 		yield return loadBank;
 		Queue<Coroutine> gainCoins = new Queue<Coroutine>();
@@ -108,6 +106,11 @@ public class PreGameResolver : IResolvable {
 	private IEnumerator LoadAndShuffle(StockType stockType, int numIterations, int randomSeed) {
 		yield return GameManager.Instance.CardStocks[stockType].Load();
 		yield return GameManager.Instance.CardStocks[stockType].Shuffle(numIterations, randomSeed);
+	}
+
+	private IEnumerator LoadShuffleDeal(StockType stockType, int numIterations, int randomSeed) {
+		yield return LoadAndShuffle(stockType, numIterations, randomSeed);
+		yield return GameManager.Instance.CardStocks[stockType].Deal();
 	}
 
 }
