@@ -9,7 +9,7 @@ public enum DeckType {
 	Wonder, Age1, Age2, Age3, Leader, West, East, Discard, Swap
 }
 public enum Structure { RawMaterial, ManufacturedGoods, Civilian, Scientific, Commercial, Military, Guild, City, Leader, Wonder };
-public enum Age { Age1, Age2, Age3 };
+public enum Age { Age1=1, Age2=2, Age3=3 };
 public enum Facing { Up, Down };
 public enum DisplayType { Resource, Point, OneOff, Military, Scientific, Leader };
 public enum CardType { RawMaterial, ManufacturedGoods, Civilian, Scientific, Commercial, Military, Guild, City, Leader };

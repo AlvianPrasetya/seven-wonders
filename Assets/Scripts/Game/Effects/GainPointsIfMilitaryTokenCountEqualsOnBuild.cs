@@ -1,18 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿public class GainPointsIfMilitaryTokenCountEqualsOnBuild : OnBuildEffect {
+    public PointType pointType;
+	public int rewardPoints;
+	public MilitaryTokenType militaryTokenType;
+	public int tokenCount;
+    public override void Effect(Player player) {
+		GainPointsResolver.Count count = () => {
+			int playerMilitaryTokenCount = player.militaryTokenDisplay.Count(militaryTokenType);
 
-public class GainPointsIfMilitaryTokenCountEqualsOnBuild : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+			return  playerMilitaryTokenCount == tokenCount ? rewardPoints : 0;
+		};
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+		GameManager.Instance.EnqueueResolver(
+			new GainPointsResolver(player, pointType, count),
+			Priority.GainPoints
+		);
+	}
 }
