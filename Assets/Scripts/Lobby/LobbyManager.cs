@@ -19,8 +19,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks {
 	void Start() {
 		photonServerSettings = (ServerSettings)Resources.Load("PhotonServerSettings", typeof(ServerSettings));
 		versionText.text = photonServerSettings.AppSettings.AppVersion;
-		backgroundImageFrontBuffer.sprite = backgroundSprites[0];
-		// StartCoroutine(TransitionBackground());
+		backgroundImageFrontBuffer.overrideSprite = backgroundSprites[0];
+		StartCoroutine(TransitionBackground());
 	}
 
 	public override void OnConnectedToMaster() {
@@ -76,7 +76,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks {
 		while (true) {
 			yield return new WaitForSeconds(backgroundStayDuration);
 
-			backgroundImageBackBuffer.sprite = backgroundSprites[++backgroundIndex % backgroundSprites.Length];
+			backgroundImageBackBuffer.overrideSprite = backgroundSprites[++backgroundIndex % backgroundSprites.Length];
 			float fadeToBackBufferProgress = 0;
 			while (fadeToBackBufferProgress <= 1) {
 				backgroundImageFrontBuffer.color = new Color(
@@ -99,7 +99,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks {
 
 			yield return new WaitForSeconds(backgroundStayDuration);
 
-			backgroundImageFrontBuffer.sprite = backgroundSprites[++backgroundIndex % backgroundSprites.Length];
+			backgroundImageFrontBuffer.overrideSprite = backgroundSprites[++backgroundIndex % backgroundSprites.Length];
 			float fadeToFrontBufferProgress = 0;
 			while (fadeToFrontBufferProgress <= 1) {
 				backgroundImageFrontBuffer.color = new Color(
