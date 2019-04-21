@@ -20,7 +20,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks {
 		photonServerSettings = (ServerSettings)Resources.Load("PhotonServerSettings", typeof(ServerSettings));
 		versionText.text = photonServerSettings.AppSettings.AppVersion;
 		backgroundImageFrontBuffer.sprite = backgroundSprites[0];
-		StartCoroutine(TransitionBackground());
+		// StartCoroutine(TransitionBackground());
 	}
 
 	public override void OnConnectedToMaster() {
