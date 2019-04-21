@@ -1,6 +1,9 @@
+using System;
+
 public class GainPointsPerMilitaryTokenOnBuild : OnBuildEffect {
 
 	public PointType pointType;
+	public int baseAmount;
 	public int amountPerMilitaryToken;
 	public MilitaryTokenType militaryTokenType;
 	public Target countTarget;
@@ -10,23 +13,32 @@ public class GainPointsPerMilitaryTokenOnBuild : OnBuildEffect {
 		switch (countTarget) {
 			case Target.Self:
 				count = () => {
-					return amountPerMilitaryToken * player.militaryTokenDisplay.Count(militaryTokenType);
+					return Math.Max(
+						baseAmount + amountPerMilitaryToken * player.militaryTokenDisplay.Count(militaryTokenType),
+						0
+					);
 				};
 				break;
 			case Target.Neighbours:
 				count = () => {
-					return amountPerMilitaryToken * (
-						player.Neighbours[Direction.West].militaryTokenDisplay.Count(militaryTokenType) +
-						player.Neighbours[Direction.East].militaryTokenDisplay.Count(militaryTokenType)
+					return Math.Max(
+						baseAmount + amountPerMilitaryToken * (
+							player.Neighbours[Direction.West].militaryTokenDisplay.Count(militaryTokenType) +
+							player.Neighbours[Direction.East].militaryTokenDisplay.Count(militaryTokenType)
+						),
+						0
 					);
 				};
 				break;
 			case Target.Neighbourhood:
 				count = () => {
-					return amountPerMilitaryToken * (
-						player.militaryTokenDisplay.Count(militaryTokenType) +
-						player.militaryTokenDisplay.Count(militaryTokenType) +
-						player.militaryTokenDisplay.Count(militaryTokenType)
+					return Math.Max(
+						baseAmount + amountPerMilitaryToken * (
+							player.militaryTokenDisplay.Count(militaryTokenType) +
+							player.militaryTokenDisplay.Count(militaryTokenType) +
+							player.militaryTokenDisplay.Count(militaryTokenType)
+						),
+						0
 					);
 				};
 				break;

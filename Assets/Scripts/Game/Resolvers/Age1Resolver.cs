@@ -3,7 +3,7 @@ using System.Collections;
 public class Age1Resolver : IResolvable {
 
 	public IEnumerator Resolve() {
-		GameManager.Instance.currentAge = Age.Age1;
+		GameManager.Instance.CurrentAge = Age.Age1;
 		
 		GameManager.Instance.EnqueueResolver(
 			new TurnResolver(DeckType.Leader, DeckType.Leader, Direction.West, true),

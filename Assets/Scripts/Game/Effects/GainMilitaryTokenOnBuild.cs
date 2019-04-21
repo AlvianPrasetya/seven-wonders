@@ -1,14 +1,14 @@
-﻿public class AddMilitaryTokenOnBuild : OnBuildEffect {
-    
-    public MilitaryTokenType militaryTokenType;
+﻿public class GainMilitaryTokenOnBuild : OnBuildEffect {
+	
+	public MilitaryTokenType militaryTokenType;
 	public Target target;
 	
 	public override void Effect(Player player) {
-		// Determines military token to add
+		// Determine military token to gain
 		MilitaryToken militaryToken = null;
 		switch (militaryTokenType) {
 			case MilitaryTokenType.Victory:
-				switch (GameManager.Instance.currentAge) {
+				switch (GameManager.Instance.CurrentAge) {
 					case Age.Age1:
 						militaryToken = GameManager.Instance.victoryTokenAge1Prefab;
 						break;

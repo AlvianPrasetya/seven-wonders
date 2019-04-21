@@ -24,6 +24,12 @@ public enum ScienceType { Compass, Tablet, Gear, Copy }
 public enum MilitaryTokenType { Victory, Draw, Defeat }
 public enum PaymentType { Normal, Chained }
 
+public class Amount {
+	
+	public const int Age = 16;
+
+}
+
 public class Constant {
 	
 	public const float DistanceEpsilon = 0.01f;

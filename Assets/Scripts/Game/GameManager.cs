@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviourPun {
 	public List<Human> Humans { get; private set; }
 	public List<Bot> Bots { get; private set; }
 	public Queue<int> SyncQueue { get; private set; }
-	public Age currentAge;
+	public Age CurrentAge { get; set; }
 	private ResolverQueue resolverQueue;
 
 	void Awake() {
