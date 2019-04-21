@@ -46,6 +46,10 @@ public class Multiset<T> : IEnumerable<T> {
 			Add(element);
 		}
 	}
+	
+	public void Clear() {
+		dict.Clear();
+	}
 
 	public void Remove(T element) {
 		if (dict.ContainsKey(element)) {

@@ -1,26 +1,26 @@
-public struct ResourceOptions {
+public struct Resource {
 
 	public bool IsProduced {
 		get; private set;
 	}
-	public Resource[] Resources {
+	public ResourceType[] ResourceTypes {
 		get; private set;
 	}
 
-	public ResourceOptions(bool produced, Resource[] resources) {
+	public Resource(bool produced, ResourceType[] resourceTypes) {
 		IsProduced = produced;
-		Resources = resources;
+		ResourceTypes = resourceTypes;
 	}
 
 	public override bool Equals(object obj) {
-		ResourceOptions other = (ResourceOptions)obj;
-		return IsProduced.Equals(other.IsProduced) && Resources.Equals(other.Resources);
+		Resource other = (Resource)obj;
+		return IsProduced.Equals(other.IsProduced) && ResourceTypes.Equals(other.ResourceTypes);
 	}
 
 	public override int GetHashCode() {
 		int hash = 0;
 		hash = hash * 23 + IsProduced.GetHashCode();
-		hash = hash * 23 + Resources.GetHashCode();
+		hash = hash * 23 + ResourceTypes.GetHashCode();
 		return hash;
 	}
 

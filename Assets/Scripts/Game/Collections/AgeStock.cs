@@ -2,16 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AgeStock : Stock<Card>, IDealable {
+public class AgeStock : CardStock {
 
 	public Age age;
 	public DeckType dealDeckType;
-	public CardPile[] cardRifflePiles;
-
-	protected override void Awake() {
-		base.Awake();
-		rifflePiles = cardRifflePiles;
-	}
 
 	public override IEnumerator Load() {
 		CardStock rawMaterialStock = GameManager.Instance.CardStocks[StockType.RawMaterial];
@@ -21,6 +15,7 @@ public class AgeStock : Stock<Card>, IDealable {
 		CardStock commercialStock = GameManager.Instance.CardStocks[StockType.Commercial];
 		CardStock militaryStock = GameManager.Instance.CardStocks[StockType.Military];
 		CardStock guildStock = GameManager.Instance.CardStocks[StockType.Guild];
+		CardStock cityStock = GameManager.Instance.CardStocks[StockType.City];
 
 		while (rawMaterialStock.Count != 0) {
 			Card card = rawMaterialStock.Pop();
@@ -93,9 +88,19 @@ public class AgeStock : Stock<Card>, IDealable {
 				break;
 			}
 		}
+
+		while (cityStock.Count != 0) {
+			Card card = cityStock.Pop();
+			if (((StructureCard) card).age == age) {
+				yield return Push(card);
+			} else {
+				yield return cityStock.Push(card);
+				break;
+			}
+		}
 	}
 
-	public IEnumerator Deal() {
+	public override IEnumerator Deal() {
 		int playerIndex = 0;
 		Queue<Coroutine> dealCards = new Queue<Coroutine>();
 		while (Elements.Count != 0) {

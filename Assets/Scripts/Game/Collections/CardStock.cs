@@ -30,4 +30,12 @@ public class CardStock : Stock<Card> {
 		}
 	}
 
+	public override IEnumerator RandomLoad(int randomSeed) {
+		throw new System.NotImplementedException();
+	}
+
+	public override IEnumerator Deal() {
+		throw new System.NotImplementedException();
+	}
+
 }

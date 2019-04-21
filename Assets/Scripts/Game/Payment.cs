@@ -21,6 +21,13 @@ public struct Payment {
 		PayEastAmount = payEastAmount;
 	}
 
+	public Payment(Payment payment) {
+		PaymentType = payment.PaymentType;
+		PayBankAmount = payment.PayBankAmount;
+		PayWestAmount = payment.PayWestAmount;
+		PayEastAmount = payment.PayEastAmount;
+	}
+
 	public override bool Equals(object obj) {
 		Payment other = (Payment)obj;
 		return PaymentType.Equals(other.PaymentType) && PayBankAmount.Equals(other.PayBankAmount) &&

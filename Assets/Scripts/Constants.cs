@@ -14,9 +14,9 @@ public enum Facing { Up, Down };
 public enum DisplayType { Resource, Point, OneOff, Military, Scientific, Leader };
 public enum CardType { RawMaterial, ManufacturedGoods, Civilian, Scientific, Commercial, Military, Guild, City, Leader };
 public enum Target { Self, Neighbours, Neighbourhood, Others, Everyone };
-public enum Resource { Lumber, Ore, Clay, Stone, Loom, Glassworks, Press };
-public enum PointType { Military, Treasury, Wonders, Civilian, Scientific, Commercial, Guilds, Leaders };
-public enum Science { Compass, Tablet, Gear }
+public enum ResourceType { Lumber, Ore, Clay, Stone, Loom, Glassworks, Press };
+public enum PointType { Military, Treasury, Wonders, Civilian, Scientific, Commercial, Guilds, Leaders, Cities };
+public enum ScienceType { Compass, Tablet, Gear, Copy }
 public enum MilitaryTokenType { Victory, Draw, Defeat }
 public enum PaymentType { Normal, Chained }
 
@@ -64,7 +64,7 @@ public class GameOptions {
 	public const int DiscountedBuyCost = 1;
 	public const int DecideTime = 30;
 	public const int DraftCount = 4;
-	public const int TurnsPerAge = 6;
+	public const int TurnsPerAge = 7;
 	public const int DefaultPointsPerScienceSet = 7;
 	public const int CoinsPerTreasuryPoint = 3;
 
@@ -75,11 +75,11 @@ public class Priority {
 	public const int GainCoins = 8;
 	public const int LoseCoins = 7;
 	public const int PlayHand = 6;
-	public const int DiscardLastHand = 5;
-	public const int DigDiscardPile = 4;
-	public const int ResolveTurn = 3;
-	public const int ResolvePhase = 2;
-	public const int GainPoints = 2;
+	public const int DigDiscardPile = 5;
+	public const int ResolveTurn = 4;
+	public const int ResolvePhase = 3;
+	public const int GainPoints = 3;
+	public const int GainPointsDelayed = 2;
 	public const int ResolveMatch = 1;
 
 }

@@ -3,22 +3,25 @@ using System.Collections;
 
 public class DraftResolver : IResolvable {
 
-	private DeckType sourceDeck;
-	private DeckType targetDeck;
+	private DeckType? sourceDeck;
+	private DeckType? targetDeck;
 	private Direction direction;
 
-	public DraftResolver(DeckType sourceDeck, DeckType targetDeck, Direction direction) {
+	public DraftResolver(DeckType? sourceDeck, DeckType? targetDeck, Direction direction) {
 		this.sourceDeck = sourceDeck;
 		this.targetDeck = targetDeck;
 		this.direction = direction;
 	}
 
 	public IEnumerator Resolve() {
-		GameManager.Instance.EnqueueResolver(
-			new UnloadDeckResolver(sourceDeck, direction),
-			Priority.PlayHand
-		);
 		GameManager.Instance.EnqueueResolver(new SyncResolver(), Priority.PlayHand);
+
+		if (sourceDeck != null) {
+			GameManager.Instance.EnqueueResolver(
+				new UnloadDeckResolver(sourceDeck ?? default(DeckType), direction),
+				Priority.PlayHand
+			);
+		}
 
 		if (PhotonNetwork.IsMasterClient) {
 			foreach (Bot bot in GameManager.Instance.Bots) {
@@ -37,10 +40,12 @@ public class DraftResolver : IResolvable {
 		GameManager.Instance.EnqueueResolver(new PerformActionResolver(), Priority.PlayHand);
 		GameManager.Instance.EnqueueResolver(new EffectActionResolver(), Priority.PlayHand);
 		
-		GameManager.Instance.EnqueueResolver(
-			new UnloadHandResolver(targetDeck, direction),
-			(targetDeck == DeckType.Discard) ? Priority.DiscardLastHand : Priority.PlayHand
-		);
+		if (targetDeck != null) {
+			GameManager.Instance.EnqueueResolver(
+				new UnloadHandResolver(targetDeck ?? default(DeckType), direction),
+				Priority.PlayHand
+			);
+		}
 		
 		yield return null;
 	}

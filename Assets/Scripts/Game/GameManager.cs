@@ -17,21 +17,11 @@ public class GameManager : MonoBehaviourPun {
 
 	}
 
-	[System.Serializable]
-	public class AgeStockEntry {
-
-		public StockType stockType;
-		public AgeStock ageStock;
-
-	}
-
 	public GameCamera gameCamera;
 	public Bank bank;
 	public Deck discardPile;
 	public WonderStock wonderStock;
 	public CardStockEntry[] cardStocks;
-	public AgeStockEntry[] ageStocks;
-	public LeaderStock leaderStock;
 	public Human humanPrefab;
 	public Bot botPrefab;
 	public MilitaryToken victoryTokenAge1Prefab;
@@ -41,7 +31,6 @@ public class GameManager : MonoBehaviourPun {
 	public MilitaryToken defeatTokenPrefab;
 	public static GameManager Instance { get; private set; }
 	public Dictionary<StockType, CardStock> CardStocks { get; private set; }
-	public Dictionary<StockType, AgeStock> AgeStocks { get; private set; }
 	public List<Player> Players { get; private set; }
 	public Dictionary<int, Player> HumansByActorID { get; private set; }
 	/// <summary>
@@ -59,7 +48,6 @@ public class GameManager : MonoBehaviourPun {
 
 		Instance = this;
 		CardStocks = new Dictionary<StockType, CardStock>();
-		AgeStocks = new Dictionary<StockType, AgeStock>();
 		Players = new List<Player>();
 		HumansByActorID = new Dictionary<int, Player>();
 		Humans = new List<Human>();
@@ -69,9 +57,6 @@ public class GameManager : MonoBehaviourPun {
 
 		foreach (CardStockEntry cardStock in cardStocks) {
 			CardStocks.Add(cardStock.stockType, cardStock.cardStock);
-		}
-		foreach (AgeStockEntry ageStock in ageStocks) {
-			AgeStocks.Add(ageStock.stockType, ageStock.ageStock);
 		}
 	}
 
