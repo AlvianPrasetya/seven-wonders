@@ -15,6 +15,15 @@ public class MilitaryTokenDisplay : MonoBehaviour, IPushable<MilitaryToken> {
 		}
 	}
 
+	public IEnumerator Remove(MilitaryToken token) {
+		foreach (MilitaryTokenSlot slot in militaryTokenSlots) {
+			if (slot.Element.type == token.type) {
+				yield return slot.Pop();
+				break;
+			}
+		}
+	}
+
 	public IEnumerator PushMany(MilitaryToken[] tokens) {
 		foreach (MilitaryToken token in tokens) {
 			yield return Push(token);

@@ -46,7 +46,7 @@ public class PaymentResolver : IResolvable {
 		);
 		// Add in card base coin cost
 		for (int i = 0; i < payments.Count; i++) {
-			payments[i] += new Payment(PaymentType.Normal, cardToBuild.coinCost, 0, 0);
+			payments[i] += new Payment(PaymentType.Normal, cardToBuild.coinCost ? (int)GameManager.Instance.currentAge : cardToBuild.coinCost, 0, 0);
 		}
 
 		// Apply payment modifiers

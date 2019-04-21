@@ -194,6 +194,16 @@ public abstract class Player : MonoBehaviour {
 		yield return militaryTokenDisplay.Push(militaryToken);
 	}
 
+	public IEnumerator RemoveMilitaryToken(MilitaryToken militaryToken) {
+		GameManager.Instance.EnqueueResolver(
+			new GainPointsResolver(this, PointType.Military, () => {
+				return -1 * militaryToken.points;
+			}),
+			Priority.GainPoints
+		);
+		yield return militaryTokenDisplay.Remove(militaryToken);
+	}
+
 	public void AddResource(Resource resource) {
 		Resources.Add(resource);
 	}
