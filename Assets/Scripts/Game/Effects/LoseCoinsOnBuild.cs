@@ -3,13 +3,10 @@ public class LoseCoinsOnBuild : OnBuildEffect {
 	public Target target;
 	public int amount;
 
-	public LoseCoinsOnBuild(Target target, int amount) {
-		this.target = target;
-		this.amount = (amount == Amount.Age) ? (int)GameManager.Instance.CurrentAge : amount;
-	}
-
 	public override void Effect(Player player) {
-		LoseCoinsResolver.Count count = () => { return amount; };
+		LoseCoinsResolver.Count count = () => {
+			return (amount == Amount.Age) ? (int)GameManager.Instance.CurrentAge : amount;
+		};
 		switch (target) {
 			case Target.Self:
 				GameManager.Instance.EnqueueResolver(

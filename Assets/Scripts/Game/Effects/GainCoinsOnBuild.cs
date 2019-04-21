@@ -3,11 +3,6 @@ public class GainCoinsOnBuild : OnBuildEffect {
 	public Target target;
 	public int amount;
 
-	public GainCoinsOnBuild(Target target, int amount) {
-		this.target = target;
-		this.amount = amount;
-	}
-
 	public override void Effect(Player player) {
 		GainCoinsResolver.Count count = () => { return amount; };
 		switch (target) {

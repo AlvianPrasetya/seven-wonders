@@ -11,7 +11,6 @@ public class CheaperResourcesOnBuild : OnBuildEffect {
 	public bool glassworks;
 	public bool press;
 
-
 	public override void Effect(Player player) {
 		Player neighbour = player.Neighbours[direction];
 

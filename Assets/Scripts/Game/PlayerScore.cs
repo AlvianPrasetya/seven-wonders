@@ -86,6 +86,7 @@ public class PlayerScore : MonoBehaviour, IComparable<PlayerScore> {
 	public Text nicknameText;
 	public PointEntry[] pointEntries;
 	public TotalEntry totalEntry;
+	public Image highlightPanel;
 
 	private RectTransform rectTransform;
 	private Dictionary<PointType, PointEntry> pointEntriesByType;
@@ -128,6 +129,12 @@ public class PlayerScore : MonoBehaviour, IComparable<PlayerScore> {
 	public int TotalScore {
 		get {
 			return totalEntry.Total;
+		}
+	}
+
+	public bool IsHighlighted {
+		set {
+			highlightPanel.gameObject.SetActive(value);
 		}
 	}
 
