@@ -29,16 +29,7 @@ public class BuildAction : IActionable {
 		player.BuiltCards.Add(card.cardName);
 		player.BuiltCardsByType[card.cardType].Add(card);
 
-		// Pay bank and neighbours
-		yield return GameManager.Instance.bank.PushMany(
-			player.bank.PopMany(payment.PayBankAmount)
-		);
-		yield return player.Neighbours[Direction.West].bank.PushMany(
-			player.bank.PopMany(payment.PayWestAmount)
-		);
-		yield return player.Neighbours[Direction.East].bank.PushMany(
-			player.bank.PopMany(payment.PayEastAmount)
-		);
+		yield return player.Pay(payment);
 	}
 
 	public void Effect(Player player) {

@@ -46,7 +46,12 @@ public class PaymentResolver : IResolvable {
 		);
 		// Add in card base coin cost
 		for (int i = 0; i < payments.Count; i++) {
-			payments[i] += new Payment(PaymentType.Normal, cardToBuild.coinCost, 0, 0);
+			payments[i] += new Payment(
+				PaymentType.Normal,
+				(cardToBuild.coinCost == Amount.Age) ? (int)GameManager.Instance.CurrentAge : cardToBuild.coinCost,
+				0,
+				0
+			);
 		}
 
 		// Apply payment modifiers
@@ -69,7 +74,12 @@ public class PaymentResolver : IResolvable {
 		);
 		// Add in wonder stage base coin cost
 		for (int i = 0; i < payments.Count; i++) {
-			payments[i] += new Payment(PaymentType.Normal, stageToBuild.coinCost, 0, 0);
+			payments[i] += new Payment(
+				PaymentType.Normal,
+				(stageToBuild.coinCost == Amount.Age) ? (int)GameManager.Instance.CurrentAge : stageToBuild.coinCost,
+				0,
+				0
+			);
 		}
 
 		// Apply payment modifiers

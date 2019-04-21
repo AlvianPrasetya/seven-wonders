@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviourPun {
 	public List<Human> Humans { get; private set; }
 	public List<Bot> Bots { get; private set; }
 	public Queue<int> SyncQueue { get; private set; }
-
+	public Age CurrentAge { get; set; }
 	private ResolverQueue resolverQueue;
 
 	void Awake() {
@@ -208,6 +208,10 @@ public class GameManager : MonoBehaviourPun {
 	public void DecideCycle(Direction direction) {
 		photonView.RPC("DecideCycle", RpcTarget.All, direction);
 	}
+	
+	public void SendChat(string message) {
+		photonView.RPC("SendChat", RpcTarget.All, message);
+	}
 
 	[PunRPC]
 	private void DecideDraft(int positionInHand, PhotonMessageInfo info) {
@@ -266,6 +270,11 @@ public class GameManager : MonoBehaviourPun {
 	private void DecideCycle(Direction direction, PhotonMessageInfo info) {
 		Player player = HumansByActorID[info.Sender.ActorNumber];
 		StartCoroutine(player.hand.Cycle(direction, player == Player));
+	}
+
+	[PunRPC]
+	private void SendChat(string message, PhotonMessageInfo info) {
+		UIManager.Instance.chat.AddMessage(info.Sender.NickName, message);
 	}
 
 	private IEnumerator Resolve() {

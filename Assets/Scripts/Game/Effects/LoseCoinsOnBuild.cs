@@ -5,7 +5,7 @@ public class LoseCoinsOnBuild : OnBuildEffect {
 
 	public LoseCoinsOnBuild(Target target, int amount) {
 		this.target = target;
-		this.amount = amount;
+		this.amount = (amount == Amount.Age) ? (int)GameManager.Instance.CurrentAge : amount;
 	}
 
 	public override void Effect(Player player) {

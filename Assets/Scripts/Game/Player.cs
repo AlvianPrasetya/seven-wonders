@@ -172,12 +172,50 @@ public abstract class Player : MonoBehaviour {
 		Action = null;
 	}
 
+	public IEnumerator Pay(Payment payment) {
+		// Pay bank and neighbours
+		yield return GameManager.Instance.bank.PushMany(
+			bank.PopMany(payment.PayBankAmount)
+		);
+		yield return Neighbours[Direction.West].bank.PushMany(
+			bank.PopMany(payment.PayWestAmount)
+		);
+		yield return Neighbours[Direction.East].bank.PushMany(
+			bank.PopMany(payment.PayEastAmount)
+		);
+
+		/*if (this == GameManager.Instance.Player) {
+			UIManager.Instance.chat.AddMessage(
+				string.Format(
+					"You paid {0} coins to the bank, {1} coins to <b>{2}</b>, and {3} coins to <b>{4}</b>",
+					payment.PayBankAmount,
+					payment.PayWestAmount,
+					Neighbours[Direction.West].Nickname,
+					payment.PayEastAmount,
+					Neighbours[Direction.East].Nickname
+				)
+			);
+		}*/
+	}
+
 	public IEnumerator GainCoins(int amount) {
 		yield return bank.PushMany(GameManager.Instance.bank.PopMany(amount));
+
+		if (this == GameManager.Instance.Player) {
+			UIManager.Instance.chat.AddMessage(
+				string.Format("You gained {0} coins", amount
+			));
+		}
 	}
 
 	public IEnumerator LoseCoins(int amount) {
 		yield return GameManager.Instance.bank.PushMany(bank.PopMany(amount));
+		
+		if (this == GameManager.Instance.Player) {
+			UIManager.Instance.chat.AddMessage(
+				string.Format("You lost {0} coins", amount)
+			);
+		}
 	}
 
 	public IEnumerator GainPoints(PointType pointType, int amount) {
@@ -192,6 +230,16 @@ public abstract class Player : MonoBehaviour {
 			Priority.GainPoints
 		);
 		yield return militaryTokenDisplay.Push(militaryToken);
+	}
+
+	public IEnumerator RemoveMilitaryToken(MilitaryToken militaryToken) {
+		GameManager.Instance.EnqueueResolver(
+			new GainPointsResolver(this, PointType.Military, () => {
+				return -1 * militaryToken.points;
+			}),
+			Priority.GainPoints
+		);
+		yield return militaryTokenDisplay.Remove(militaryToken);
 	}
 
 	public void AddResource(Resource resource) {
