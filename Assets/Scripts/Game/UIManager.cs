@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour {
 	public PlayerNav[] playerNavs;
 	public Text timerText;
 	public Scoreboard scoreboard;
+	public Chat chat;
 
 	private Coroutine countdown;
 
