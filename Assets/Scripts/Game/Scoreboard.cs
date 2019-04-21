@@ -29,6 +29,7 @@ public class Scoreboard : MonoBehaviour {
 		playerScore.AnchoredPosition = initialSpacing;
 		
 		playerScore.Nickname = player.Nickname;
+		playerScore.IsHighlighted = (player == GameManager.Instance.Player);
 		playerScoresByPlayer.Add(player, playerScore);
 		playerScores.Add(playerScore);
 
