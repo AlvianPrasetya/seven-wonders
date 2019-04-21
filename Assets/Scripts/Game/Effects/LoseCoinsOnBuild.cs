@@ -5,11 +5,7 @@ public class LoseCoinsOnBuild : OnBuildEffect {
 
 	public override void Effect(Player player) {
 		LoseCoinsResolver.Count count = () => {
-			if (amount == Amount.Age) {
-				return (int)GameManager.Instance.CurrentAge;
-			}
-
-			return amount;
+			return (amount == Amount.Age) ? (int)GameManager.Instance.CurrentAge : amount;
 		};
 		switch (target) {
 			case Target.Self:
