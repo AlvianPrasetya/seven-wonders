@@ -7,17 +7,19 @@ public class PaymentResolver : IResolvable {
 
 	private Player player;
 	// Statically allocated processing variables to optimize memory usage
-	private List<Resource> resourceCost;
-	private List<ResourceOptions> ownedResources;
-	private List<BuyableResourceOptions> buyableResources;
+	private List<ResourceType> resourceCost;
+	private List<Resource> ownedResources;
+	private List<BuyableResource> buyableResources;
 	private Dictionary<KeyValuePair<int, int>, HashSet<Payment>> memo;
+	private List<PaymentModifier> paymentModifiers;
 
 	public PaymentResolver(Player player) {
 		this.player = player;
-		resourceCost = new List<Resource>();
-		ownedResources = new List<ResourceOptions>();
-		buyableResources = new List<BuyableResourceOptions>();
+		resourceCost = new List<ResourceType>();
+		ownedResources = new List<Resource>();
+		buyableResources = new List<BuyableResource>();
 		memo = new Dictionary<KeyValuePair<int, int>, HashSet<Payment>>();
+		paymentModifiers = new List<PaymentModifier>();
 	}
 
 	public IEnumerator Resolve() {
@@ -28,8 +30,9 @@ public class PaymentResolver : IResolvable {
 		foreach (string chainedCardName in cardToBuild.chainedFrom) {
 			if (player.BuiltCards.Contains(chainedCardName)) {
 				// Card is chainable for 0 cost
-				yield return new Payment(PaymentType.Chained, 0, 0, 0);
-				yield break;
+				return new Payment[]{
+					new Payment(PaymentType.Chained, 0, 0, 0)
+				};
 			}
 		}
 
@@ -38,11 +41,21 @@ public class PaymentResolver : IResolvable {
 		EvaluateBuyableResources(player);
 		memo.Clear();
 
-		IEnumerable payments = GetPaymentCombinations((1 << resourceCost.Count) - 1);
-		foreach (Payment payment in payments) {
-			int coinCost = cardToBuild.coinCost == -1 ? (int)GameManager.Instance.currentAge : cardToBuild.coinCost;
-			yield return payment + new Payment(PaymentType.Normal, coinCost, 0, 0);
+		List<Payment> payments = new List<Payment>(
+			GetPaymentCombinations((1 << resourceCost.Count) - 1)
+		);
+		// Add in card base coin cost
+		for (int i = 0; i < payments.Count; i++) {
+			payments[i] += new Payment(PaymentType.Normal, cardToBuild.coinCost ? (int)GameManager.Instance.currentAge : cardToBuild.coinCost, 0, 0);
 		}
+
+		// Apply payment modifiers
+		IEnumerable<Payment> modifiedPayments = payments;
+		foreach (PaymentModifier paymentModifier in paymentModifiers) {
+			modifiedPayments = paymentModifier.ModifyForBuild(cardToBuild, modifiedPayments);
+		}
+
+		return modifiedPayments;
 	}
 
 	public IEnumerable<Payment> Resolve(Player player, WonderStage stageToBuild, Card cardToBury) {
@@ -51,16 +64,31 @@ public class PaymentResolver : IResolvable {
 		EvaluateBuyableResources(player);
 		memo.Clear();
 
-		IEnumerable payments = GetPaymentCombinations((1 << resourceCost.Count) - 1);
-		foreach (Payment payment in payments) {
-			yield return payment + new Payment(PaymentType.Normal, stageToBuild.coinCost, 0, 0);
+		List<Payment> payments = new List<Payment>(
+			GetPaymentCombinations((1 << resourceCost.Count) - 1)
+		);
+		// Add in wonder stage base coin cost
+		for (int i = 0; i < payments.Count; i++) {
+			payments[i] += new Payment(PaymentType.Normal, stageToBuild.coinCost, 0, 0);
 		}
+
+		// Apply payment modifiers
+		IEnumerable<Payment> modifiedPayments = payments;
+		foreach (PaymentModifier paymentModifier in paymentModifiers) {
+			modifiedPayments = paymentModifier.ModifyForBury(stageToBuild, modifiedPayments);
+		}
+
+		return modifiedPayments;
+	}
+
+	public void AddPaymentModifier(PaymentModifier paymentModifier) {
+		paymentModifiers.Add(paymentModifier);
 	}
 
 	private void EvaluateResourceCost(Card cardToBuild) {
 		resourceCost.Clear();
 
-		foreach (Resource resource in cardToBuild.resourceCost) {
+		foreach (ResourceType resource in cardToBuild.resourceCost) {
 			resourceCost.Add(resource);
 		}
 	}
@@ -68,7 +96,7 @@ public class PaymentResolver : IResolvable {
 	private void EvaluateResourceCost(WonderStage stageToBuild) {
 		resourceCost.Clear();
 
-		foreach (Resource resource in stageToBuild.resourceCost) {
+		foreach (ResourceType resource in stageToBuild.resourceCost) {
 			resourceCost.Add(resource);
 		}
 	}
@@ -76,12 +104,12 @@ public class PaymentResolver : IResolvable {
 	private void EvaluateOwnedResources(Player player, Card cardToBuild) {
 		ownedResources.Clear();
 
-		foreach (ResourceOptions resource in player.Resources) {
+		foreach (Resource resource in player.Resources) {
 			ownedResources.Add(resource);
 		}
 
-		foreach (ConditionalResourceOptions conditionalResource in player.ConditionalResources) {
-			foreach (ResourceOptions resource in conditionalResource.EvaluateForBuild(
+		foreach (ConditionalResource conditionalResource in player.ConditionalResources) {
+			foreach (Resource resource in conditionalResource.EvaluateForBuild(
 				player, cardToBuild
 			)) {
 				ownedResources.Add(resource);
@@ -92,12 +120,12 @@ public class PaymentResolver : IResolvable {
 	private void EvaluateOwnedResources(Player player, WonderStage stageToBuild) {
 		ownedResources.Clear();
 
-		foreach (ResourceOptions resource in player.Resources) {
+		foreach (Resource resource in player.Resources) {
 			ownedResources.Add(resource);
 		}
 
-		foreach (ConditionalResourceOptions conditionalResource in player.ConditionalResources) {
-			foreach (ResourceOptions resource in conditionalResource.EvaluateForBury(
+		foreach (ConditionalResource conditionalResource in player.ConditionalResources) {
+			foreach (Resource resource in conditionalResource.EvaluateForBury(
 				player, stageToBuild
 			)) {
 				ownedResources.Add(resource);
@@ -109,26 +137,26 @@ public class PaymentResolver : IResolvable {
 		buyableResources.Clear();
 
 		// Evaluate buyable resources from west neighbour
-		List<ResourceOptions> westResources = player.Neighbours[Direction.West].ProducedResources;
-		foreach (ResourceOptions resource in westResources) {
+		List<Resource> westResources = player.Neighbours[Direction.West].ProducedResources;
+		foreach (Resource resource in westResources) {
 			int buyCost = player.ResourceBuyCosts[
-				new KeyValuePair<Direction, Resource>(Direction.West, resource.Resources[0])
+				new KeyValuePair<Direction, ResourceType>(Direction.West, resource.ResourceTypes[0])
 			];
 			
 			buyableResources.Add(
-				new BuyableResourceOptions(resource, new Payment(PaymentType.Normal, 0, buyCost, 0))
+				new BuyableResource(resource, new Payment(PaymentType.Normal, 0, buyCost, 0))
 			);
 		}
 
 		// Evaluate buyable resources from east neighbour
-		List<ResourceOptions> eastResources = player.Neighbours[Direction.East].ProducedResources;
-		foreach (ResourceOptions resource in eastResources) {
+		List<Resource> eastResources = player.Neighbours[Direction.East].ProducedResources;
+		foreach (Resource resource in eastResources) {
 			int buyCost = player.ResourceBuyCosts[
-				new KeyValuePair<Direction, Resource>(Direction.East, resource.Resources[0])
+				new KeyValuePair<Direction, ResourceType>(Direction.East, resource.ResourceTypes[0])
 			];
 			
 			buyableResources.Add(
-				new BuyableResourceOptions(resource, new Payment(PaymentType.Normal, 0, 0, buyCost))
+				new BuyableResource(resource, new Payment(PaymentType.Normal, 0, 0, buyCost))
 			);
 		}
 	}
@@ -156,9 +184,9 @@ public class PaymentResolver : IResolvable {
 			// Use owned resources first
 			int actualPos = pos;
 			bool usable = false;
-			foreach (Resource resource in ownedResources[actualPos].Resources) {
+			foreach (ResourceType resourceType in ownedResources[actualPos].ResourceTypes) {
 				for (int i = 0; i < resourceCost.Count; i++) {
-					if ((costBitmask & (1 << i)) == 0 || resource != resourceCost[i]) {
+					if ((costBitmask & (1 << i)) == 0 || resourceType != resourceCost[i]) {
 						// This resource is no longer required or resources do not match
 						continue;
 					}
@@ -186,8 +214,8 @@ public class PaymentResolver : IResolvable {
 		} else if (pos < ownedResources.Count + buyableResources.Count) {
 			// Resort to buyable resources if self-fulfilment is not possible
 			int actualPos = pos - ownedResources.Count;
-			BuyableResourceOptions buyableResource = buyableResources[actualPos];
-			foreach (Resource resource in buyableResource.ResourceOptions.Resources) {
+			BuyableResource buyableResource = buyableResources[actualPos];
+			foreach (ResourceType resource in buyableResource.Resource.ResourceTypes) {
 				for (int i = 0; i < resourceCost.Count; i++) {
 					if ((costBitmask & (1 << i)) == 0 || resource != resourceCost[i]) {
 						// This resource is no longer required or resources do not match

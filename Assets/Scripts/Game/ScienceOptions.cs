@@ -1,16 +1,16 @@
 [System.Serializable]
-public class ScienceOptions {
+public class Science {
 
 	public bool IsProduced {
 		get; private set;
 	}
-	public Science[] Sciences {
+	public ScienceType[] ScienceTypes {
 		get; private set;
 	}
 
-	public ScienceOptions(bool produced, Science[] sciences) {
+	public Science(bool produced, ScienceType[] scienceTypes) {
 		this.IsProduced = produced;
-		this.Sciences = sciences;
+		this.ScienceTypes = scienceTypes;
 	}
 
 }

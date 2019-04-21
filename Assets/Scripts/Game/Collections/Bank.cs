@@ -92,4 +92,8 @@ public class Bank : MonoBehaviour, IPushable<Coin>, IPoppable<Coin>, ILoadable {
 		}
 	}
 
+	public IEnumerator RandomLoad(int randomSeed) {
+		throw new System.NotImplementedException();
+	}
+
 }

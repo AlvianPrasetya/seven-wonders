@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Stock represents a pile of cards to be dealt.
-public abstract class Stock<T> : Pile<T>, ILoadable, IShuffleable where T : MonoBehaviour, IMoveable {
+public abstract class Stock<T> : Pile<T>, ILoadable, IShuffleable, IDealable where T : MonoBehaviour, IMoveable {
 
 	public abstract IEnumerator Load();
+	public abstract IEnumerator RandomLoad(int randomSeed);
 	public Pile<T>[] rifflePiles;
 
 	public IEnumerator Shuffle(int numIterations, int randomSeed) {
@@ -41,5 +42,7 @@ public abstract class Stock<T> : Pile<T>, ILoadable, IShuffleable where T : Mono
 			}
 		}
 	}
+
+	public abstract IEnumerator Deal();
 
 }

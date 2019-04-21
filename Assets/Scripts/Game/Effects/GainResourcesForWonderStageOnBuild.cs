@@ -11,37 +11,37 @@ public class GainResourcesForWonderStageOnBuild : OnBuildEffect {
 	public bool press;
 
 	public override void Effect(Player player) {
-		List<Resource> resources = new List<Resource>();
+		List<ResourceType> resources = new List<ResourceType>();
 		if (lumber) {
-			resources.Add(Resource.Lumber);
+			resources.Add(ResourceType.Lumber);
 		}
 		if (ore) {
-			resources.Add(Resource.Ore);
+			resources.Add(ResourceType.Ore);
 		}
 		if (clay) {
-			resources.Add(Resource.Clay);
+			resources.Add(ResourceType.Clay);
 		}
 		if (stone) {
-			resources.Add(Resource.Stone);
+			resources.Add(ResourceType.Stone);
 		}
 		if (loom) {
-			resources.Add(Resource.Loom);
+			resources.Add(ResourceType.Loom);
 		}
 		if (glassworks) {
-			resources.Add(Resource.Glassworks);
+			resources.Add(ResourceType.Glassworks);
 		}
 		if (press) {
-			resources.Add(Resource.Press);
+			resources.Add(ResourceType.Press);
 		}
 
 		player.AddConditionalResource(
-			new ConditionalResourceOptions(
+			new ConditionalResource(
 				delegate(Player buildingPlayer, Card cardToBuild) {
-					return new ResourceOptions[0];
+					return new Resource[0];
 				},
 				delegate(Player buildingPlayer, WonderStage stageToBuild) {
-					return new ResourceOptions[] {
-						new ResourceOptions(false, resources.ToArray())
+					return new Resource[] {
+						new Resource(false, resources.ToArray())
 					};
 				}
 			)

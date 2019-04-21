@@ -4,15 +4,21 @@ using UnityEngine;
 
 public class PerformActionResolver : IResolvable {
 
-	private Player targetPlayer;
+	private Player[] targetPlayers;
 
-	public PerformActionResolver(Player targetPlayer = null) {
-		this.targetPlayer = targetPlayer;
+	public PerformActionResolver() {
+		targetPlayers = null;
+	}
+
+	public PerformActionResolver(params Player[] targetPlayers) {
+		this.targetPlayers = targetPlayers;
 	}
 
 	public IEnumerator Resolve() {
-		if (targetPlayer != null) {
-			yield return GameManager.Instance.StartCoroutine(targetPlayer.PerformAction());
+		if (targetPlayers != null) {
+			foreach (Player targetPlayer in targetPlayers) {
+				yield return GameManager.Instance.StartCoroutine(targetPlayer.PerformAction());
+			}
 			yield break;
 		}
 

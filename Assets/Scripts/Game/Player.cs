@@ -45,12 +45,12 @@ public abstract class Player : MonoBehaviour {
 	public Dictionary<CardType, List<Card>> BuiltCardsByType { get; private set; }
 	public string Nickname { get; set; }
 
-	public List<ResourceOptions> Resources { get; private set; }
-	public List<ConditionalResourceOptions> ConditionalResources { get; private set; }
-	public List<ResourceOptions> ProducedResources {
+	public List<Resource> Resources { get; private set; }
+	public List<ConditionalResource> ConditionalResources { get; private set; }
+	public List<Resource> ProducedResources {
 		get {
-			List<ResourceOptions> producedResources = new List<ResourceOptions>();
-			foreach (ResourceOptions resource in Resources) {
+			List<Resource> producedResources = new List<Resource>();
+			foreach (Resource resource in Resources) {
 				if (resource.IsProduced) {
 					producedResources.Add(resource);
 				}
@@ -59,10 +59,22 @@ public abstract class Player : MonoBehaviour {
 			return producedResources;
 		}
 	}
-	public Dictionary<KeyValuePair<Direction, Resource>, int> ResourceBuyCosts { get; private set; }
+	public Dictionary<KeyValuePair<Direction, ResourceType>, int> ResourceBuyCosts { get; private set; }
 	public int ShieldCount { get; private set; }
 	public bool IsPeaceful { get; set; }
-	public List<ScienceOptions> Sciences { get; private set; }
+	public List<Science> Sciences { get; private set; }
+	public List<Science> ProducedSciences {
+		get {
+			List<Science> producedSciences = new List<Science>();
+			foreach (Science science in Sciences) {
+				if (science.IsProduced) {
+					producedSciences.Add(science);
+				}
+			}
+
+			return producedSciences;
+		}
+	}
 
 	// Resolvers
 	public PaymentResolver PaymentResolver {
@@ -84,16 +96,16 @@ public abstract class Player : MonoBehaviour {
 		foreach (CardType cardType in Enum.GetValues(typeof(CardType))) {
 			BuiltCardsByType[cardType] = new List<Card>();
 		}
-		ResourceBuyCosts = new Dictionary<KeyValuePair<Direction, Resource>, int>();
+		ResourceBuyCosts = new Dictionary<KeyValuePair<Direction, ResourceType>, int>();
 		foreach (Direction direction in Enum.GetValues(typeof(Direction))) {
-			foreach (Resource resource in Enum.GetValues(typeof(Resource))) {
-				ResourceBuyCosts[new KeyValuePair<Direction, Resource>(direction, resource)] =
+			foreach (ResourceType resource in Enum.GetValues(typeof(ResourceType))) {
+				ResourceBuyCosts[new KeyValuePair<Direction, ResourceType>(direction, resource)] =
 					GameOptions.InitialBuyCost;
 			}
 		}
-		Resources = new List<ResourceOptions>();
-		ConditionalResources = new List<ConditionalResourceOptions>();
-		Sciences = new List<ScienceOptions>();
+		Resources = new List<Resource>();
+		ConditionalResources = new List<ConditionalResource>();
+		Sciences = new List<Science>();
 
 		PaymentResolver = new PaymentResolver(this);
 		SciencePointsResolver = new SciencePointsResolver(this);
@@ -192,20 +204,20 @@ public abstract class Player : MonoBehaviour {
 		yield return militaryTokenDisplay.Remove(militaryToken);
 	}
 
-	public void AddResource(ResourceOptions resource) {
+	public void AddResource(Resource resource) {
 		Resources.Add(resource);
 	}
 
-	public void AddConditionalResource(ConditionalResourceOptions conditionalResource) {
+	public void AddConditionalResource(ConditionalResource conditionalResource) {
 		ConditionalResources.Add(conditionalResource);
 	}
 
 	/// <summary>
 	/// Adds a science entry for this player and returns the points gained by playing  this science.
 	/// </summary>
-	public int AddScience(ScienceOptions scienceOptions) {
+	public int AddScience(Science science) {
 		int pointsBefore = SciencePointsResolver.ResolvePoints();
-		Sciences.Add(scienceOptions);
+		Sciences.Add(science);
 		int pointsAfter = SciencePointsResolver.ResolvePoints();
 
 		return pointsAfter - pointsBefore;
@@ -301,16 +313,16 @@ public abstract class Player : MonoBehaviour {
 		discardDropArea.IsPlayable = false;
 	}
 
-	public int CountResource(Resource countedResource) {
+	public int CountResource(ResourceType countedResourceType) {
 		int count = 0;
-		foreach (ResourceOptions resourceOptions in Resources) {
-			if (!resourceOptions.IsProduced) {
+		foreach (Resource resource in Resources) {
+			if (!resource.IsProduced) {
 				// Only count produced resources
 				continue;
 			}
 
-			foreach (Resource resource in resourceOptions.Resources) {
-				if (resource == countedResource) {
+			foreach (ResourceType resourceType in resource.ResourceTypes) {
+				if (resourceType == countedResourceType) {
 					count++;
 				}
 			}

@@ -13,30 +13,30 @@ public class GainResourcesOnBuild : OnBuildEffect {
 	public bool press;
 
 	public override void Effect(Player player) {
-		List<Resource> resources = new List<Resource>();
+		List<ResourceType> resources = new List<ResourceType>();
 		if (lumber) {
-			resources.Add(Resource.Lumber);
+			resources.Add(ResourceType.Lumber);
 		}
 		if (ore) {
-			resources.Add(Resource.Ore);
+			resources.Add(ResourceType.Ore);
 		}
 		if (clay) {
-			resources.Add(Resource.Clay);
+			resources.Add(ResourceType.Clay);
 		}
 		if (stone) {
-			resources.Add(Resource.Stone);
+			resources.Add(ResourceType.Stone);
 		}
 		if (loom) {
-			resources.Add(Resource.Loom);
+			resources.Add(ResourceType.Loom);
 		}
 		if (glassworks) {
-			resources.Add(Resource.Glassworks);
+			resources.Add(ResourceType.Glassworks);
 		}
 		if (press) {
-			resources.Add(Resource.Press);
+			resources.Add(ResourceType.Press);
 		}
 
-		player.AddResource(new ResourceOptions(produced, resources.ToArray()));
+		player.AddResource(new Resource(produced, resources.ToArray()));
 	}
 
 }
