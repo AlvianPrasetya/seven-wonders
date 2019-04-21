@@ -16,7 +16,7 @@ public enum CardType { RawMaterial, ManufacturedGoods, Civilian, Scientific, Com
 public enum Target { Self, Neighbours, Neighbourhood, Others, Everyone };
 public enum ResourceType { Lumber, Ore, Clay, Stone, Loom, Glassworks, Press };
 public enum PointType { Military, Treasury, Wonders, Civilian, Scientific, Commercial, Guilds, Leaders, Cities };
-public enum ScienceType { Compass, Tablet, Gear }
+public enum ScienceType { Compass, Tablet, Gear, Copy }
 public enum MilitaryTokenType { Victory, Draw, Defeat }
 public enum PaymentType { Normal, Chained }
 
@@ -72,13 +72,14 @@ public class GameOptions {
 
 public class Priority {
 
-	public const int GainCoins = 7;
-	public const int LoseCoins = 6;
-	public const int PlayHand = 5;
-	public const int DigDiscardPile = 4;
-	public const int ResolveTurn = 3;
-	public const int ResolvePhase = 2;
-	public const int GainPoints = 2;
+	public const int GainCoins = 8;
+	public const int LoseCoins = 7;
+	public const int PlayHand = 6;
+	public const int DigDiscardPile = 5;
+	public const int ResolveTurn = 4;
+	public const int ResolvePhase = 3;
+	public const int GainPoints = 3;
+	public const int GainPointsDelayed = 2;
 	public const int ResolveMatch = 1;
 
 }

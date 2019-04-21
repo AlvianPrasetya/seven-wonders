@@ -63,6 +63,18 @@ public abstract class Player : MonoBehaviour {
 	public int ShieldCount { get; private set; }
 	public bool IsPeaceful { get; set; }
 	public List<Science> Sciences { get; private set; }
+	public List<Science> ProducedSciences {
+		get {
+			List<Science> producedSciences = new List<Science>();
+			foreach (Science science in Sciences) {
+				if (science.IsProduced) {
+					producedSciences.Add(science);
+				}
+			}
+
+			return producedSciences;
+		}
+	}
 
 	// Resolvers
 	public PaymentResolver PaymentResolver {
