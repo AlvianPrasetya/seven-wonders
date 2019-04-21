@@ -26,7 +26,7 @@ public enum PaymentType { Normal, Chained }
 
 public class Amount {
 	
-	public const int Age = 16;
+	public const int Age = -16;
 
 }
 
