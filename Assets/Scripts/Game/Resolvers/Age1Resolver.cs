@@ -9,6 +9,7 @@ public class Age1Resolver : IResolvable {
 			new TurnResolver(DeckType.Leader, DeckType.Leader, Direction.West, true),
 			Priority.ResolveTurn
 		);
+
 		GameManager.Instance.EnqueueResolver(
 			new TurnResolver(DeckType.Age1, DeckType.East, Direction.West),
 			Priority.ResolveTurn
@@ -20,12 +21,7 @@ public class Age1Resolver : IResolvable {
 			);
 		}
 		GameManager.Instance.EnqueueResolver(
-			new TurnResolver(DeckType.East, null, Direction.West),
-			Priority.ResolveTurn
-		);
-
-		GameManager.Instance.EnqueueResolver(
-			new ExtraTurnResolver(null, DeckType.Discard, Direction.West),
+			new LastTurnResolver(DeckType.East, DeckType.Discard, Direction.West, true),
 			Priority.ResolveTurn
 		);
 
