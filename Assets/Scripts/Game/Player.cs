@@ -201,21 +201,21 @@ public abstract class Player : MonoBehaviour {
 	public IEnumerator GainCoins(int amount) {
 		yield return bank.PushMany(GameManager.Instance.bank.PopMany(amount));
 
-		if (this == GameManager.Instance.Player) {
+		/*if (this == GameManager.Instance.Player) {
 			UIManager.Instance.chat.AddMessage(
 				string.Format("You gained {0} coins", amount
 			));
-		}
+		}*/
 	}
 
 	public IEnumerator LoseCoins(int amount) {
 		yield return GameManager.Instance.bank.PushMany(bank.PopMany(amount));
 		
-		if (this == GameManager.Instance.Player) {
+		/*if (this == GameManager.Instance.Player) {
 			UIManager.Instance.chat.AddMessage(
 				string.Format("You lost {0} coins", amount)
 			);
-		}
+		}*/
 	}
 
 	public IEnumerator GainPoints(PointType pointType, int amount) {
