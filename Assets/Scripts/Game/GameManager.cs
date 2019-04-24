@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviourPun {
+public class GameManager : MonoBehaviour {
 
 	private const string MatchSeedKey = "match_seed";
 
@@ -141,140 +141,57 @@ public class GameManager : MonoBehaviourPun {
 		}
 	}
 
-	public void DecideDraft(int positionInHand) {
-		photonView.RPC("DecideDraft", RpcTarget.All, positionInHand);
-	}
-
-	public void DecideBuild(int positionInHand, Payment payment) {
-		photonView.RPC("DecideBuild", RpcTarget.All, positionInHand, payment);
-	}
-
-	public void DecideBury(int positionInHand, int wonderStage, Payment payment) {
-		photonView.RPC("DecideBury", RpcTarget.All, positionInHand, wonderStage, payment);
-	}
-
-	public void DecideDiscard(int positionInHand) {
-		photonView.RPC("DecideDiscard", RpcTarget.All, positionInHand);
-	}
-
-	public void DecideBotDraft(Bot bot, int positionInHand) {
-		int botIndex = 0;
-		for (int i = 0; i < Bots.Count; i++) {
-			if (bot == Bots[i]) {
-				botIndex = i;
-				break;
-			}
-		}
-		photonView.RPC("DecideBotDraft", RpcTarget.All, botIndex, positionInHand);
-	}
-
-	public void DecideBotBuild(Bot bot, int positionInHand, Payment payment) {
-		int botIndex = 0;
-		for (int i = 0; i < Bots.Count; i++) {
-			if (bot == Bots[i]) {
-				botIndex = i;
-				break;
-			}
-		}
-		photonView.RPC("DecideBotBuild", RpcTarget.All, botIndex, positionInHand, payment);
-	}
-
-	public void DecideBotBury(Bot bot, int positionInHand, int wonderStage, Payment payment) {
-		int botIndex = 0;
-		for (int i = 0; i < Bots.Count; i++) {
-			if (bot == Bots[i]) {
-				botIndex = i;
-				break;
-			}
-		}
-		photonView.RPC("DecideBotBury", RpcTarget.All, botIndex, positionInHand, wonderStage, payment);
-	}
-
-	public void DecideBotDiscard(Bot bot, int positionInHand) {
-		int botIndex = 0;
-		for (int i = 0; i < Bots.Count; i++) {
-			if (bot == Bots[i]) {
-				botIndex = i;
-				break;
-			}
-		}
-		photonView.RPC("DecideBotDiscard", RpcTarget.All, botIndex, positionInHand);
-	}
-
-	public void Sync() {
-		photonView.RPC("Sync", RpcTarget.All);
-	}
-
-	public void DecideCycle(Direction direction) {
-		photonView.RPC("DecideCycle", RpcTarget.All, direction);
-	}
-	
-	public void SendChat(string message) {
-		photonView.RPC("SendChat", RpcTarget.All, message);
-	}
-
-	[PunRPC]
-	private void DecideDraft(int positionInHand, PhotonMessageInfo info) {
-		Player player = HumansByActorID[info.Sender.ActorNumber];
+	public void HandleDecideDraft(int positionInHand, int senderActorID) {
+		Player player = HumansByActorID[senderActorID];
 		StartCoroutine(player.PrepareDraft(positionInHand));
 	}
 
-	[PunRPC]
-	private void DecideBuild(int positionInHand, Payment payment, PhotonMessageInfo info) {
-		Player player = HumansByActorID[info.Sender.ActorNumber];
+	public void HandleDecideBuild(int positionInHand, Payment payment, int senderActorID) {
+		Player player = HumansByActorID[senderActorID];
 		StartCoroutine(player.PrepareBuild(positionInHand, payment));
 	}
 
-	[PunRPC]
-	private void DecideBury(int positionInHand, int wonderStage, Payment payment, PhotonMessageInfo info) {
-		Player player = HumansByActorID[info.Sender.ActorNumber];
+	public void HandleDecideBury(int positionInHand, int wonderStage, Payment payment, int senderActorID) {
+		Player player = HumansByActorID[senderActorID];
 		StartCoroutine(player.PrepareBury(positionInHand, wonderStage, payment));
 	}
 
-	[PunRPC]
-	private void DecideDiscard(int positionInHand, PhotonMessageInfo info) {
-		Player player = HumansByActorID[info.Sender.ActorNumber];
+	public void HandleDecideDiscard(int positionInHand, int senderActorID) {
+		Player player = HumansByActorID[senderActorID];
 		StartCoroutine(player.PrepareDiscard(positionInHand));
 	}
 
-	[PunRPC]
-	private void DecideBotDraft(int botIndex, int positionInHand) {
-		Player player = Bots[botIndex];
-		StartCoroutine(player.PrepareDraft(positionInHand));
-	}
-
-	[PunRPC]
-	private void DecideBotBuild(int botIndex, int positionInHand, Payment payment) {
-		Player player = Bots[botIndex];
-		StartCoroutine(player.PrepareBuild(positionInHand, payment));
-	}
-
-	[PunRPC]
-	private void DecideBotBury(int botIndex, int positionInHand, int wonderStage, Payment payment) {
-		Player player = Bots[botIndex];
-		StartCoroutine(player.PrepareBury(positionInHand, wonderStage, payment));
-	}
-
-	[PunRPC]
-	private void DecideBotDiscard(int botIndex, int positionInHand) {
-		Player player = Bots[botIndex];
-		StartCoroutine(player.PrepareDiscard(positionInHand));
-	}
-
-	[PunRPC]
-	private void Sync(PhotonMessageInfo info) {
-		SyncQueue.Enqueue(info.Sender.ActorNumber);
-	}
-
-	[PunRPC]
-	private void DecideCycle(Direction direction, PhotonMessageInfo info) {
-		Player player = HumansByActorID[info.Sender.ActorNumber];
+	public void HandleDecideCycle(Direction direction, int senderActorID) {
+		Player player = HumansByActorID[senderActorID];
 		StartCoroutine(player.hand.Cycle(direction, player == Player));
 	}
 
-	[PunRPC]
-	private void SendChat(string message, PhotonMessageInfo info) {
-		UIManager.Instance.chat.AddMessage(info.Sender.NickName, message);
+	public void HandleDecideBotDraft(int botIndex, int positionInHand) {
+		Player player = Bots[botIndex];
+		StartCoroutine(player.PrepareDraft(positionInHand));
+	}
+
+	public void HandleDecideBotBuild(int botIndex, int positionInHand, Payment payment) {
+		Player player = Bots[botIndex];
+		StartCoroutine(player.PrepareBuild(positionInHand, payment));
+	}
+
+	public void HandleDecideBotBury(int botIndex, int positionInHand, int wonderStage, Payment payment) {
+		Player player = Bots[botIndex];
+		StartCoroutine(player.PrepareBury(positionInHand, wonderStage, payment));
+	}
+
+	public void HandleDecideBotDiscard(int botIndex, int positionInHand) {
+		Player player = Bots[botIndex];
+		StartCoroutine(player.PrepareDiscard(positionInHand));
+	}
+
+	public void HandleSync(int senderActorID) {
+		SyncQueue.Enqueue(senderActorID);
+	}
+
+	public void HandleSendChat(string message) {
+		UIManager.Instance.chat.AddMessage(message);
 	}
 
 	private IEnumerator Resolve() {

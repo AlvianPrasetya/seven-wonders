@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class MilitaryConflictResolver : IResolvable {
 
-	public MilitaryToken victoryTokenPrefab;
-	public MilitaryToken drawTokenPrefab;
-	public MilitaryToken defeatTokenPrefab;
+	private MilitaryToken victoryTokenPrefab;
+	private MilitaryToken drawTokenPrefab;
+	private MilitaryToken defeatTokenPrefab;
 
 	public MilitaryConflictResolver(
 		MilitaryToken victoryTokenPrefab, MilitaryToken drawTokenPrefab, MilitaryToken defeatTokenPrefab
@@ -22,10 +22,14 @@ public class MilitaryConflictResolver : IResolvable {
 			if (player.IsPeaceful) {
 				// Peace is treated as draws to both sides
 				gainTokens.Enqueue(GameManager.Instance.StartCoroutine(
-					player.GainMilitaryToken(drawTokenPrefab)
+					player.GainMilitaryToken(
+						GameObject.Instantiate(drawTokenPrefab, Vector3.zero, Quaternion.identity)
+					)
 				));
 				gainTokens.Enqueue(GameManager.Instance.StartCoroutine(
-					player.GainMilitaryToken(drawTokenPrefab)
+					player.GainMilitaryToken(
+						GameObject.Instantiate(drawTokenPrefab, Vector3.zero, Quaternion.identity)
+					)
 				));
 				continue;
 			}

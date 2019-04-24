@@ -15,7 +15,6 @@ public class Chat : MonoBehaviour {
 
 	void Awake() {
 		rectTransform = GetComponent<RectTransform>();
-		expanded = false;
 	}
 
 	public void Toggle(bool expanded) {
@@ -36,15 +35,9 @@ public class Chat : MonoBehaviour {
 			return;
 		}
 
-		GameManager.Instance.SendChat(message);
-	}
-
-	public void AddMessage(string senderNickname, string message) {
-		AddMessage(string.Format("<b>{0}</b>: {1}", senderNickname, message));
-
-		if (!expanded) {
-			SetUnread();
-		}
+		NetworkManager.Instance.SendChat(
+			string.Format("<b>{0}</b>: {1}", GameManager.Instance.Player.Nickname, message)
+		);
 	}
 
 	public void AddMessage(string message) {
@@ -52,6 +45,10 @@ public class Chat : MonoBehaviour {
 			chatTexts[i].text = chatTexts[i - 1].text;
 		}
 		chatTexts[0].text = message;
+
+		if (!expanded) {
+			SetUnread();
+		}
 	}
 
 	private void SetUnread() {

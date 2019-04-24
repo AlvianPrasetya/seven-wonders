@@ -16,6 +16,13 @@ public class UIManager : MonoBehaviour {
 		Instance = this;
 	}
 
+	void Start() {
+		float leftSafeMargin = 1920 * Screen.safeArea.xMin / Screen.width;
+		chat.collapsedPosition.x += leftSafeMargin;
+		chat.expandedPosition.x += leftSafeMargin;
+		chat.Toggle(false);
+	}
+
 	public void StartTimer(float time) {
 		timerText.gameObject.SetActive(true);
 

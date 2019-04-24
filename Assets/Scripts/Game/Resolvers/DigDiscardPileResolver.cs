@@ -26,8 +26,8 @@ public class DigDiscardPileResolver : IResolvable {
 			Priority.DigDiscardPile
 		);
 
-		if (player.GetType() == typeof(Bot) && PhotonNetwork.IsMasterClient) {
-			// This player is a bot, enqueue decide bot action resolver on master client
+		if (player.GetType() == typeof(Bot)) {
+			// This player is a bot, enqueue decide bot action resolver
 			GameManager.Instance.EnqueueResolver(
 				new DecideBotActionResolver((Bot)player),
 				Priority.DigDiscardPile

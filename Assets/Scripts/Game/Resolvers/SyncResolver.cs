@@ -14,7 +14,7 @@ public class SyncResolver : IResolvable {
 	}
 
 	public IEnumerator Resolve() {
-		GameManager.Instance.Sync();
+		NetworkManager.Instance.Sync();
 		
 		while (waitSyncQueue.Count != 0) {
 			if (GameManager.Instance.SyncQueue.Count == 0) {

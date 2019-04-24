@@ -13,7 +13,7 @@ public class DecideBotDraftResolver : IResolvable {
 	public IEnumerator Resolve() {
 		bot.IsPlayable = true;
 
-		bot.DecideDraft(bot.hand.GetRandom());
+		bot.DecideDraft(bot.hand.PlayableCards[0]);
 
 		bot.IsPlayable = false;
 

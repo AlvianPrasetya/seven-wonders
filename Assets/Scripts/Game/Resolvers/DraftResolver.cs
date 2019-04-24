@@ -23,13 +23,11 @@ public class DraftResolver : IResolvable {
 			);
 		}
 
-		if (PhotonNetwork.IsMasterClient) {
-			foreach (Bot bot in GameManager.Instance.Bots) {
-				GameManager.Instance.EnqueueResolver(
-					new DecideBotDraftResolver(bot),
-					Priority.PlayHand
-				);
-			}
+		foreach (Bot bot in GameManager.Instance.Bots) {
+			GameManager.Instance.EnqueueResolver(
+				new DecideBotDraftResolver(bot),
+				Priority.PlayHand
+			);
 		}
 		GameManager.Instance.EnqueueResolver(
 			new DecideDraftResolver(GameOptions.DecideTime),
