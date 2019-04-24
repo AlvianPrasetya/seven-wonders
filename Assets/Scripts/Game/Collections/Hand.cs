@@ -188,11 +188,11 @@ public class Hand : MonoBehaviour, IPushable<Card>, IPoppable<Card> {
 	}
 
 	public void DecideCycleWest() {
-		GameManager.Instance.DecideCycle(Direction.West);
+		NetworkManager.Instance.DecideCycle(Direction.West);
 	}
 
 	public void DecideCycleEast() {
-		GameManager.Instance.DecideCycle(Direction.East);
+		NetworkManager.Instance.DecideCycle(Direction.East);
 	}
 
 	public IEnumerator Cycle(Direction direction, bool local = false) {
