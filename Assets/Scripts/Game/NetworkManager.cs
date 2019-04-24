@@ -1,8 +1,29 @@
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
-public class NetworkManager : MonoBehaviour, IOnEventCallback {
+public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback {
+
+	private struct PendingEvent {
+
+		public byte EventCode { get; private set; }
+		public object EventContent { get; private set; }
+		public RaiseEventOptions RaiseEventOptions { get; private set; }
+		public ExitGames.Client.Photon.SendOptions SendOptions { get; private set; }
+
+		public PendingEvent(
+			byte eventCode, object eventContent,
+			RaiseEventOptions raiseEventOptions, ExitGames.Client.Photon.SendOptions sendOptions
+		) {
+			EventCode = eventCode;
+			EventContent = eventContent;
+			RaiseEventOptions = raiseEventOptions;
+			SendOptions = sendOptions;
+		}
+
+	}
 
 	private const byte CodeDecideDraft = 0;
 	private const byte CodeDecideBuild = 1;
@@ -18,15 +39,22 @@ public class NetworkManager : MonoBehaviour, IOnEventCallback {
 
 	public static NetworkManager Instance { get; private set; }
 
+	private Queue<PendingEvent> pendingEvents;
+
 	void Awake() {
 		Instance = this;
+		pendingEvents = new Queue<PendingEvent>();
 	}
 
-	void OnEnable() {
+	void Start() {
+		StartCoroutine(RaiseEvents());
+	}
+
+	public override void OnEnable() {
 		PhotonNetwork.AddCallbackTarget(this);
 	}
 
-	void OnDisable() {
+	public override void OnDisable() {
 		PhotonNetwork.RemoveCallbackTarget(this);
 	}
 	
@@ -74,48 +102,48 @@ public class NetworkManager : MonoBehaviour, IOnEventCallback {
 	}
 
 	public void DecideDraft(int positionInHand) {
-		PhotonNetwork.RaiseEvent(
+		pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideDraft,
 			new object[] { positionInHand },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		);
+		));
 	}
 
 	public void DecideBuild(int positionInHand, Payment payment) {
-		PhotonNetwork.RaiseEvent(
+		pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideBuild,
 			new object[] { positionInHand, payment },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		);
+		));
 	}
 
 	public void DecideBury(int positionInHand, int wonderStage, Payment payment) {
-		PhotonNetwork.RaiseEvent(
+		pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideBury,
 			new object[] { positionInHand, wonderStage, payment },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		);
+		));
 	}
 
 	public void DecideDiscard(int positionInHand) {
-		PhotonNetwork.RaiseEvent(
+		pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideDiscard,
 			new object[] { positionInHand },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		);
+		));
 	}
 
 	public void DecideCycle(Direction direction) {
-		PhotonNetwork.RaiseEvent(
+		pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideCycle,
 			new object[] { direction },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		);
+		));
 	}
 
 	public void DecideBotDraft(Bot bot, int positionInHand) {
@@ -127,12 +155,12 @@ public class NetworkManager : MonoBehaviour, IOnEventCallback {
 			}
 		}
 		
-		PhotonNetwork.RaiseEvent(
+		pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideBotDraft,
 			new object[] { botIndex, positionInHand },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		);
+		));
 	}
 
 	public void DecideBotBuild(Bot bot, int positionInHand, Payment payment) {
@@ -144,12 +172,12 @@ public class NetworkManager : MonoBehaviour, IOnEventCallback {
 			}
 		}
 		
-		PhotonNetwork.RaiseEvent(
+		pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideBotBuild,
 			new object[] { botIndex, positionInHand, payment },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		);
+		));
 	}
 
 	public void DecideBotBury(Bot bot, int positionInHand, int wonderStage, Payment payment) {
@@ -161,12 +189,12 @@ public class NetworkManager : MonoBehaviour, IOnEventCallback {
 			}
 		}
 		
-		PhotonNetwork.RaiseEvent(
+		pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideBotBury,
 			new object[] { botIndex, positionInHand, wonderStage, payment },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		);
+		));
 	}
 
 	public void DecideBotDiscard(Bot bot, int positionInHand) {
@@ -178,30 +206,58 @@ public class NetworkManager : MonoBehaviour, IOnEventCallback {
 			}
 		}
 		
-		PhotonNetwork.RaiseEvent(
+		pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideBotDiscard,
 			new object[] { botIndex, positionInHand },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		);
+		));
 	}
 
 	public void Sync() {
-		PhotonNetwork.RaiseEvent(
+		pendingEvents.Enqueue(new PendingEvent(
 			CodeSync,
 			new object[] {},
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		);
+		));
 	}
 	
 	public void SendChat(string message) {
-		PhotonNetwork.RaiseEvent(
+		pendingEvents.Enqueue(new PendingEvent(
 			CodeSendChat,
 			new object[] { message },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		);
+		));
+	}
+
+	private IEnumerator RaiseEvents() {
+		while (true) {
+			if (!PhotonNetwork.IsConnected) {
+				PhotonNetwork.ReconnectAndRejoin();
+			}
+
+			if (pendingEvents.Count != 0) {
+				PendingEvent pendingEvent = pendingEvents.Peek();
+				if (PhotonNetwork.RaiseEvent(
+					pendingEvent.EventCode,
+					pendingEvent.EventContent,
+					pendingEvent.RaiseEventOptions,
+					pendingEvent.SendOptions
+				)) {
+					
+				}
+			}
+		}
+		if (!PhotonNetwork.RaiseEvent(
+			eventCode, eventContent, raiseEventOptions, sendOptions
+		)) {
+			pendingEvents.Enqueue(pendingEvent);
+			while (!PhotonNetwork.ReconnectAndRejoin()) {
+				yield return new WaitForSeconds(2);
+			}
+		}
 	}
 
 }
