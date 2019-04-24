@@ -57,6 +57,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 	public override void OnDisable() {
 		PhotonNetwork.RemoveCallbackTarget(this);
 	}
+
+	public override void OnDisconnected(DisconnectCause cause) {
+		Debug.LogFormat("Disconnected due to {0}", cause);
+
+		PhotonNetwork.ReconnectAndRejoin();
+	}
 	
 	void IOnEventCallback.OnEvent(ExitGames.Client.Photon.EventData photonEvent) {
 		object[] data = (object[])photonEvent.CustomData;
@@ -154,13 +160,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 				break;
 			}
 		}
+
+		GameManager.Instance.HandleDecideBotDraft(botIndex, positionInHand);
 		
-		pendingEvents.Enqueue(new PendingEvent(
+		/*pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideBotDraft,
 			new object[] { botIndex, positionInHand },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		));
+		));*/
 	}
 
 	public void DecideBotBuild(Bot bot, int positionInHand, Payment payment) {
@@ -172,12 +180,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 			}
 		}
 		
-		pendingEvents.Enqueue(new PendingEvent(
+		GameManager.Instance.HandleDecideBotBuild(botIndex, positionInHand, payment);
+
+		/*pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideBotBuild,
 			new object[] { botIndex, positionInHand, payment },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		));
+		));*/
 	}
 
 	public void DecideBotBury(Bot bot, int positionInHand, int wonderStage, Payment payment) {
@@ -188,13 +198,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 				break;
 			}
 		}
+
+		GameManager.Instance.HandleDecideBotBury(botIndex, positionInHand, wonderStage, payment);
 		
-		pendingEvents.Enqueue(new PendingEvent(
+		/*pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideBotBury,
 			new object[] { botIndex, positionInHand, wonderStage, payment },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		));
+		));*/
 	}
 
 	public void DecideBotDiscard(Bot bot, int positionInHand) {
@@ -206,12 +218,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 			}
 		}
 		
-		pendingEvents.Enqueue(new PendingEvent(
+		GameManager.Instance.HandleDecideBotDiscard(botIndex, positionInHand);
+
+		/*pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideBotDiscard,
 			new object[] { botIndex, positionInHand },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		));
+		));*/
 	}
 
 	public void Sync() {
@@ -234,10 +248,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
 	private IEnumerator RaiseEvents() {
 		while (true) {
-			if (!PhotonNetwork.IsConnected) {
-				PhotonNetwork.ReconnectAndRejoin();
-			}
-
 			if (pendingEvents.Count != 0) {
 				PendingEvent pendingEvent = pendingEvents.Peek();
 				if (PhotonNetwork.RaiseEvent(
@@ -246,17 +256,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 					pendingEvent.RaiseEventOptions,
 					pendingEvent.SendOptions
 				)) {
-					
+					pendingEvents.Dequeue();
+					continue;
 				}
 			}
-		}
-		if (!PhotonNetwork.RaiseEvent(
-			eventCode, eventContent, raiseEventOptions, sendOptions
-		)) {
-			pendingEvents.Enqueue(pendingEvent);
-			while (!PhotonNetwork.ReconnectAndRejoin()) {
-				yield return new WaitForSeconds(2);
-			}
+
+			yield return null;
 		}
 	}
 

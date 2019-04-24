@@ -15,7 +15,6 @@ public class Chat : MonoBehaviour {
 
 	void Awake() {
 		rectTransform = GetComponent<RectTransform>();
-		expanded = false;
 	}
 
 	public void Toggle(bool expanded) {

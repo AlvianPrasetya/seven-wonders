@@ -10,7 +10,7 @@ public class LastTurnResolver : IResolvable {
 			GameManager.Instance.EnqueueResolver(new SyncResolver(), Priority.PlayExtraHand);
 
 			foreach (Player extraTurnPlayer in extraTurnPlayers) {
-				if (PhotonNetwork.IsMasterClient && extraTurnPlayer.GetType() == typeof(Bot)) {
+				if (extraTurnPlayer.GetType() == typeof(Bot)) {
 					GameManager.Instance.EnqueueResolver(
 						new DecideBotActionResolver((Bot)extraTurnPlayer),
 						Priority.PlayExtraHand
@@ -62,13 +62,11 @@ public class LastTurnResolver : IResolvable {
 			);
 		}
 
-		if (PhotonNetwork.IsMasterClient) {
-			foreach (Bot bot in GameManager.Instance.Bots) {
-				GameManager.Instance.EnqueueResolver(
-					new DecideBotActionResolver(bot),
-					Priority.PlayHand
-				);
-			}
+		foreach (Bot bot in GameManager.Instance.Bots) {
+			GameManager.Instance.EnqueueResolver(
+				new DecideBotActionResolver(bot),
+				Priority.PlayHand
+			);
 		}
 		GameManager.Instance.EnqueueResolver(
 			new DecideActionResolver(GameOptions.DecideTime),

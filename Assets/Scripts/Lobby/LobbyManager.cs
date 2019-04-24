@@ -54,6 +54,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks {
 
 		Photon.Realtime.RoomOptions roomOptions = new Photon.Realtime.RoomOptions();
 		roomOptions.MaxPlayers = 7;
+		roomOptions.PlayerTtl = 60000;
+		roomOptions.EmptyRoomTtl = 60000;
 
 		PhotonNetwork.CreateRoom(null, roomOptions);
 	}

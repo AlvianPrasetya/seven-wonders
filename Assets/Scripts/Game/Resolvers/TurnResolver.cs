@@ -27,13 +27,11 @@ public class TurnResolver : IResolvable {
 			);
 		}
 
-		if (PhotonNetwork.IsMasterClient) {
-			foreach (Bot bot in GameManager.Instance.Bots) {
-				GameManager.Instance.EnqueueResolver(
-					new DecideBotActionResolver(bot),
-					Priority.PlayHand
-				);
-			}
+		foreach (Bot bot in GameManager.Instance.Bots) {
+			GameManager.Instance.EnqueueResolver(
+				new DecideBotActionResolver(bot),
+				Priority.PlayHand
+			);
 		}
 		GameManager.Instance.EnqueueResolver(
 			new DecideActionResolver(GameOptions.DecideTime),
