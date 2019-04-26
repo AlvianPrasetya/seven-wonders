@@ -69,7 +69,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks {
 		Debug.Log(statusText);
 		this.statusText.text = statusText;
 
-		PhotonNetwork.ConnectUsingSettings();
+		//PhotonNetwork.ConnectUsingSettings();
+		PhotonNetwork.OfflineMode = true;
 	}
 
 	private IEnumerator TransitionBackground() {

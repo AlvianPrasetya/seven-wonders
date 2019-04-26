@@ -18,29 +18,18 @@ public class RoomManager : MonoBehaviourPunCallbacks {
 
 	void Awake() {
 		playersByActorID = new Dictionary<int, RoomPlayer>();
-
-		PhotonNetwork.AutomaticallySyncScene = true;
-	}
-
-	void Start() {
-		if (PhotonNetwork.IsMasterClient) {
-			readyToggle.gameObject.SetActive(false);
-
-			startGameButton.gameObject.SetActive(true);
-			startGameButton.interactable = false;
-			startGameText.text = StartText;
-		} else {
-			readyToggle.gameObject.SetActive(true);
-
-			startGameButton.gameObject.SetActive(false);
-		}
-
 		// Sync the states of all existing players through their custom properties
 		foreach (Photon.Realtime.PhotonPlayer photonPlayer in PhotonNetwork.PlayerList) {
 			RoomPlayer player = CreatePlayer(photonPlayer);
 			playersByActorID.Add(photonPlayer.ActorNumber, player);
 			OnPlayerPropertiesUpdate(photonPlayer, photonPlayer.CustomProperties);
 		}
+
+		PhotonNetwork.AutomaticallySyncScene = true;
+
+		readyToggle.gameObject.SetActive(false);
+		startGameButton.gameObject.SetActive(true);
+		startGameText.text = StartText;
 	}
 
 	public override void OnPlayerEnteredRoom(Photon.Realtime.PhotonPlayer newPlayer) {

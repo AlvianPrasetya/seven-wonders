@@ -46,9 +46,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 		pendingEvents = new Queue<PendingEvent>();
 	}
 
-	void Start() {
+	/*void Start() {
 		StartCoroutine(RaiseEvents());
-	}
+	}*/
 
 	public override void OnEnable() {
 		PhotonNetwork.AddCallbackTarget(this);
@@ -58,11 +58,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 		PhotonNetwork.RemoveCallbackTarget(this);
 	}
 
-	public override void OnDisconnected(DisconnectCause cause) {
+	/*public override void OnDisconnected(DisconnectCause cause) {
 		Debug.LogFormat("Disconnected due to {0}", cause);
 
 		PhotonNetwork.ReconnectAndRejoin();
-	}
+	}*/
 	
 	void IOnEventCallback.OnEvent(ExitGames.Client.Photon.EventData photonEvent) {
 		object[] data = (object[])photonEvent.CustomData;
@@ -108,48 +108,58 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 	}
 
 	public void DecideDraft(int positionInHand) {
-		pendingEvents.Enqueue(new PendingEvent(
+		GameManager.Instance.HandleDecideDraft(positionInHand, PhotonNetwork.LocalPlayer.ActorNumber);
+
+		/*pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideDraft,
 			new object[] { positionInHand },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		));
+		));*/
 	}
 
 	public void DecideBuild(int positionInHand, Payment payment) {
-		pendingEvents.Enqueue(new PendingEvent(
+		GameManager.Instance.HandleDecideBuild(positionInHand, payment, PhotonNetwork.LocalPlayer.ActorNumber);
+
+		/*pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideBuild,
 			new object[] { positionInHand, payment },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		));
+		));*/
 	}
 
 	public void DecideBury(int positionInHand, int wonderStage, Payment payment) {
-		pendingEvents.Enqueue(new PendingEvent(
+		GameManager.Instance.HandleDecideBury(positionInHand, wonderStage, payment, PhotonNetwork.LocalPlayer.ActorNumber);
+		
+		/*pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideBury,
 			new object[] { positionInHand, wonderStage, payment },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		));
+		));*/
 	}
 
 	public void DecideDiscard(int positionInHand) {
-		pendingEvents.Enqueue(new PendingEvent(
+		GameManager.Instance.HandleDecideDiscard(positionInHand, PhotonNetwork.LocalPlayer.ActorNumber);
+
+		/*pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideDiscard,
 			new object[] { positionInHand },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		));
+		));*/
 	}
 
 	public void DecideCycle(Direction direction) {
-		pendingEvents.Enqueue(new PendingEvent(
+		GameManager.Instance.HandleDecideCycle(direction, PhotonNetwork.LocalPlayer.ActorNumber);
+		
+		/*pendingEvents.Enqueue(new PendingEvent(
 			CodeDecideCycle,
 			new object[] { direction },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		));
+		));*/
 	}
 
 	public void DecideBotDraft(Bot bot, int positionInHand) {
@@ -229,21 +239,25 @@ public class NetworkManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 	}
 
 	public void Sync() {
-		pendingEvents.Enqueue(new PendingEvent(
+		GameManager.Instance.HandleSync(PhotonNetwork.LocalPlayer.ActorNumber);
+
+		/*pendingEvents.Enqueue(new PendingEvent(
 			CodeSync,
 			new object[] {},
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		));
+		));*/
 	}
 	
 	public void SendChat(string message) {
-		pendingEvents.Enqueue(new PendingEvent(
+		GameManager.Instance.HandleSendChat(message);
+		
+		/*pendingEvents.Enqueue(new PendingEvent(
 			CodeSendChat,
 			new object[] { message },
 			new RaiseEventOptions{ Receivers = ReceiverGroup.All },
 			new ExitGames.Client.Photon.SendOptions { Reliability = true }
-		));
+		));*/
 	}
 
 	private IEnumerator RaiseEvents() {
