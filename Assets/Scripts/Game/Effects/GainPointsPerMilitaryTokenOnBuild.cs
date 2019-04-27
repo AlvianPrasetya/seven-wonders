@@ -6,6 +6,7 @@ public class GainPointsPerMilitaryTokenOnBuild : OnBuildEffect {
 	public int baseAmount;
 	public int amountPerMilitaryToken;
 	public MilitaryTokenType militaryTokenType;
+	public Age[] ages;
 	public Target countTarget;
 
 	public override void Effect(Player player) {
@@ -14,7 +15,7 @@ public class GainPointsPerMilitaryTokenOnBuild : OnBuildEffect {
 			case Target.Self:
 				count = () => {
 					return Math.Max(
-						baseAmount + amountPerMilitaryToken * player.militaryTokenDisplay.Count(militaryTokenType),
+						baseAmount + amountPerMilitaryToken * countMilitaryTokenOf(player),
 						0
 					);
 				};
@@ -23,8 +24,8 @@ public class GainPointsPerMilitaryTokenOnBuild : OnBuildEffect {
 				count = () => {
 					return Math.Max(
 						baseAmount + amountPerMilitaryToken * (
-							player.Neighbours[Direction.West].militaryTokenDisplay.Count(militaryTokenType) +
-							player.Neighbours[Direction.East].militaryTokenDisplay.Count(militaryTokenType)
+							countMilitaryTokenOf(player.Neighbours[Direction.West]) +
+							countMilitaryTokenOf(player.Neighbours[Direction.East])
 						),
 						0
 					);
@@ -34,9 +35,9 @@ public class GainPointsPerMilitaryTokenOnBuild : OnBuildEffect {
 				count = () => {
 					return Math.Max(
 						baseAmount + amountPerMilitaryToken * (
-							player.militaryTokenDisplay.Count(militaryTokenType) +
-							player.militaryTokenDisplay.Count(militaryTokenType) +
-							player.militaryTokenDisplay.Count(militaryTokenType)
+							countMilitaryTokenOf(player) +
+							countMilitaryTokenOf(player.Neighbours[Direction.West]) +
+							countMilitaryTokenOf(player.Neighbours[Direction.East])
 						),
 						0
 					);
@@ -51,6 +52,31 @@ public class GainPointsPerMilitaryTokenOnBuild : OnBuildEffect {
 			new GainPointsResolver(player, pointType, count),
 			Priority.GainPoints
 		);
+	}
+
+	private int countMilitaryTokenOf(Player player) {
+		if (militaryTokenType != MilitaryTokenType.Victory) {
+			return player.militaryTokenDisplay.Count(militaryTokenType);
+		}
+
+		int count = 0;
+		MilitaryTokenSlot[] militaryTokenSlots = player.militaryTokenDisplay.militaryTokenSlots;
+
+		foreach(Age age in ages) {
+			switch (age) {
+				case Age.Age1:
+					count += Array.FindAll(militaryTokenSlots, slot => slot.Element.points == 1).Length;
+					break;
+				case Age.Age2:
+					count += Array.FindAll(militaryTokenSlots, slot => slot.Element.points == 3).Length;
+					break;
+				case Age.Age3:
+					count += Array.FindAll(militaryTokenSlots, slot => slot.Element.points == 5).Length;
+					break;
+			}
+		}
+
+		return count;
 	}
 
 }
